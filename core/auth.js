@@ -9,12 +9,7 @@ import {
   createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile,
   sendPasswordResetEmail, sendEmailVerification, deleteUser
 } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
-import {
-  getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager,
-  doc, getDoc, getDocs, setDoc, serverTimestamp,
-  collection, addDoc, updateDoc, deleteDoc, onSnapshot, query, where,
-  increment, arrayUnion, arrayRemove
-} from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+import { getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager, doc, getDoc, getDocs, setDoc, serverTimestamp, collection, addDoc, updateDoc, deleteDoc, onSnapshot, query, where, increment, arrayUnion, arrayRemove, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
 
 /* Firebase project comes from the active brand (brandkit.js). Each instance
    points at its OWN project.
@@ -138,6 +133,10 @@ window.EdenCloud = {
     /* top-level profile.companyId is what the rules' myCompany() reads — keep it in step */
     setDoc(doc(db, 'users', u.uid), { state: st, profile: { companyId: p.companyId }, updatedAt: serverTimestamp() }, { merge: true }).catch(() => {});
     const name = p.name || (p.email ? p.email.split('@')[0] : 'Learner');
+    /* the row only changes when XP, streak, name or week fields change — a
+       note typed or a question asked must not cost a leaderboard write */
+    const rowKey = [name, p.username, st.xp, st.streak, p.dept, st.weekStart, st.weekBaseXp].join('|');
+    if (window.EdenCloud._lastRowKey !== rowKey) { window.EdenCloud._lastRowKey = rowKey;
     setDoc(doc(db, 'leaderboard', u.uid), {
       name, username: p.username || '',
       initials: name.trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase() || 'ER',
@@ -145,7 +144,7 @@ window.EdenCloud = {
       joinedAt: p.joinedAt || null, dept: p.dept || null, companyId: p.companyId || BRAND_ID,
       weekStart: st.weekStart || null, weekBaseXp: st.weekBaseXp || 0,
       lastSeen: serverTimestamp(), updatedAt: serverTimestamp()
-    }, { merge: true }).catch(() => {});
+    }, { merge: true }).catch(() => {}); }
     window.EdenCloud.syncLedger();
     window.EdenCloud.pullConfirmations();
   },
@@ -363,8 +362,25 @@ window.EdenCloud = {
        Superadmins keep the unfiltered view, then scope client-side. */
     const u = auth.currentUser;
     const base = collection(db, 'leaderboard');
-    const snap = await getDocs(u && isSuperEmail(u.email) ? base : query(base, where('companyId', '==', cid())));
-    return snap.docs.map(d => Object.assign({ uid: d.id }, d.data())).filter(r => ofCompany(r));
+    /* SCALE. This read used to fetch the WHOLE company collection on every
+       visit to My Learning and 2.5 s after every boot: at 1,000 members that is
+       1,000 document reads per visit, and fifty visits a day exhaust the free
+       plan's read quota for everyone. Two changes:
+       · a per-device cache (10 min) — one read per session, not per visit;
+       · a bounded query — the top BOARD_LIMIT by XP plus the newest joiners —
+         when the tenant has the composite index (companyId + xp), declared in
+         firestore.indexes.json and flagged by BRAND.boardIndexed. Without the
+         index the equality filter alone is still bounded by limit(). */
+    const KEYC = 'edenBoard:' + cid();
+    try { const c = JSON.parse(localStorage.getItem(KEYC) || 'null'); if (c && Date.now() - c.at < 10 * 60e3 && Array.isArray(c.rows)) return c.rows; } catch (e) {}
+    const LIM = 100;
+    const indexed = !!(window.BRAND && BRAND.boardIndexed);
+    let snap;
+    if (u && isSuperEmail(u.email)) snap = await getDocs(indexed ? query(base, orderBy('xp', 'desc'), limit(LIM)) : query(base, limit(LIM)));
+    else snap = await getDocs(indexed ? query(base, where('companyId', '==', cid()), orderBy('xp', 'desc'), limit(LIM)) : query(base, where('companyId', '==', cid()), limit(LIM)));
+    const rows = snap.docs.map(d => Object.assign({ uid: d.id }, d.data())).filter(r => ofCompany(r));
+    try { localStorage.setItem(KEYC, JSON.stringify({ at: Date.now(), rows })); } catch (e) {}
+    return rows;
   },
   async signOut() {
     localStorage.setItem(MODE, 'out');

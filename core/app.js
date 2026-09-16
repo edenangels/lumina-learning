@@ -162,6 +162,21 @@ function ledgerAppend(type, data = {}) {
      refused evidence mirror throws nothing and would otherwise be invisible —
      which is the whole defect this reporting path exists to close. */
   window.EdenBeacon = logErr;
+  /* SCALE/OPS: errors also reach the watch worker (academy-watch) so a broken
+     deploy is seen from outside the device. Sampled per signature, sendBeacon,
+     never awaited, never more than 5 per session. */
+  const _sentSig = new Set();
+  const _origLogErr = logErr;
+  logErr = function (kind, msg, src) {
+    try { _origLogErr(kind, msg, src); } catch (e) {}
+    try {
+      const sig = kind + '|' + String(msg).slice(0, 80);
+      if (_sentSig.size >= 5 || _sentSig.has(sig)) return; _sentSig.add(sig);
+      const body = JSON.stringify({ kind, msg: String(msg).slice(0, 300), src: String(src || '').slice(0, 120), v: (document.querySelector('script[src*="core/app.js"]') || {}).src, ua: navigator.userAgent.slice(0, 80), url: location.hash, brand: (window.BRAND && BRAND.id) || '' });
+      (navigator.sendBeacon && navigator.sendBeacon('https://academy-watch.edenrise.workers.dev/beacon', new Blob([body], { type: 'application/json' }))) || fetch('https://academy-watch.edenrise.workers.dev/beacon', { method: 'POST', body, keepalive: true }).catch(() => {});
+    } catch (e) {}
+  };
+  window.EdenBeacon = logErr;
 })();
 
 async function ledgerVerify(L = S.ledger || []) {
@@ -8734,6 +8749,11 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   }
   addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js').then(reg => {
+      /* SCALE/OPS: sw.js already skips waiting and claims clients, and the page
+         reloads once on controllerchange — the missing piece was DISCOVERY: a
+         browser only checks for a new worker on navigation or every 24 h, which
+         is why "hard-refresh" lived in the deploy protocol. Poll every 30 min. */
+      setInterval(() => { try { reg.update(); } catch (e) {} }, 30 * 60e3);
       reg.update().catch(() => {});                          /* check for a newer SW right now */
       setInterval(() => reg.update().catch(() => {}), 1800000);  /* …and every 30 min */
     }).catch(() => {});
@@ -8741,7 +8761,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
 }
 
 /* boot */
-setTimeout(() => { if (boardCache === null) initBoard(); }, 2500);
+/* SCALE: the board is read when a screen needs it (My Learning, Progress, Community), not 2.5 s after every boot */
 if (S.xp == null) S.xp = seedXp();
 if (!S.badges) S.badges = [];
 checkBadges(true);

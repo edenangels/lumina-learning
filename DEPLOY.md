@@ -1,4 +1,11 @@
 # Deploy instruction — EdenRise Academy
+> **Since 2026-09-16 the site is served by Cloudflare Pages, not GitHub Pages.** The GitHub account that
+> hosted it (meridante-dev) was suspended and every site on it went dark. Deploy with
+> `scripts/deploy-pages.sh` (tests → version bump → minified build on the SSD → `wrangler pages deploy`
+> → curl-verify `edenrise-academy.pages.dev`). The custom domain `academy.edenrise.com` is a CNAME at
+> GoDaddy → `edenrise-academy.pages.dev`. GitHub is a mirror (`backup` remote → edenangels/lumina-learning-backup);
+> the old Actions workflow stays for the day the account returns. Uptime + app errors: https://academy-watch.edenrise.workers.dev
+
 
 When the build work is done, deploy like this:
 

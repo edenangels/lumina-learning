@@ -1,7 +1,7 @@
 /* EdenRise Academy — offline app shell + cached art
    Strategy: network-first for code/HTML (updates always win, cache is the
    offline fallback); cache-first for media/fonts (immutable-ish). */
-const VERSION = 'edenrise-v200';
+const VERSION = 'edenrise-v201';
 const CORE = ['./', './index.html', './brands/edenrise/brand.js', './brands/_example/brand.js', './core/brandkit.js', './core/ots.js', './core/styles.css', './fonts/fonts.css', './core/app.js', './core/landflow.js', './vendor/gsap.min.js', './vendor/ScrollTrigger.min.js', './brands/edenrise/content.js', './data.js', './manifest.json', './favicon.svg', './icon-192.png', './icon-512.png', './og-image.png'];
 
 self.addEventListener('install', e => {
@@ -49,3 +49,5 @@ self.addEventListener('fetch', e => {
   }
   /* everything else (Firebase, Vimeo, APIs) → straight to network */
 });
+/* the page asks the waiting worker to take over (update toast) */
+self.addEventListener('message', e => { if (e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting(); });
