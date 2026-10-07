@@ -1,5 +1,7 @@
 # Deploy instruction — EdenRise Academy
-> **Since 2026-09-16 the site is served by Cloudflare Pages, not GitHub Pages.** The GitHub account that
+> **Since 2026-10-07 the Academy has two hosts.** GitHub Pages is back, now under **edenangels/lumina-learning** (public): a push to `main` runs `.github/workflows/pages.yml` and serves https://edenangels.github.io/lumina-learning/. Cloudflare Pages (`scripts/deploy-pages.sh` → edenrise-academy.pages.dev) stays as the second host. Release = push to main AND run the script. The custom domain academy.edenrise.com is attached to whichever host João frees it for at GoDaddy (see ClickUp B0).
+>
+> **History:** 2026-09-16 the site was served by Cloudflare Pages only, not GitHub Pages. The GitHub account that
 > hosted it (meridante-dev) was suspended and every site on it went dark. Deploy with
 > `scripts/deploy-pages.sh` (tests → version bump → minified build on the SSD → `wrangler pages deploy`
 > → curl-verify `edenrise-academy.pages.dev`). The custom domain `academy.edenrise.com` is a CNAME at
