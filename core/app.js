@@ -4736,7 +4736,13 @@ function render() {
   /* One line of cross-route continuity. renderNow() is fully synchronous, so
      the transition captures a clean before/after with no extra bookkeeping. */
   if (document.startViewTransition && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    try { document.startViewTransition(() => renderNow()); return; } catch (e) { /* fall through */ }
+    try {
+      const vt = document.startViewTransition(() => renderNow());
+      /* a navigation that lands while the previous transition is still running aborts it;
+         that is expected, so swallow the rejections instead of logging an uncaught promise */
+      for (const p of [vt.ready, vt.finished, vt.updateCallbackDone]) p && p.catch(() => {});
+      return;
+    } catch (e) { /* fall through */ }
   }
   renderNow();
 }
