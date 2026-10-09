@@ -1511,6 +1511,9 @@ html[data-gate="on"] #authGate { display: flex; }
 .ob-handle:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(200,164,93,.18); }
 .ob-handle > span { color: var(--text-faint); font-weight: 600; font-size: 15px; }
 .ob-input { flex: 1; background: none; border: none; outline: none; color: var(--text); font-family: var(--font-body); font-size: 15px; padding: 12px 6px; }
+/* the wrapper (.ob-handle:focus-within) draws the focus ring; without this the global
+   :focus-visible rule, declared later, adds a second offset ring on the input itself */
+.ob-input:focus, .ob-input:focus-visible { outline: none; box-shadow: none; }
 .ob-input::placeholder { color: var(--text-faint); }
 
 .prof-guest { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: rgba(200,164,93,.08); border: 1px solid rgba(200,164,93,.25); border-radius: 10px; padding: 14px 18px; margin: 20px 0 4px; font-size: 13px; color: var(--text-dim); }
