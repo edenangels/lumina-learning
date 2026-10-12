@@ -1217,7 +1217,7 @@ function openDigest(id) {
     el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
   }
   const m = d.media;
-  const video = m ? (m.type === 'vimeo' ? `<div class="post-embed-live"><iframe src="https://player.vimeo.com/video/${m.id}?dnt=1" allow="autoplay; fullscreen" allowfullscreen></iframe></div>`
+  const video = m ? (m.type === 'vimeo' ? `<div class="post-embed-live"><iframe src="https://player.vimeo.com/video/${m.id}?${m.h ? 'h=' + m.h + '&' : ''}dnt=1" allow="autoplay; fullscreen" allowfullscreen></iframe></div>`
     : m.type === 'youtube' ? `<div class="post-embed-live"><iframe src="https://www.youtube-nocookie.com/embed/${m.id}" allow="autoplay; fullscreen" allowfullscreen></iframe></div>`
     : m.type === 'mp4' ? `<video controls playsinline style="width:100%;border-radius:12px;" src="${esc(m.src)}"></video>` : '') : '';
   $('#digBody').innerHTML = `

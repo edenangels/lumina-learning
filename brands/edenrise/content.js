@@ -33,13 +33,13 @@ const CATALOG = [
     ],
     moduleDurations_pt: [5, 4, 6, 6, 6, 6, 6],   /* real: 5:06 4:29 6:19 6:20 6:19 5:39 5:48 */
     moduleMedia: [
-      { type: 'vimeo', id: '1217932399' },   /* 1. Above the Line, Below the Line */
-      { type: 'vimeo', id: '1217936795' },   /* 2. No Failure, Only Feedback */
-      { type: 'vimeo', id: '1217934684' },   /* 3. Total Responsibility */
-      { type: 'vimeo', id: '1217933990' },   /* 4. Don't Assume, Clarify */
-      { type: 'vimeo', id: '1217934619' },   /* 5. Benchmarking Excellence */
-      { type: 'vimeo', id: '1217933175' },   /* 6. Attention to Detail */
-      { type: 'vimeo', id: '1217933425' },   /* 7. Lifelong Learner */
+      { type: 'vimeo', id: '1217932399', h: '4e18df6b14' },   /* 1. Above the Line, Below the Line */
+      { type: 'vimeo', id: '1217936795', h: '3d115763ba' },   /* 2. No Failure, Only Feedback */
+      { type: 'vimeo', id: '1217934684', h: '36b9126a17' },   /* 3. Total Responsibility */
+      { type: 'vimeo', id: '1217933990', h: '0b3c705815' },   /* 4. Don't Assume, Clarify */
+      { type: 'vimeo', id: '1217934619', h: 'f983b08c58' },   /* 5. Benchmarking Excellence */
+      { type: 'vimeo', id: '1217933175', h: '0921f2fe28' },   /* 6. Attention to Detail */
+      { type: 'vimeo', id: '1217933425', h: 'a18a64990d' },   /* 7. Lifelong Learner */
       /* 8. The Science of Gratitude. WAS 1218881643, which Vimeo now reports as
          "in purgatory and unavailable" — the cut was replaced and the old id
          deleted, so English module 8 was serving a dead player. This id is the
@@ -66,11 +66,11 @@ const CATALOG = [
     modules: ['Ultimate Purpose', 'Goal Setting', 'Kaizen', 'Winning Beliefs', 'Six Core Human Needs'],
     moduleDurations: [6, 6, 7, 6, 5],   /* real Vimeo lengths: 5:41 6:17 6:32 5:33 5:03 */
     moduleMedia: [
-      { type: 'vimeo', id: '1217934850' },   /* 1. Ultimate purpose */
-      { type: 'vimeo', id: '1220781804' },   /* 2. Goal Setting */
-      { type: 'vimeo', id: '1221805602' },   /* 3. Kaizen (with music, 27 Aug) */
-      { type: 'vimeo', id: '1222970261' },   /* 4. Winning Beliefs */
-      { type: 'vimeo', id: '1223416806' }    /* 6. Six core human needs — master your reactions */
+      { type: 'vimeo', id: '1217934850', h: 'dca2bb30cf' },   /* 1. Ultimate purpose */
+      { type: 'vimeo', id: '1220781804', h: '16c7dabe91' },   /* 2. Goal Setting */
+      { type: 'vimeo', id: '1221805602', h: 'd88d420ea7' },   /* 3. Kaizen (with music, 27 Aug) */
+      { type: 'vimeo', id: '1222970261', h: '994b07a80c' },   /* 4. Winning Beliefs */
+      { type: 'vimeo', id: '1223416806', h: 'd27a3a4bc7' }    /* 6. Six core human needs — master your reactions */
     ],
     moduleDurations_pt: [7, 7, 6, 6, 6],   /* real: 6:59 6:43 6:06 6:26 5:55 */
     moduleMedia_pt: [
@@ -153,7 +153,9 @@ const CATALOG = [
     hook: 'AI is on the team now. Use it well.', hookSub: 'The literacy every EU workplace must have — practical, honest, ours.',
     desc: 'The EU AI Act (Article 4) asks every organisation using AI to make sure its people are AI-literate. This is our version: what AI is and isn\'t, how to work with the Academy\'s AI honestly and safely, what it does with your data, and what the law expects of us.',
     modules: ['What AI Is (and Isn\'t)', 'Working with Our AI Tutor', 'When AI Is Wrong', 'Your Data & Privacy', 'The EU AI Act & Us'],
-    moduleDurations: [4, 5, 5, 4, 5]
+    moduleDurations: [4, 5, 5, 4, 5],
+    /* scripted, not yet filmed — every row reads \"Coming soon\" until the footage lands */
+    moduleMedia: Array.from({ length: 5 }, () => ({ type: 'soon' }))
   }
 ];
 /* designed brand covers — every course ships with art (land-team-journey keeps its filmed cover) */
