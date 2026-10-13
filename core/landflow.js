@@ -24,7 +24,8 @@
   function tok() { try { return localStorage.getItem(TKEY); } catch (e) { return null; } }
   function q() { try { return JSON.parse(localStorage.getItem(QKEY) || '[]'); } catch (e) { return []; } }
   function qset(a) { try { localStorage.setItem(QKEY, JSON.stringify(a.slice(-20))); } catch (e) {} }
-  function pt() { try { return (localStorage.getItem('lang') || 'pt').indexOf('pt') === 0; } catch (e) { return true; } }
+  /* the app keeps the language in its state, not under a 'lang' key — read it there, EN otherwise */
+  function pt() { try { return String((typeof S !== 'undefined' && S && S.lang) || 'en').indexOf('pt') === 0; } catch (e) { return false; } }
 
   /* ── the one entry point, called from app.js at module_complete ── */
   window.lfModuleComplete = function (courseId, mod) {
@@ -89,8 +90,11 @@
   };
 
   /* ── pairing: /codigo in the bot → 6 digits → token. Shown only when needed, never nags. ── */
-  function pairChip() {
+  function pairChip(tries) {
     if (document.getElementById('lf-pair') || document.getElementById('lf-bar')) return;
+    /* never on top of a check, the takeaways or onboarding — wait until the screen is free */
+    if (document.querySelector('.ck-ov.on, .take-overlay.open, #onboard.open, #quizModal.open')) { if ((tries || 0) < 40) setTimeout(function () { pairChip((tries || 0) + 1); }, 3000); return; }
+    try { if (Number(localStorage.getItem('lf_pair_snooze') || 0) > Date.now()) return; } catch (e) {}
     var b = document.createElement('div');
     b.id = 'lf-pair';
     b.style.cssText = 'position:fixed;left:12px;right:12px;bottom:12px;z-index:9999;background:#121714;' +
@@ -125,7 +129,7 @@
         if (i) { i.value = ''; i.placeholder = pt() ? 'código inválido' : 'invalid code'; }
       });
   };
-  window.lfDismiss = function () { kill('lf-pair'); };
+  window.lfDismiss = function () { kill('lf-pair'); try { localStorage.setItem('lf_pair_snooze', String(Date.now() + 7 * 864e5)); } catch (e) {} };
 
   function btn(label, call) {
     return '<button onclick="' + call + '" style="flex:1;padding:10px;border-radius:8px;border:1px solid #2a332d;' +

@@ -1668,7 +1668,19 @@ html:not(.is-admin) [data-admin] { display: none !important; }
 
 /* takeaways — the peak-end moment */
 .take-overlay { position: fixed; inset: 0; z-index: 320; display: none; align-items: center; justify-content: center; padding: 22px; background: rgba(10,14,10,.82); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
-.take-overlay.open { display: flex; }
+.take-overlay.open { display: flex; overflow-y: auto; overscroll-behavior: contain; align-items: flex-start; }
+.take-card { margin: auto; }
+/* the commit button inherited the card's full-width CTA rule and squeezed the input to a sliver */
+.take-card .intent-box .btn { width: auto; margin-top: 0; }
+/* result folded to a sheet while the learner reviews the moment */
+.ck-ov.peek { background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; pointer-events: none; place-items: end center; }
+.ck-ov.peek .ck-card { pointer-events: auto; max-height: 34vh; width: min(520px, 100%); box-shadow: 0 -12px 40px rgba(0,0,0,.6); }
+.ck-back { width: 100%; justify-content: center; margin-bottom: 12px; position: sticky; top: 0; }
+.ck-ov:not(.peek) .ck-back { display: none; }
+/* curtain over the Vimeo iframe the moment a lesson ends — hides Vimeo's own end screen */
+#vimeoWrap { position: relative; }
+#vimeoWrap.ended::after { content: ''; position: absolute; inset: 0; background: var(--bg); }
+.ai-close { margin-left: 6px; }
 .take-card { width: 100%; max-width: 520px; background: linear-gradient(180deg, rgba(26,35,27,.98), rgba(15,21,16,.99)); border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent); border-radius: 14px; padding: 36px 34px 30px; text-align: left; animation: authIn .5s cubic-bezier(.2,.7,.3,1); box-shadow: 0 40px 120px rgba(0,0,0,.6); }
 .take-spark { font-size: 30px; margin-bottom: 14px; animation: takePop .6s cubic-bezier(.3,1.6,.4,1) both; }
 @keyframes takePop { from { transform: scale(0) rotate(-30deg); opacity: 0; } to { transform: none; opacity: 1; } }

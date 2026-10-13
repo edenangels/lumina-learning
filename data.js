@@ -69,17 +69,27 @@ const PATH_RATIONALES = [
    after the first says "unlocks after assessment" for a lesson nobody shot is
    worse than a short, honest path. Add goals back as the library is produced. */
 const GOAL_PRESETS = {
-  'Land Team': ['land-team-journey', 'fire-truck-training', 'alignment-journey', 'ai-literacy']
+  /* outcome goals (John, 13 Oct 2026: "Land Team is not a goal") — each sequences the
+     filmed courses toward something a learner can want */
+  'Show up Above the Line':       ['land-team-journey', 'alignment-journey', 'growth-journey'],
+  'Purpose & goals that stick':   ['growth-journey', 'alignment-journey', 'land-team-journey'],
+  'Fire-season ready':            ['fire-truck-training', 'land-team-journey'],
+  'Work well with AI':            ['ai-literacy', 'land-team-journey'],
+  /* kept so paths chosen before 13 Oct 2026 still resolve; shown as "The full journey" */
+  'Land Team':                    ['land-team-journey', 'fire-truck-training', 'alignment-journey', 'ai-literacy']
 };
+const GOALS_EN = { 'Land Team': 'The full Land Team journey' };
 
 const ROLE_OPTIONS = [
-  /* Every role leads to the same filmed path for now. Offering a learner a
-     choice between four goals that resolve to the same four lessons is a
-     costume, not a choice — restore the branching when the library branches. */
-  { key: 'land', label: 'Land & Farming', icon: 'sprout', goals: ['Land Team'] },
-  { key: 'nature', label: 'Nature & Wellbeing', icon: 'leaf', goals: ['Land Team'] },
-  { key: 'water', label: 'Water & Climate', icon: 'drop', goals: ['Land Team'] },
-  { key: 'community', label: 'Community & Place', icon: 'people', goals: ['Land Team'] }
+  /* the real EdenRise crews — salaried team incl. construction, houses and kitchen */
+  { key: 'land',      label: 'Land & Farming',             icon: 'sprout',   goals: ['Show up Above the Line', 'Fire-season ready'] },
+  { key: 'build',     label: 'Construction & Maintenance', icon: 'mountain', goals: ['Show up Above the Line', 'Fire-season ready'] },
+  { key: 'hosting',   label: 'Hospitality & Housekeeping', icon: 'people',   goals: ['Show up Above the Line', 'Purpose & goals that stick'] },
+  { key: 'kitchen',   label: 'Kitchen & Food',             icon: 'leaf',     goals: ['Show up Above the Line', 'Purpose & goals that stick'] },
+  { key: 'nature',    label: 'Nature & Wellbeing',         icon: 'tree',     goals: ['Purpose & goals that stick', 'Show up Above the Line'] },
+  { key: 'water',     label: 'Water & Climate',            icon: 'drop',     goals: ['Fire-season ready', 'Show up Above the Line'] },
+  { key: 'community', label: 'Community & Place',          icon: 'sun',      goals: ['Show up Above the Line', 'Purpose & goals that stick'] },
+  { key: 'office',    label: 'Office & Leadership',        icon: 'compass',  goals: ['Purpose & goals that stick', 'Work well with AI'] }
 ];
 
 /* Gamification — growth-themed levels (nature) + subtle badges. Tuned to lift completion. */
@@ -220,7 +230,7 @@ const UI = {
     howto_h:'Quick answers', howto_sub:'Reference clips — always here when you need a reminder. They don\u2019t count toward your 40 hours.', howto_no_path:'Reference clips don\u2019t join the training path — they\u2019re always one search away.',
     topics_h:'Browse by topic — straight from the lessons', pal_moments:'In the lessons',
     tr_loading:'Loading transcript…', tr_none:'No transcript for this lesson yet.', ask_moments:'From the lessons themselves', recall_recent:'Pick up where you asked', sw_update:'A new version is ready', sw_update_btn:'↻ Update now', mark_complete_short:'✓ Done', tutor_foot_gateway:'AI tutor · answers grounded in your courses · this is an AI, not a person', link_copy:'Copy link to this moment', link_copied:'Link copied — opens the video at this second', tag_at:'Said at', ask_speak:'Read the answer aloud', ask_no_moments:'Nothing in the lessons matches that yet — try other words, or ask the tutor.',
-    mc_conf:'How sure are you?', mc_conf_sure:'Sure', mc_conf_guess:'Guessing', mc_result:'Your result', mc_correct_was:'Correct answer:', mc_moment:'Review the moment', mc_continue:'Continue', rev_h:'Review', rev_done:'Review done — it sticks better every round', rev_chip:'to review', checks_chip:'lesson(s) awaiting their check',
+    mc_conf:'How sure are you?', mc_conf_sure:'Sure', mc_conf_guess:'Guessing', mc_result:'Your result', mc_correct_was:'Correct answer:', mc_moment:'Review the moment', mc_back_result:'↩ Back to your result', mc_continue:'Continue', rev_h:'Review', rev_done:'Review done — it sticks better every round', rev_chip:'to review', checks_chip:'lesson(s) awaiting their check',
     mc_eyebrow:'Quick check', mc_sub:'Two questions on what you just watched. Answering is what records your training hours.', mc_note:'Answer both to record this lesson.', mc_submit:'Submit & record', mc_all_right:'Both right — hours recorded', mc_recorded:'Recorded — hours counted, answers kept', mc_ack_q:'Confirm you watched this lesson', mc_ack_label:'I watched this lesson and understood it.', mc_ack_note:'Your confirmation is part of the training record.', mc_pending:'lesson(s) awaiting their check — hours are not counted until you answer',
     ask_h:'Ask the Academy', ask_sub:'Any question about the land — answered from your team\u2019s own courses.', ask_ph:'e.g. How do I fill the water tank on the fire truck?', ask_go:'Ask', ask_refs:'Learn more in', ask_thinking:'Reading the library…', ask_fail:'Could not answer right now — try again.',
     skills_h:'Skills', skills_sub:'',
@@ -365,7 +375,7 @@ const UI = {
     howto_h:'Respostas rápidas', howto_sub:'Clipes de referência — sempre aqui quando precisar de relembrar. Não contam para as suas 40 horas.', howto_no_path:'Clipes de referência não entram no percurso de formação — estão sempre à distância de uma pesquisa.',
     topics_h:'Explorar por tema — direto das lições', pal_moments:'Nas lições',
     tr_loading:'A carregar a transcrição…', tr_none:'Ainda não há transcrição para esta lição.', ask_moments:'Das próprias lições', recall_recent:'Retomar o que perguntou', sw_update:'Há uma nova versão pronta', sw_update_btn:'↻ Atualizar agora', mark_complete_short:'✓ Feito', tutor_foot_gateway:'Tutor de IA · respostas baseadas nos seus cursos · é uma IA, não uma pessoa', link_copy:'Copiar ligação para este momento', link_copied:'Ligação copiada — abre o vídeo neste segundo', tag_at:'Dito aos', ask_speak:'Ler a resposta em voz alta', ask_no_moments:'Nada nas lições corresponde a isso — tente outras palavras, ou pergunte ao tutor.',
-    mc_conf:'Que certeza tem?', mc_conf_sure:'Tenho a certeza', mc_conf_guess:'A adivinhar', mc_result:'O seu resultado', mc_correct_was:'Resposta certa:', mc_moment:'Rever o momento', mc_continue:'Continuar', rev_h:'Revisão', rev_done:'Revisão feita — fica mais sólido a cada volta', rev_chip:'para rever', checks_chip:'lição(ões) por verificar',
+    mc_conf:'Que certeza tem?', mc_conf_sure:'Tenho a certeza', mc_conf_guess:'A adivinhar', mc_result:'O seu resultado', mc_correct_was:'Resposta certa:', mc_moment:'Rever o momento', mc_back_result:'↩ Voltar ao resultado', mc_continue:'Continuar', rev_h:'Revisão', rev_done:'Revisão feita — fica mais sólido a cada volta', rev_chip:'para rever', checks_chip:'lição(ões) por verificar',
     mc_eyebrow:'Verificação rápida', mc_sub:'Duas perguntas sobre o que acabou de ver. É a resposta que regista as suas horas de formação.', mc_note:'Responda às duas para registar esta lição.', mc_submit:'Submeter e registar', mc_all_right:'Ambas certas — horas registadas', mc_recorded:'Registado — horas contadas, respostas guardadas', mc_ack_q:'Confirme que viu esta lição', mc_ack_label:'Vi esta lição e compreendi-a.', mc_ack_note:'A sua confirmação faz parte do registo de formação.', mc_pending:'lição(ões) por verificar — as horas só contam depois de responder',
     ask_h:'Pergunte à Academia', ask_sub:'Qualquer pergunta sobre a terra — respondida a partir dos cursos da equipa.', ask_ph:'ex.: Como encho o tanque de água do camião?', ask_go:'Perguntar', ask_refs:'Aprenda mais em', ask_thinking:'A ler a biblioteca…', ask_fail:'Não foi possível responder — tente de novo.',
     skills_h:'Competências', skills_sub:'',
@@ -450,10 +460,10 @@ const PILLARS_PT = { 'Regenerative':'Regenerativo', 'Rooted':'Enraizado', 'Resto
 const tpillar = l => _lang() === 'pt' ? (PILLARS_PT[l] || l) : l;
 const LEVELS_PT = ['Semente','Rebento','Broto','Muda','Árvore Jovem','Guardião do Bosque','Carvalho Ancião'];
 const tlevel = i => _lang() === 'pt' ? (LEVELS_PT[i] || LEVELS[i].name) : LEVELS[i].name;
-const ROLES_PT = { land:'Terra e Agricultura', nature:'Natureza e Bem-estar', water:'Água e Clima', community:'Comunidade e Lugar' };
+const ROLES_PT = { land:'Terra e Agricultura', build:'Construção e Manutenção', hosting:'Hospitalidade e Limpezas', kitchen:'Cozinha e Alimentação', nature:'Natureza e Bem-estar', water:'Água e Clima', community:'Comunidade e Lugar', office:'Escritório e Liderança' };
 const trole = r => _lang() === 'pt' ? (ROLES_PT[r.key] || r.label) : r.label;
-const GOALS_PT = { 'Regenerative Steward':'Zelador Regenerativo', 'Food Forester':'Guardião da Floresta Alimentar', 'Land Restorer':'Restaurador da Terra', 'Rooted Living':'Vida Enraizada' };
-const tgoal = g => _lang() === 'pt' ? (GOALS_PT[g] || g) : g;
+const GOALS_PT = { 'Show up Above the Line':'Estar acima da linha', 'Purpose & goals that stick':'Propósito e objetivos que ficam', 'Fire-season ready':'Pronto para a época de fogos', 'Work well with AI':'Trabalhar bem com IA', 'Land Team':'A jornada completa da Equipa da Terra' };
+const tgoal = g => _lang() === 'pt' ? (GOALS_PT[g] || g) : ((typeof GOALS_EN !== 'undefined' && GOALS_EN[g]) || g);
 const BADGES_PT = {
   'first-steps':['Primeiros Passos','Conclua o seu primeiro módulo'], 'rooted':['Enraizado','Termine o seu primeiro curso'],
   'quiz-ace':['Ás dos Testes','Passe num questionário'], 'grove':['Guardião do Bosque','Termine três cursos'],

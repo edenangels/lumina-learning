@@ -582,12 +582,13 @@ function pathRowHTML() {
        numbered row is artwork with the numeral over it, never a list with a
        bullet — and this row is what a buyer sees before anything else. */
     const art = c.poster ? ` style="background-image:url('${c.poster}')"` : '';
-    return `<${st === 'locked' ? 'div' : 'button'} class="pstep ${st}${c.poster ? ' has-art' : ''}"${st === 'locked' ? ' aria-disabled="true"' : ` data-action="open-course" data-id="${id}"`}${art}>
+    /* a locked step still opens its course page — John could not even read what was coming */
+    return `<button class="pstep ${st}${c.poster ? ' has-art' : ''}" data-action="open-course" data-id="${id}"${art}>
       <span class="pstep-n">${st === 'done' ? '✓' : n}</span>
       <span class="pstep-t">${esc(ctitle(c))}</span>
       <span class="pstep-s">${sub}</span>
       ${st === 'current' ? `<span class="pstep-bar"><i style="width:${pct}%"></i></span>` : ''}
-    </${st === 'locked' ? 'div' : 'button'}>`;
+    </button>`;
   }).filter(Boolean).join('');
   if (!steps) return '';
   return `<section class="rail-section path-row-section">
@@ -610,9 +611,11 @@ function renderHome() {
      A storefront's lead title is an editorial decision, not a function of what
      this particular viewer happened to open last — and the viewer loses
      nothing, because "Continue learning" carries their place one row below. */
-  const brandHero = BRAND.heroCourse && courseById(BRAND.heroCourse);
+  const _pin = BRAND.heroCourse && courseById(BRAND.heroCourse);
+  const brandHero = _pin && !isDone(_pin.id) ? _pin : null;   /* a finished course is not a billboard */
+  const _last = lastPlayed && courseById(lastPlayed[0]);
   const featured = brandHero
-    || (lastPlayed && courseById(lastPlayed[0]))
+    || (_last && !isDone(_last.id) ? _last : null)
     || realOnes.find(c => !isDone(c.id)) || realOnes[0]
     || S.path.map(courseById).filter(Boolean).find(c => !isDone(c.id))
     || CATALOG.find(c => c.featured && !isDone(c.id)) || CATALOG.find(c => !isDone(c.id))
@@ -671,7 +674,7 @@ function renderHome() {
       <!-- ONE line, not two. The hook sells; the sub-hook repeated it. -->
       <p class="desc"><span class="hook-line">${chook(featured)}</span></p>
       <div class="hero-actions">
-        <button class="btn btn-primary" data-action="play" data-id="${featured.id}">▶&nbsp; ${fp && fp.mod != null ? `${t('resume_module')} ${fp.mod + 1}` : t('start_learning')}</button>
+        <button class="btn btn-primary" data-action="play" data-id="${featured.id}">▶&nbsp; ${isDone(featured.id) ? t('rewatch') : fp && fp.mod != null ? `${t('resume_module')} ${fp.mod + 1}` : t('start_learning')}</button>
         <button class="btn btn-glass" data-action="open-course" data-id="${featured.id}">${t('course_details') || 'Details'}</button>
       </div>
       <div class="hero-progress">
@@ -2494,9 +2497,14 @@ function brandVar(name, fb) {
   try { const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim(); return v || fb; } catch (e) { return fb; }
 }
 function openPrintDoc(html) {
-  const w = window.open('', '_blank');
+  /* a Blob URL gives Safari a real document (document.write into about:blank left a white
+     "Untitled" tab), and the named window means ten clicks reuse ONE tab instead of opening ten */
+  let url = null; try { url = URL.createObjectURL(new Blob([html], { type: 'text/html' })); } catch (e) {}
+  const w = window.open(url || '', 'academy-doc');
   if (!w) { toast(t('cert_popup'), 'ℹ️'); return; }
-  w.document.write(html); w.document.close();
+  if (!url) { w.document.open(); w.document.write(html); w.document.close(); }
+  try { w.focus(); } catch (e) {}
+  if (url) setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 function certFooterNote() {
   /* Part 4.1 of the legal spec: our output may never be called a `certificado`.
@@ -2652,8 +2660,9 @@ function buildCertHTML(o) {
   .prov { font-family:Helvetica,Arial,sans-serif; font-size:9.5px; color:#6a736c; margin-bottom:2mm; letter-spacing:.03em; }
   .prov b { color:#3c453e; }
   .note { position:absolute; bottom:9.5mm; left:20mm; right:20mm; font-family:Helvetica,Arial,sans-serif; font-size:8px; color:#8b938c; line-height:1.45; }
-  .print { position:fixed; top:12px; right:12px; font-family:Helvetica,Arial,sans-serif; background:#161d18; color:#fff; border:0; border-radius:8px; padding:9px 16px; cursor:pointer; font-size:13px; }
-  @media print { .print { display:none; } body { background:#faf8f2; } }
+  .print { position:fixed; top:12px; left:12px; font-family:Helvetica,Arial,sans-serif; background:#161d18; color:#fff; border:0; border-radius:8px; padding:9px 16px; cursor:pointer; font-size:13px; }
+  @media screen { body { padding-top:56px; } }
+  @media print { .print { display:none; } body { background:#faf8f2; display:block; min-height:0; padding:0; } .sheet { margin:0; page-break-after:avoid; } }
 </style></head><body>
 <button class="print" onclick="print()">⤓ ${pt ? 'Imprimir / Guardar PDF' : 'Print / Save as PDF'}</button>
 <div class="sheet">
@@ -5283,7 +5292,7 @@ const avgQuizScore = () => (S.quizScores && S.quizScores.length) ? Math.round(S.
 
 function resetStages() {
   stopSim(); simStage.classList.remove('on');
-  vimeoWrap.classList.remove('on'); vimeoWrap.innerHTML = '';
+  vimeoWrap.classList.remove('on', 'ended'); vimeoWrap.innerHTML = '';
   soonStage.classList.remove('on');
   videoEl.style.display = ''; videoEl.pause(); try { videoEl.removeAttribute('src'); videoEl.load(); } catch (e) {}
 }
@@ -5300,6 +5309,7 @@ window.addEventListener('popstate', () => {
    walkie-talkie answers link open_at_moment, and quiz review sends the learner
    back to the exact passage a missed question came from. */
 let _seekTo = null;
+let _openPaused = false;   /* set by 'resume-check': open the lesson silent, show its check */
 function openPlayer(courseId, mod, startAt) {
   const c = courseById(courseId);
   if (!c) return;
@@ -5331,7 +5341,7 @@ function openPlayer(courseId, mod, startAt) {
   } else if (media && media.type === 'vimeo') {
     videoEl.style.display = 'none';
     vimeoWrap.classList.add('on');
-    vimeoWrap.innerHTML = `<iframe src="https://player.vimeo.com/video/${media.id}?${media.h ? 'h=' + media.h + '&' : ''}title=0&byline=0&portrait=0&badge=0&autoplay=1&autopause=0&dnt=1&player_id=0&app_id=58479" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen title="${cmods(c)[mod]}"></iframe>`;
+    vimeoWrap.innerHTML = `<iframe src="https://player.vimeo.com/video/${media.id}?${media.h ? 'h=' + media.h + '&' : ''}title=0&byline=0&portrait=0&badge=0&autoplay=${_openPaused ? 0 : 1}&autopause=0&dnt=1&player_id=0&app_id=58479" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen title="${cmods(c)[mod]}"></iframe>`;
     armVimeo(c, mod);
   } else {
     if (watchEv) watchEv.method = 'video-timeupdate';
@@ -5341,7 +5351,7 @@ function openPlayer(courseId, mod, startAt) {
       _seekTo = null;
     });
     videoEl.src = c.video || vidFor(courseId, mod);
-    videoEl.play().catch(() => {});
+    if (!_openPaused) videoEl.play().catch(() => {});
   }
 
   $('#playerTitle').textContent = ctitle(c);
@@ -5377,12 +5387,16 @@ function openPlayer(courseId, mod, startAt) {
   if ($('#notesDrawer').classList.contains('open')) refreshNotesDrawer();
   ledgerAppend('module_start', { courseId, mod });
   maybePretest(c, mod);
+  _openPaused = false;
 }
 
 /* R2-12 · pretesting warm-up — guess before you learn. Two zero-stakes questions before
    the FIRST lesson of an untouched course; even wrong guesses prime retention, and the
    pretest→quiz delta becomes an honest learning-gain number in the ledger. */
 function maybePretest(c, mod) {
+  /* 13 Oct 2026 (John + João): a question before the first video reads as being quizzed on
+     nothing, and the video played behind it. Checks live at the END of a lesson only. */
+  return;
   if (mod !== 0) return;
   if (coursePct(c.id) > 0 || isDone(c.id)) return;
   if ((S.ledger || []).some(e => e.type === 'pretest' && e.courseId === c.id)) return;
@@ -5402,7 +5416,7 @@ function maybePretest(c, mod) {
       ${q.opts.map((o, i) => `<div class="q-opt" data-ck="${i}" role="button" tabindex="0"><span class="radio"></span><span>${esc(o)}</span></div>`).join('')}
       <div class="ck-foot"><button class="ob-skip" id="preSkip">${t('pre_skip')}</button><span style="flex:1"></span><button class="btn btn-primary btn-sm" id="preNext" style="display:none;">${idx ? '▶ ' + t('ck_continue') : t('pre_next')}</button></div>
     </div>`;
-    ov.classList.add('on');
+    ov.classList.remove('peek'); ov.classList.add('on');
     let answered = false;
     ov.querySelectorAll('.q-opt').forEach(el => el.addEventListener('click', () => {
       if (answered) return; answered = true;
@@ -5510,6 +5524,7 @@ function armVimeo(c, mod) {
       const p = prog(c.id); if (p && d.percent) p.pct = Math.max(p.pct || 0, Math.round(d.percent * 100));
     });
     vimeoPlayer.on('ended', () => {
+      vimeoWrap.classList.add('ended');   /* our curtain, not Vimeo's "more from" screen */
       if (done || !playing || playing.courseId !== c.id || playing.mod !== mod) return;
       /* the same discipline the <video> branch has always had: reaching the end
          of the timeline is not the same as having watched the lesson, and a
@@ -5714,7 +5729,8 @@ function showTakeaways(c, mod, next) {
   $('#takeMod').textContent = `${cmods(c)[mod]} · ${ctitle(c)}`;
   $('#takeTitle').textContent = t('take_title');
   $('#takeSub').textContent = t('take_sub');
-  $('#takeGo').textContent = next && next.kind === 'course-done' ? t('take_done') : t('take_continue');
+  const _cd = !!(next && next.kind === 'course-done');
+  const _go = $('#takeGo'); _go.textContent = _cd ? t('take_quiz') : t('take_continue'); _go.dataset.action = _cd ? 'take-quiz' : 'take-go';
   if (next && next.kind === 'course-done') {
     $('#takeList').innerHTML += `<div class="take-extra">
       ${ratingStarsHTML(next.courseId)}
@@ -5727,7 +5743,7 @@ function showTakeaways(c, mod, next) {
     </div>`}`;
   }
   const tq = $('#takeQuiz');
-  if (tq) { tq.style.display = next && next.kind === 'course-done' ? '' : 'none'; tq.textContent = t('take_quiz'); }
+  if (tq) { tq.style.display = _cd ? '' : 'none'; tq.textContent = t('take_done'); tq.dataset.action = 'take-go'; }
   $('#takeModal').classList.add('open');
   armUpNext(next);
 }
@@ -5757,7 +5773,7 @@ function showModuleCheck(c, mod, after) {
         <div class="ck-foot"><span class="ck-note">${t('mc_ack_note')}</span>
           <button class="btn btn-primary btn-sm" id="mcGo" disabled>${t('mc_submit')}</button></div>
       </div>`;
-      ov.classList.add('on');
+      ov.classList.remove('peek'); ov.classList.add('on');
       const box = $('#mcAck'), go = $('#mcGo');
       box.addEventListener('change', () => { go.disabled = !box.checked; });
       go.addEventListener('click', () => finish({ kind: 'acknowledgment', acknowledged: true, at: Date.now() }));
@@ -5814,7 +5830,7 @@ function showModuleCheck(c, mod, after) {
       });
     };
     paint();
-    ov.classList.add('on');
+    ov.classList.remove('peek'); ov.classList.add('on');
   });
 }
 
@@ -5836,7 +5852,7 @@ function openReviewSession() {
       ${v.opts.map((o, oi) => `<div class="q-opt" data-o="${oi}" role="button" tabindex="0"><span class="radio"></span><span>${esc(o)}</span></div>`).join('')}
       <div class="ck-foot"><span class="ck-note" id="revNote"></span><button class="btn btn-primary btn-sm" id="revNext" style="display:none;">${t('mc_continue')}</button></div>
     </div>`;
-    ov.classList.add('on');
+    ov.classList.remove('peek'); ov.classList.add('on');
     let answered = false;
     ov.querySelectorAll('.q-opt').forEach(el => el.addEventListener('click', () => {
       if (answered) return; answered = true;
@@ -5905,7 +5921,7 @@ function resolveTakeawaysNext(n, toQuiz) {
   else if (n.kind === 'soon') { closePlayer(); setTimeout(() => toast(_lang() === 'pt' ? 'É tudo por agora — o resto da jornada está a caminho' : 'That’s every lesson available so far — the rest of the journey is coming soon', ''), 400); }
   else if (n.kind === 'course-done') {
     closePlayer();
-    setTimeout(() => { openTutorWith(`${_lang() === 'pt' ? 'Terminou' : 'You finished'} <b>${esc(titleOf(n.courseId))}</b> — ${_lang() === 'pt' ? 'quer o teste de certificação agora? São 3 perguntas.' : 'want the certification quiz now? It’s 3 questions.'}`, ['Quiz me now', 'Build me a path']); }, 700);
+    /* the takeaways card already leads with the quiz — no tutor nag with a dead link */
   }
 }
 /* ===== REQ-L-020 · JOB RELEVANCE ===========================================
@@ -7346,12 +7362,14 @@ function drawQuiz() {
       <div class="score-ring" style="background:conic-gradient(${pass ? 'var(--accent-2)' : '#f59e0b'} ${pctScore * 3.6}deg, rgba(255,255,255,.08) 0); ">
         <span style="background:var(--bg-2);width:96px;height:96px;border-radius:50%;display:grid;place-items:center;">${pctScore}%</span>
       </div>
-      <h3>${pass ? 'Verified ✓' : 'Almost there'}</h3>
+      <h3>${pass ? (_lang() === 'pt' ? 'Verificado ✓' : 'Verified ✓') : (_lang() === 'pt' ? 'Quase lá' : 'Almost there')}</h3>
       <p class="m-sub">${pass
-        ? `Skill verified and added to your profile. The AI just unlocked the next step of your path.`
-        : `Below 70% — the AI re-queued the tricky module in <b>${esc(c.title)}</b> for review. It happens to the best of us.`}</p>
-      <div class="q-foot" style="justify-content:center;">
-        <button class="btn btn-primary btn-sm" data-action="quiz-close">${pass ? 'Continue' : 'Review module'}</button>
+        ? (_lang() === 'pt' ? `${quiz.score}/${quiz.qs.length} certas. Competência verificada — o seu certificado está pronto.` : `${quiz.score}/${quiz.qs.length} right. Skill verified — your certificate is ready.`)
+        : (_lang() === 'pt' ? `${quiz.score}/${quiz.qs.length} certas — o certificado pede 70%. Reveja o módulo e tente de novo; as tentativas são ilimitadas.` : `${quiz.score}/${quiz.qs.length} right — the certificate needs 70%. Rewatch the module and try again; attempts are unlimited.`)}</p>
+      <div class="q-foot" style="justify-content:center;gap:10px;flex-wrap:wrap;">
+        ${pass
+          ? `<button class="btn btn-primary btn-sm" data-action="cert-dl" data-id="${c.id}">⤓ ${t('cert_dl')}</button><button class="btn btn-glass btn-sm" data-action="quiz-close">${_lang() === 'pt' ? 'Continuar' : 'Continue'}</button>`
+          : `<button class="btn btn-primary btn-sm" data-action="quiz" data-id="${c.id}">${_lang() === 'pt' ? 'Tentar de novo' : 'Try again'}</button><button class="btn btn-glass btn-sm" data-action="quiz-close">${_lang() === 'pt' ? 'Rever módulo' : 'Review module'}</button>`}
       </div></div>`;
     return;
   }
@@ -8179,9 +8197,24 @@ document.addEventListener('click', e => {
     case 'seed-demo': seedDemo(); break;
     case 'voice-search': startVoiceSearch(); break;
     case 'review-moment': {
-      /* from the check's feedback or a review card: close overlays, reopen the
-         player four seconds before the moment that teaches the answer */
-      const ck = $('#ckOv'); if (ck) { ck.classList.remove('on'); ck.innerHTML = ''; }
+      const ck = $('#ckOv');
+      const same = playing && playing.courseId === el.dataset.id && playing.mod === +el.dataset.mod && playerEl.classList.contains('open');
+      if (ck && same && ck.classList.contains('on')) {
+        /* the learner asked to SEE the moment, not to lose their answers: the result
+           folds into a bottom sheet while the lesson replays, with a way back */
+        ck.classList.add('peek');
+        if (!ck.querySelector('.ck-back')) {
+          const b = document.createElement('button'); b.className = 'btn btn-primary btn-sm ck-back'; b.textContent = t('mc_back_result');
+          b.addEventListener('click', () => { ck.classList.remove('peek'); try { vimeoPlayer && vimeoPlayer.pause(); } catch (e) {} try { videoEl.pause(); } catch (e) {} });
+          if (ck.firstElementChild) ck.firstElementChild.prepend(b);
+        }
+        const tt = +el.dataset.t;
+        if (vimeoPlayer) vimeoPlayer.setCurrentTime(tt).then(() => vimeoPlayer.play()).catch(() => {});
+        else { try { videoEl.currentTime = tt; videoEl.play(); } catch (e) {} }
+        break;
+      }
+      /* from a review card elsewhere: open the player four seconds before the moment */
+      if (ck) { ck.classList.remove('on', 'peek'); ck.innerHTML = ''; }
       openPlayer(el.dataset.id, +el.dataset.mod, +el.dataset.t);
       break;
     }
@@ -8205,7 +8238,11 @@ document.addEventListener('click', e => {
     }
     case 'resume-check': {
       const k = Object.keys(S.pendingChecks || {})[0];
-      if (k) { const [cid, mod] = k.split(':'); openPlayer(cid, +mod); }
+      if (k) {
+        const [cid, mod] = k.split(':'); const c = courseById(cid);
+        _openPaused = true; openPlayer(cid, +mod);
+        if (c) setTimeout(() => showModuleCheck(c, +mod, () => {}), 500);
+      }
       break;
     }
     case 'save-profile': saveProfile(); break;
@@ -8321,6 +8358,7 @@ addEventListener('keydown', e => {
 $('#playerBack').addEventListener('click', closePlayer);
 $('#playerComplete').addEventListener('click', () => { if (playing) completeModule(playing.courseId, playing.mod); else closePlayer(); });
 $('#aiFab').addEventListener('click', () => setTutorOpen(!tutorPanel.classList.contains('open')));
+const _tutorClose = $('#tutorCloseBtn'); if (_tutorClose) _tutorClose.addEventListener('click', () => setTutorOpen(false));
 $('#aiSend').addEventListener('click', sendTutor);
 $('#aiInput').addEventListener('keydown', e => { if (e.key === 'Enter') sendTutor(); });
 function sendTutor() {
@@ -8527,6 +8565,8 @@ function drawOnboard() {
   } else if (ob.step === 1) {
     const role = ROLE_OPTIONS.find(r => r.key === ob.role) || ROLE_OPTIONS[0];
     const goals = [...new Set([...role.goals, ...Object.keys(GOAL_PRESETS)])].slice(0, 4);
+    /* the role already implies a first goal — pre-select it so the step is one click, not two */
+    if (!ob.goal || !GOAL_PRESETS[ob.goal]) ob.goal = goals[0];
     body.innerHTML = `
       <div class="ob-eyebrow">${t('ob_step')} 2 ${t('of')} 3 · ${t('ob_destination')}</div>
       <div class="ob-title">${t('ob_q2')}</div>
@@ -8569,7 +8609,6 @@ function drawOnboard() {
       $('#onboard').classList.remove('open');
       render();
       toast(`${_lang() === 'pt' ? 'O seu percurso para' : 'Your AI path to'} ${tgoal(ob.goal)} ${_lang() === 'pt' ? 'está pronto' : 'is ready'}`, '✦');
-      setTimeout(() => { setTutorOpen(true); }, 900);
     }, 750);
   }
   const next = $('#obNext');
