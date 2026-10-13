@@ -184,10 +184,11 @@ const LIVE_SESSIONS = [
 ];
 const COURSE_HOOKS = {
   'ai-literacy': ['AI is on the team now. Use it well.', 'The literacy every EU workplace must have — practical, honest, ours.'],
-  'fire-truck-training': ['When fire comes, know the truck.', 'Start it, drive it, fill it, and put water where it’s needed — hands-on, step by step.'],
-  'alignment-journey': ['One team, one way of showing up.', 'Six shifts that align how we think, set goals, meet fear, and work the land together.'],
-  'growth-journey': ['You bring the purpose. Not the job.', 'Make the day count — purpose, goals, kaizen, beliefs and the six needs behind every reaction. The second journey, from the inside out.'],
-  'land-team-journey': ['One question changes how you show up.', 'Above the line or below it — the mindset the whole journey grows from.'],
+  /* benefit/outcome-driven headlines (John, 13 Oct 2026) — drafts for John to refine */
+  'fire-truck-training': ['When fire comes, you will know the truck.', 'Start it, drive it, fill it, pump it — hands-on, step by step, before you ever need it.'],
+  'alignment-journey': ['One team, one way of working — starting with a warm welcome.', 'John’s welcome, the ESIP framework, moving beyond fear, and caring for body, soul and spirit.'],
+  'growth-journey': ['Know why you get up — and set goals that stick.', 'Purpose, 90-day goals, kaizen and the beliefs that carry you through a hard season.'],
+  'land-team-journey': ['Choose how you show up — even on the hard days.', 'Eight mindset habits that make you someone the team can rely on.'],
   'land-literacy': ['Learn to read the land like a story.', 'Slope, soil, water, wind — see what the land has been telling you all along.'],
   'living-soil': ['There’s a universe under your feet.', 'Feed the soil, and everything above it thrives.'],
   'water-cycles': ['Water writes the landscape.', 'Slow it, sink it, store it — become fluent in the land’s oldest language.'],
@@ -211,10 +212,10 @@ const COURSE_HOOKS = {
 };
 const COURSE_HOOKS_PT = {
   'ai-literacy': ['A IA já faz parte da equipa. Use-a bem.', 'A literacia que todos os locais de trabalho na UE devem ter — prática, honesta, nossa.'],
-  'fire-truck-training': ['Quando o fogo vem, conheça o camião.', 'Arrancar, conduzir, encher e pôr água onde é preciso — na prática, passo a passo.'],
-  'alignment-journey': ['Uma equipa, uma forma de estar.', 'Seis mudanças que alinham como pensamos, definimos objetivos, enfrentamos o medo e trabalhamos a terra juntos.'],
-  'growth-journey': ['És tu que trazes o propósito. Não o trabalho.', 'Fazer o dia valer — propósito, objetivos, kaizen, crenças e as seis necessidades por trás de cada reação. A segunda jornada, de dentro para fora.'],
-  'land-team-journey': ['Uma pergunta muda como aparecemos.', 'Acima ou abaixo da linha — a mentalidade de onde cresce toda a jornada.'],
+  'fire-truck-training': ['Quando o fogo vier, vai conhecer o camião.', 'Arrancar, conduzir, encher, bombear — na prática, passo a passo, antes de alguma vez precisar.'],
+  'alignment-journey': ['Uma equipa, uma forma de trabalhar — a começar por boas-vindas calorosas.', 'As boas-vindas do John, o ESIP, ir para além do medo, e cuidar do corpo, alma e espírito.'],
+  'growth-journey': ['Saiba porque se levanta — e defina objetivos que ficam.', 'Propósito, objetivos a 90 dias, kaizen e as crenças que o sustentam numa época difícil.'],
+  'land-team-journey': ['Escolha como aparece — mesmo nos dias difíceis.', 'Oito hábitos de mentalidade que fazem de si alguém em quem a equipa pode confiar.'],
   'land-literacy': ['Aprenda a ler a terra como uma história.', 'Declive, solo, água, vento — veja o que a terra sempre lhe quis dizer.'],
   'living-soil': ['Há um universo debaixo dos seus pés.', 'Alimente o solo, e tudo acima dele floresce.'],
   'water-cycles': ['A água escreve a paisagem.', 'Abrande-a, infiltre-a, guarde-a — fale a língua mais antiga da terra.'],
