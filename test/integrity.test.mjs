@@ -418,8 +418,6 @@ export function run(t) {
      provenance after all, the test FAILS and tells you to delete the entry. An
      allowlist nobody is forced to shrink is just a way to hide a growing pile. */
   const LEGACY_UNSOURCED = {
-    'alignment-journey': 'transcribed by the pre-API duration-matching pipeline',
-    'fire-truck-training': 'transcribed by the pre-API duration-matching pipeline',
   };
 
   t.group('transcript provenance');

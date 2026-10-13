@@ -729,6 +729,734 @@
     "generatedAt": 1788526403469,
     "corrected": true
    }
+  ],
+  "5": [
+   {
+    "a": 0,
+    "en": {
+     "opts": [
+      "His ability to concentrate and work towards a goal",
+      "His natural talent",
+      "His experience in the sport",
+      "His ability to work with others"
+     ],
+     "q": "What is the primary asset that has helped golfing legend Jack Nicholas achieve his goals?",
+     "why": "Jack Nicholas stated that his ability to concentrate and work towards a goal has been his greatest asset."
+    },
+    "pt": {
+     "opts": [
+      "Sua capacidade de se concentrar e trabalhar em direção a um objetivo",
+      "Seu talento natural",
+      "Sua experiência no esporte",
+      "Sua capacidade de trabalhar com os outros"
+     ],
+     "q": "Qual é o principal ativo que ajudou o lendário golfista Jack Nicholas a alcançar seus objetivos?",
+     "why": "Jack Nicholas afirmou que sua capacidade de se concentrar e trabalhar em direção a um objetivo foi seu maior ativo."
+    },
+    "t0": 26,
+    "type": "recall",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750172357,
+    "corrected": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "That they are set by someone else",
+      "That they are your own and truly excite and inspire you",
+      "That they are only focused on winning",
+      "That they are too difficult to achieve"
+     ],
+     "q": "What should you ensure when setting long-term goals?",
+     "why": "It is essential to ensure that long-term goals are your own and truly excite and inspire you."
+    },
+    "pt": {
+     "opts": [
+      "Que sejam definidas por alguém else",
+      "Que sejam suas e verdadeiramente o inspirem e o motivem",
+      "Que sejam apenas focadas em vencer",
+      "Que sejam muito difíceis de alcançar"
+     ],
+     "q": "O que você deve garantir ao definir metas de longo prazo?",
+     "why": "É essencial garantir que as metas de longo prazo sejam suas e verdadeiramente o inspirem e o motivem."
+    },
+    "t0": 83,
+    "type": "recall",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750172357,
+    "verified": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "Wait for the right moment to start working towards it",
+      "Set a medium-term goal to work towards something that is not too far away",
+      "Focus only on the outcome",
+      "Give up if it seems too difficult"
+     ],
+     "q": "What should you do after setting a long-term goal?",
+     "why": "After setting a long-term goal, you should set a medium-term goal to work towards something that is not too far away."
+    },
+    "pt": {
+     "opts": [
+      "Esperar o momento certo para começar a trabalhar em direção a ela",
+      "Definir uma meta de médio prazo para trabalhar em direção a algo que não esteja muito longe",
+      "Focar apenas no resultado",
+      "Desistir se parecer muito difícil"
+     ],
+     "q": "O que você deve fazer após definir uma meta de longo prazo?",
+     "why": "Após definir uma meta de longo prazo, você deve definir uma meta de médio prazo para trabalhar em direção a algo que não esteja muito longe."
+    },
+    "t0": 109,
+    "type": "application",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750172357,
+    "corrected": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "Winning and losing",
+      "Getting better",
+      "The outcome",
+      "The process"
+     ],
+     "q": "What should you focus on to reach your goals, according to Steffi Graff's father?",
+     "why": "According to Steffi Graff's father, you should focus on getting better to reach your goals."
+    },
+    "pt": {
+     "opts": [
+      "Vencer e perder",
+      "Melhorar",
+      "O resultado",
+      "O processo"
+     ],
+     "q": "No que você deve se concentrar para alcançar seus objetivos, de acordo com o pai de Steffi Graff?",
+     "why": "De acordo com o pai de Steffi Graff, você deve se concentrar em melhorar para alcançar seus objetivos."
+    },
+    "t0": 165,
+    "type": "application",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750172357,
+    "verified": true
+   },
+   {
+    "a": 0,
+    "en": {
+     "opts": [
+      "Break down the task into smaller, short-term achievable goals",
+      "Focus only on the outcome",
+      "Give up on the goal",
+      "Work on the task for a longer period each day"
+     ],
+     "q": "You are working towards a medium-term goal, but you are feeling overwhelmed by the task. What can you do to build confidence and momentum?",
+     "why": "Breaking down the task into smaller, short-term achievable goals can help build confidence and momentum."
+    },
+    "pt": {
+     "opts": [
+      "Dividir a tarefa em metas menores, de curto prazo e alcançáveis",
+      "Focar apenas no resultado",
+      "Desistir da meta",
+      "Trabalhar na tarefa por um período mais longo cada dia"
+     ],
+     "q": "Você está trabalhando em direção a uma meta de médio prazo, mas está se sentindo sobrecarregado pela tarefa. O que você pode fazer para construir confiança e momentum?",
+     "why": "Dividir a tarefa em metas menores, de curto prazo e alcançáveis pode ajudar a construir confiança e momentum."
+    },
+    "t0": 138,
+    "type": "scenario",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750172357,
+    "corrected": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "Set a new long-term goal",
+      "Create and track smaller, short-term achievable goals",
+      "Focus only on the outcome",
+      "Give up on the goal"
+     ],
+     "q": "You have set a long-term goal, but you are struggling to make progress. What can you do to get back on track?",
+     "why": "Creating and tracking smaller, short-term achievable goals can help you get back on track and make progress towards your long-term goal."
+    },
+    "pt": {
+     "opts": [
+      "Definir uma nova meta de longo prazo",
+      "Criar e acompanhar metas menores, de curto prazo e alcançáveis",
+      "Focar apenas no resultado",
+      "Desistir da meta"
+     ],
+     "q": "Você definiu uma meta de longo prazo, mas está tendo dificuldade em fazer progressos. O que você pode fazer para voltar ao trilho?",
+     "why": "Criar e acompanhar metas menores, de curto prazo e alcançáveis pode ajudar a voltar ao trilho e fazer progressos em direção à sua meta de longo prazo."
+    },
+    "t0": 193,
+    "type": "scenario",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750172357,
+    "corrected": true
+   }
+  ],
+  "6": [
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "It helps individuals achieve personal goals",
+      "It helps the company understand its vision and direction",
+      "It is a requirement for employee evaluation",
+      "It is a way to punish underperforming departments"
+     ],
+     "q": "Why is goal setting important for the company?",
+     "why": "Goal setting helps the company understand its vision and direction, and ensures all departments are working towards the same goals."
+    },
+    "pt": {
+     "opts": [
+      "Ajuda os indivíduos a alcançar metas pessoais",
+      "Ajuda a empresa a entender sua visão e direção",
+      "É um requisito para a avaliação de funcionários",
+      "É uma forma de punir departamentos com desempenho insuficiente"
+     ],
+     "q": "Por que é importante definir metas para a empresa?",
+     "why": "Definir metas ajuda a empresa a entender sua visão e direção, e garante que todos os departamentos estejam trabalhando em direção aos mesmos objetivos."
+    },
+    "t0": 25,
+    "type": "recall",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750202370,
+    "verified": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "Spend a lot of time perfecting the template",
+      "Get the first one done quickly and familiarize yourself with the process",
+      "Wait for guidance from a supervisor before starting",
+      "Only complete the template with a team"
+     ],
+     "q": "What is the recommended approach to completing the 90-day goal setting template?",
+     "why": "The recommended approach is to get the first one done quickly and familiarize yourself with the process."
+    },
+    "pt": {
+     "opts": [
+      "Gastar muito tempo aperfeiçoando o modelo",
+      "Concluir o primeiro rapidamente e familiarizar-se com o processo",
+      "Esperar orientação de um supervisor antes de começar",
+      "Concluir o modelo apenas com uma equipe"
+     ],
+     "q": "Qual é a abordagem recomendada para completar o modelo de definição de metas de 90 dias?",
+     "why": "A abordagem recomendada é concluir o primeiro rapidamente e familiarizar-se com o processo."
+    },
+    "t0": 51,
+    "type": "recall",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750202370,
+    "corrected": true
+   },
+   {
+    "a": 2,
+    "en": {
+     "opts": [
+      "Leave it blank until the company defines the department names",
+      "Use a generic term such as 'Operations'",
+      "Enter the name of your actual department, such as 'Landcare department'",
+      "Enter the name of a department you aspire to work in"
+     ],
+     "q": "What should you do when completing the department section of the 90-day goal setting template?",
+     "why": "You should enter the name of your actual department, such as 'Landcare department'."
+    },
+    "pt": {
+     "opts": [
+      "Deixar em branco até que a empresa defina os nomes dos departamentos",
+      "Usar um termo genérico, como 'Operações'",
+      "Inserir o nome do seu departamento atual, como 'departamento de Landcare'",
+      "Inserir o nome de um departamento que você aspira trabalhar"
+     ],
+     "q": "O que você deve fazer ao completar a seção do departamento no modelo de definição de metas de 90 dias?",
+     "why": "Você deve inserir o nome do seu departamento atual, como 'departamento de Landcare'."
+    },
+    "t0": 81,
+    "type": "application",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750202370,
+    "verified": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "Think only about the specific tasks you perform daily",
+      "Consider the bigger inspiration and purpose behind your work",
+      "Focus on the goals of other departments",
+      "Ignore this section as it's not relevant to your role"
+     ],
+     "q": "How should you approach defining the 'grand vision dream' for your department?",
+     "why": "You should consider the bigger inspiration and purpose behind your work."
+    },
+    "pt": {
+     "opts": [
+      "Pensar apenas nas tarefas específicas que você realiza diariamente",
+      "Considerar a inspiração e propósito maior por trás do seu trabalho",
+      "Focar nos objetivos de outros departamentos",
+      "Ignorar esta seção, pois não é relevante para o seu papel"
+     ],
+     "q": "Como você deve abordar a definição do 'sonho da visão grandiosa' para o seu departamento?",
+     "why": "Você deve considerar a inspiração e propósito maior por trás do seu trabalho."
+    },
+    "t0": 112,
+    "type": "application",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750202370,
+    "verified": true
+   },
+   {
+    "a": 2,
+    "en": {
+     "opts": [
+      "Ask a colleague from a different department for their opinion",
+      "Focus on the daily tasks and ignore the 'grand vision dream' section",
+      "Think about how your work contributes to the overall mission of the company",
+      "Wait for guidance from a supervisor before proceeding"
+     ],
+     "q": "You are a new team member in the Building Maintenance Team department. You are struggling to define the 'grand vision dream' for your department. What should you do?",
+     "why": "You should think about how your work contributes to the overall mission of the company."
+    },
+    "pt": {
+     "opts": [
+      "Perguntar a um colega de um departamento diferente sobre sua opinião",
+      "Focar nas tarefas diárias e ignorar a seção do 'sonho da visão grandiosa'",
+      "Pensar sobre como o seu trabalho contribui para a missão geral da empresa",
+      "Esperar orientação de um supervisor antes de prosseguir"
+     ],
+     "q": "Você é um novo membro da equipe no departamento de Manutenção de Edifícios. Você está tendo dificuldade em definir o 'sonho da visão grandiosa' para o seu departamento. O que você deve fazer?",
+     "why": "Você deve pensar sobre como o seu trabalho contribui para a missão geral da empresa."
+    },
+    "t0": 141,
+    "type": "scenario",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750202370,
+    "corrected": true
+   },
+   {
+    "a": 2,
+    "en": {
+     "opts": [
+      "Leave the section blank and move on to the next part of the template",
+      "Write down your personal goals and aspirations",
+      "Describe the specific actions you will take to achieve your department's goals",
+      "Call a meeting with your team to discuss the section"
+     ],
+     "q": "You are completing the 90-day goal setting template and reach the 'B, do and have' section. You are unsure what to write. What should you do?",
+     "why": "You should describe the specific actions you will take to achieve your department's goals."
+    },
+    "pt": {
+     "opts": [
+      "Deixar a seção em branco e passar para a próxima parte do modelo",
+      "Escrever os seus objetivos e aspirações pessoais",
+      "Descrever as ações específicas que você tomará para alcançar os objetivos do seu departamento",
+      "Chamar uma reunião com a sua equipe para discutir a seção"
+     ],
+     "q": "Você está completando o modelo de definição de metas de 90 dias e chega à seção 'B, fazer e ter'. Você está incerto sobre o que escrever. O que você deve fazer?",
+     "why": "Você deve descrever as ações específicas que você tomará para alcançar os objetivos do seu departamento."
+    },
+    "t0": 167,
+    "type": "scenario",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750202370,
+    "corrected": true
+   }
+  ],
+  "7": [
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "Having more meetings",
+      "Having more focus and unity",
+      "Having more time off",
+      "Having more money"
+     ],
+     "q": "What is one of the benefits of creating goals for the team?",
+     "why": "Creating goals helps the team have more focus and unity, allowing them to work together towards a common objective."
+    },
+    "pt": {
+     "opts": [
+      "Ter mais reuniões",
+      "Ter mais foco e unidade",
+      "Ter mais tempo de folga",
+      "Ter mais dinheiro"
+     ],
+     "q": "Qual é uma das vantagens de criar metas para a equipe?",
+     "why": "Criar metas ajuda a equipe a ter mais foco e unidade, permitindo que eles trabalhem juntos em direção a um objetivo comum."
+    },
+    "t0": 27,
+    "type": "recall",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750221049,
+    "verified": true
+   },
+   {
+    "a": 2,
+    "en": {
+     "opts": [
+      "Ignore them",
+      "Only track some of them",
+      "Measure and track all of them",
+      "Only evaluate some of them"
+     ],
+     "q": "What should be done with things that are important?",
+     "why": "Anything that is important should be measured, tracked, and evaluated to provide feedback and help with progress."
+    },
+    "pt": {
+     "opts": [
+      "Ignorá-las",
+      "Apenas acompanhar algumas delas",
+      "Medir e acompanhar todas elas",
+      "Apenas avaliar algumas delas"
+     ],
+     "q": "O que deve ser feito com coisas que são importantes?",
+     "why": "Tudo o que é importante deve ser medido, acompanhado e avaliado para fornecer feedback e ajudar com o progresso."
+    },
+    "t0": 53,
+    "type": "recall",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750221049,
+    "corrected": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "Just move on to the next week's goals",
+      "Reflect on the challenges and lessons learned",
+      "Only celebrate their achievements",
+      "Ignore their progress and don't reflect"
+     ],
+     "q": "What should a team member do when they have achieved their weekly goals?",
+     "why": "Reflecting on the challenges and lessons learned helps to motivate and empower the team member to move forward in the following weeks."
+    },
+    "pt": {
+     "opts": [
+      "Apenas seguir em frente para as metas da próxima semana",
+      "Refletir sobre os desafios e lições aprendidas",
+      "Apenas celebrar seus sucessos",
+      "Ignorar seu progresso e não refletir"
+     ],
+     "q": "O que um membro da equipe deve fazer quando alcança suas metas semanais?",
+     "why": "Refletir sobre os desafios e lições aprendidas ajuda a motivar e empoderar o membro da equipe a seguir em frente nas semanas seguintes."
+    },
+    "t0": 115,
+    "type": "application",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750221049,
+    "corrected": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "To their own personal vision",
+      "To the bigger vision of their particular team and their goals",
+      "To the goals of a different team",
+      "To no specific vision or goal"
+     ],
+     "q": "How should an individual's goals and subtasks be connected?",
+     "why": "An individual's goals and subtasks should be connected to the bigger vision of their particular team and their goals for that week and for the 90 days."
+    },
+    "pt": {
+     "opts": [
+      "À sua própria visão pessoal",
+      "À visão maior da sua equipe particular e suas metas",
+      "Às metas de uma equipe diferente",
+      "A nenhuma visão ou meta específica"
+     ],
+     "q": "Como as metas e subtarefas de um indivíduo devem ser conectadas?",
+     "why": "As metas e subtarefas de um indivíduo devem ser conectadas à visão maior da sua equipe particular e suas metas para aquela semana e para os 90 dias."
+    },
+    "t0": 144,
+    "type": "application",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750221049,
+    "verified": true
+   },
+   {
+    "a": 0,
+    "en": {
+     "opts": [
+      "The ESIP model",
+      "The weekly goals model",
+      "The 90-day model",
+      "The team leader model"
+     ],
+     "q": "A team is struggling with their culture and values. What model can they use to diagnose and improve their situation?",
+     "why": "The ESIP model allows teams to diagnose and improve their culture, beliefs, purpose, goals, values, and structures."
+    },
+    "pt": {
+     "opts": [
+      "O modelo ESIP",
+      "O modelo de metas semanais",
+      "O modelo de 90 dias",
+      "O modelo de líder de equipe"
+     ],
+     "q": "Uma equipe está tendo dificuldades com sua cultura e valores. Qual modelo eles podem usar para diagnosticar e melhorar sua situação?",
+     "why": "O modelo ESIP permite que as equipes diagnosticem e melhorem sua cultura, crenças, propósito, metas, valores e estruturas."
+    },
+    "t0": 84,
+    "type": "scenario",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750221049,
+    "corrected": true
+   },
+   {
+    "a": 0,
+    "en": {
+     "opts": [
+      "The team leader",
+      "The team members themselves",
+      "The organization's CEO",
+      "The weekly goals system"
+     ],
+     "q": "Who is typically responsible for holding team members accountable for their weekly goals?",
+     "why": "The team leader is typically responsible for holding team members accountable for their weekly goals."
+    },
+    "pt": {
+     "opts": [
+      "O líder da equipe",
+      "Os próprios membros da equipe",
+      "O CEO da organização",
+      "O sistema de metas semanais"
+     ],
+     "q": "Quem é normalmente responsável por responsabilizar os membros da equipe por suas metas semanais?",
+     "why": "O líder da equipe é normalmente responsável por responsabilizar os membros da equipe por suas metas semanais."
+    },
+    "t0": 172,
+    "type": "scenario",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750221049,
+    "verified": true
+   }
+  ],
+  "8": [
+   {
+    "a": 0,
+    "en": {
+     "opts": [
+      "Gap analysis",
+      "SWOT analysis",
+      "Risk analysis",
+      "Needs analysis"
+     ],
+     "q": "What analysis do we perform to gauge where we can improve at the end of the 90-day goal period?",
+     "why": "We perform a gap analysis to compare our forecasted goals with our actual achievements."
+    },
+    "pt": {
+     "opts": [
+      "Análise de lacunas",
+      "Análise SWOT",
+      "Análise de riscos",
+      "Análise de necessidades"
+     ],
+     "q": "Que tipo de análise realizamos para avaliar onde podemos melhorar no final do período de 90 dias?",
+     "why": "Realizamos uma análise de lacunas para comparar os nossos objetivos previstos com os nossos resultados reais."
+    },
+    "t0": 28,
+    "type": "recall",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750245109,
+    "corrected": true
+   },
+   {
+    "a": 0,
+    "en": {
+     "opts": [
+      "Floyd Mayweather",
+      "Muhammad Ali",
+      "Mike Tyson",
+      "George Foreman"
+     ],
+     "q": "Who is quoted as saying that nobody calibrates better than him?",
+     "why": "Floyd Mayweather is quoted as saying that nobody calibrates better than him, which contributed to his success as a boxer."
+    },
+    "pt": {
+     "opts": [
+      "Floyd Mayweather",
+      "Muhammad Ali",
+      "Mike Tyson",
+      "George Foreman"
+     ],
+     "q": "Quem é citado como tendo dito que ninguém se calibra melhor do que ele?",
+     "why": "Floyd Mayweather é citado como tendo dito que ninguém se calibra melhor do que ele, o que contribuiu para o seu sucesso como boxeur."
+    },
+    "t0": 57,
+    "type": "recall",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750245109,
+    "verified": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "Spend a lot of time perfecting your goals",
+      "Get it done as quickly as possible",
+      "Review and revise your goals immediately",
+      "Make sure your goals are achievable but not too easy"
+     ],
+     "q": "What should you do when you're going through the goal-setting process for the first time?",
+     "why": "You should get it done and not worry too much about perfection, as you will review and revise your goals every 90 days."
+    },
+    "pt": {
+     "opts": [
+      "Passar muito tempo aperfeiçoando os seus objetivos",
+      "Concluir o mais rápido possível",
+      "Rever e rever os seus objetivos imediatamente",
+      "Certificar-se de que os seus objetivos são alcançáveis mas não demasiado fáceis"
+     ],
+     "q": "O que deve fazer quando estiver a passar pelo processo de definição de objetivos pela primeira vez?",
+     "why": "Deve concluir e não se preocupar demasiado com a perfeição, uma vez que irá rever e rever os seus objetivos a cada 90 dias."
+    },
+    "t0": 45,
+    "type": "application",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750245109,
+    "corrected": true
+   },
+   {
+    "a": 2,
+    "en": {
+     "opts": [
+      "Stop working on your goals",
+      "Make significant changes to your goals",
+      "Make calibrations and adjustments to improve",
+      "Continue working on your goals without making any changes"
+     ],
+     "q": "What should you do after checking your progress on your weekly and 90-day goals?",
+     "why": "You should make calibrations and adjustments to improve, based on your progress and what you've learned."
+    },
+    "pt": {
+     "opts": [
+      "Parar de trabalhar nos seus objetivos",
+      "Fazer alterações significativas nos seus objetivos",
+      "Fazer calibrações e ajustes para melhorar",
+      "Continuar a trabalhar nos seus objetivos sem fazer qualquer alteração"
+     ],
+     "q": "O que deve fazer após verificar o seu progresso nos seus objetivos semanais e de 90 dias?",
+     "why": "Deve fazer calibrações e ajustes para melhorar, com base no seu progresso e no que aprendeu."
+    },
+    "t0": 85,
+    "type": "application",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750245109,
+    "corrected": true
+   },
+   {
+    "a": 2,
+    "en": {
+     "opts": [
+      "Give up on that goal",
+      "Try to catch up on that goal immediately",
+      "Perform a gap analysis to identify areas for improvement",
+      "Continue working on your other goals and ignore the area where you fell short"
+     ],
+     "q": "You've just completed your first 90-day goal period and you're reviewing your progress. You notice that you've fallen short of your goals in one area. What should you do next?",
+     "why": "You should perform a gap analysis to identify areas for improvement and make adjustments to get back on track."
+    },
+    "pt": {
+     "opts": [
+      "Desistir desse objetivo",
+      "Tentar recuperar esse objetivo imediatamente",
+      "Realizar uma análise de lacunas para identificar áreas para melhoria",
+      "Continuar a trabalhar nos seus outros objetivos e ignorar a área onde não atingiu"
+     ],
+     "q": "Acabou de concluir o seu primeiro período de 90 dias e está a rever o seu progresso. Nota que não atingiu os seus objetivos em uma área. O que deve fazer em seguida?",
+     "why": "Deve realizar uma análise de lacunas para identificar áreas para melhoria e fazer ajustes para voltar ao caminho certo."
+    },
+    "t0": 28,
+    "type": "scenario",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750245109,
+    "corrected": true
+   },
+   {
+    "a": 2,
+    "en": {
+     "opts": [
+      "Make significant changes to your goals",
+      "Take a break and come back to your goals later",
+      "Make micro-calibrations and adjustments",
+      "Give up on your goals and start over"
+     ],
+     "q": "You're working on your goals and you realize that you need to make some adjustments to stay on track. What approach should you take?",
+     "why": "You should make micro-calibrations and adjustments, like Floyd Mayweather, to stay on track and achieve your goals."
+    },
+    "pt": {
+     "opts": [
+      "Fazer alterações significativas nos seus objetivos",
+      "Fazer uma pausa e voltar aos seus objetivos mais tarde",
+      "Fazer micro-calibrações e ajustes",
+      "Desistir dos seus objetivos e começar de novo"
+     ],
+     "q": "Está a trabalhar nos seus objetivos e percebe que precisa fazer alguns ajustes para manter-se no caminho certo. Que abordagem deve adotar?",
+     "why": "Deve fazer micro-calibrações e ajustes, como Floyd Mayweather, para manter-se no caminho certo e atingir os seus objetivos."
+    },
+    "t0": 57,
+    "type": "scenario",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750245109,
+    "verified": true
+   }
   ]
  }
 }

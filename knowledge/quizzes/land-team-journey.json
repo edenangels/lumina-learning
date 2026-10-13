@@ -1457,6 +1457,916 @@
     "generatedAt": 1786983576671,
     "corrected": true
    }
+  ],
+  "8": [
+   {
+    "a": 0,
+    "en": {
+     "opts": [
+      "Responsibility",
+      "Justification",
+      "Motivation",
+      "Accountability"
+     ],
+     "q": "What does 'roll' stand for in the context of above the line thinking?",
+     "why": "Roll stands for responsibility, which involves taking ownership of one's results."
+    },
+    "pt": {
+     "opts": [
+      "Responsabilidade",
+      "Justificação",
+      "Motivação",
+      "Prestação de contas"
+     ],
+     "q": "O que significa 'roll' no contexto do pensamento acima da linha?",
+     "why": "Roll significa responsabilidade, que implica assumir a propriedade dos seus resultados."
+    },
+    "t0": 27,
+    "type": "recall",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750343416,
+    "corrected": true
+   },
+   {
+    "a": 2,
+    "en": {
+     "opts": [
+      "Equally motivated to move towards pleasure",
+      "More motivated to move towards pleasure",
+      "Twice as motivated to move away from pain",
+      "Not motivated at all"
+     ],
+     "q": "What is the primary motivation for humans to move away from pain, according to human behavioural researchers?",
+     "why": "Humans are motivated to move away from pain twice as much as they are motivated to move towards pleasure."
+    },
+    "pt": {
+     "opts": [
+      "Igualmente motivados a se moverem em direção ao prazer",
+      "Mais motivados a se moverem em direção ao prazer",
+      "Duas vezes mais motivados a se afastarem da dor",
+      "Não motivados de todo"
+     ],
+     "q": "Qual é a principal motivação para os humanos se afastarem da dor, de acordo com os investigadores do comportamento humano?",
+     "why": "Os humanos estão motivados a se afastarem da dor duas vezes mais do que estão motivados a se moverem em direção ao prazer."
+    },
+    "t0": 54,
+    "type": "recall",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750343416,
+    "verified": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "Justify your results and actions",
+      "Take responsibility for your results",
+      "Blame circumstances and other people",
+      "Avoid challenges and setbacks"
+     ],
+     "q": "When faced with emotional pain, what should you do to build the mindset muscle of champions?",
+     "why": "Taking responsibility for your results helps you build the mindset muscle of champions."
+    },
+    "pt": {
+     "opts": [
+      "Justificar os seus resultados e ações",
+      "Assumir a responsabilidade pelos seus resultados",
+      "Culpar as circunstâncias e outras pessoas",
+      "Evitar desafios e reveses"
+     ],
+     "q": "Quando enfrenta dor emocional, o que deve fazer para construir o músculo mental dos campeões?",
+     "why": "Assumir a responsabilidade pelos seus resultados ajuda a construir o músculo mental dos campeões."
+    },
+    "t0": 83,
+    "type": "application",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750343416,
+    "verified": true
+   },
+   {
+    "a": 2,
+    "en": {
+     "opts": [
+      "Stay below the line and justify your actions",
+      "Try to blame others for your situation",
+      "Shift your response to get back above the line",
+      "Give up and accept your circumstances"
+     ],
+     "q": "What should you do when you recognize you are staying below the line for too long?",
+     "why": "Shifting your response to get back above the line helps you build a healthy response to pressure."
+    },
+    "pt": {
+     "opts": [
+      "Ficar abaixo da linha e justificar as suas ações",
+      "Tentar culpar os outros pela sua situação",
+      "Mudar a sua resposta para voltar acima da linha",
+      "Desistir e aceitar as suas circunstâncias"
+     ],
+     "q": "O que deve fazer quando reconhece que está ficando abaixo da linha por muito tempo?",
+     "why": "Mudar a sua resposta para voltar acima da linha ajuda a construir uma resposta saudável à pressão."
+    },
+    "t0": 112,
+    "type": "application",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750343416,
+    "corrected": true
+   },
+   {
+    "a": 2,
+    "en": {
+     "opts": [
+      "Blame the team leader for not providing enough support",
+      "Justify the failure by citing external circumstances",
+      "Take responsibility for the failure and explore options for improvement",
+      "Give up on the project and move on to something else"
+     ],
+     "q": "A team member has just failed to meet a project deadline. What can they do to apply above the line thinking?",
+     "why": "Taking responsibility for the failure and exploring options for improvement helps to build a healthy response to pressure."
+    },
+    "pt": {
+     "opts": [
+      "Culpar o líder da equipe por não fornecer apoio suficiente",
+      "Justificar a falha citando circunstâncias externas",
+      "Assumir a responsabilidade pela falha e explorar opções para melhoria",
+      "Desistir do projeto e passar para algo else"
+     ],
+     "q": "Um membro da equipe acaba de falhar em cumprir um prazo de projeto. O que podem fazer para aplicar o pensamento acima da linha?",
+     "why": "Assumir a responsabilidade pela falha e explorar opções para melhoria ajuda a construir uma resposta saudável à pressão."
+    },
+    "t0": 139,
+    "type": "scenario",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750343416,
+    "verified": true
+   },
+   {
+    "a": 2,
+    "en": {
+     "opts": [
+      "Encourage them to give up and try something easier",
+      "Help them to justify their failures and blame external circumstances",
+      "Support them in taking responsibility for their failures and learning from their experiences",
+      "Tell them to just work harder and try to avoid failures"
+     ],
+     "q": "A colleague is struggling to cope with the pressure of repeated failures. What can you learn from Michael Jordan's approach to apply to your colleague's situation?",
+     "why": "Supporting them in taking responsibility for their failures and learning from their experiences helps to build a healthy response to pressure."
+    },
+    "pt": {
+     "opts": [
+      "Encorajá-los a desistir e tentar algo mais fácil",
+      "Ajudá-los a justificar as suas falhas e culpar circunstâncias externas",
+      "Apoiar-lhes a assumir a responsabilidade pelas suas falhas e aprender com as suas experiências",
+      "Dizer-lhes para trabalhar mais duro e tentar evitar falhas"
+     ],
+     "q": "Um colega está tendo dificuldade em lidar com a pressão de falhas repetidas. O que pode aprender da abordagem de Michael Jordan para aplicar à situação do seu colega?",
+     "why": "Apoiar-lhes a assumir a responsabilidade pelas suas falhas e aprender com as suas experiências ajuda a construir uma resposta saudável à pressão."
+    },
+    "t0": 165,
+    "type": "scenario",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750343416,
+    "corrected": true
+   }
+  ],
+  "9": [
+   {
+    "a": 2,
+    "en": {
+     "opts": [
+      "We always grow and flow",
+      "We always diminish and contract",
+      "How we respond changes our life",
+      "We stay the same"
+     ],
+     "q": "What happens when we have pressure in life?",
+     "why": "Pressure can either help us grow and flow or diminish and contract, depending on how we respond."
+    },
+    "pt": {
+     "opts": [
+      "Sempre crescemos e fluimos",
+      "Sempre diminuímos e contraímos",
+      "Como respondemos muda a nossa vida",
+      "Ficamos iguais"
+     ],
+     "q": "O que acontece quando temos pressão na vida?",
+     "why": "A pressão pode nos ajudar a crescer e fluir ou a diminuir e contrair, dependendo de como respondemos."
+    },
+    "t0": 80,
+    "type": "recall",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750369321,
+    "corrected": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "Blaming others for what happened",
+      "Taking responsibility for what happened",
+      "Ignoring the problem",
+      "Waiting for someone else to fix it"
+     ],
+     "q": "What does it mean to go above the line when there's pressure?",
+     "why": "Going above the line means taking personal responsibility for what happened and acknowledging one's mistakes."
+    },
+    "pt": {
+     "opts": [
+      "Culpar os outros pelo que aconteceu",
+      "Assumir a responsabilidade pelo que aconteceu",
+      "Ignorar o problema",
+      "Esperar que alguém mais o resolva"
+     ],
+     "q": "O que significa ir acima da linha quando há pressão?",
+     "why": "Ir acima da linha significa assumir a responsabilidade pessoal pelo que aconteceu e reconhecer os próprios erros."
+    },
+    "t0": 105,
+    "type": "recall",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750369321,
+    "verified": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "Blame someone else",
+      "Take responsibility and ask for feedback",
+      "Ignore the mistake and hope no one notices",
+      "Wait for someone else to take action"
+     ],
+     "q": "What should you do when you make a mistake at work?",
+     "why": "Taking responsibility and asking for feedback shows leadership and allows for growth and learning."
+    },
+    "pt": {
+     "opts": [
+      "Culpar alguém mais",
+      "Assumir a responsabilidade e pedir feedback",
+      "Ignorar o erro e esperar que ninguém note",
+      "Esperar que alguém mais tome ação"
+     ],
+     "q": "O que deve fazer quando comete um erro no trabalho?",
+     "why": "Assumir a responsabilidade e pedir feedback mostra liderança e permite crescimento e aprendizado."
+    },
+    "t0": 131,
+    "type": "application",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750369321,
+    "corrected": true
+   },
+   {
+    "a": 0,
+    "en": {
+     "opts": [
+      "Ask for feedback",
+      "Procrastinate and hope the problem goes away",
+      "Take immediate action without thinking",
+      "Blame someone else for the problem"
+     ],
+     "q": "What can you do when you're feeling stuck or blocked in a difficult situation?",
+     "why": "Asking for feedback can help you gain new insights and perspectives to move forward."
+    },
+    "pt": {
+     "opts": [
+      "Pedir feedback",
+      "Procrastinar e esperar que o problema desapareça",
+      "Tomar ação imediata sem pensar",
+      "Culpar alguém mais pelo problema"
+     ],
+     "q": "O que pode fazer quando se sente bloqueado ou preso em uma situação difícil?",
+     "why": "Pedir feedback pode ajudá-lo a ganhar novas perspectivas e insights para avançar."
+    },
+    "t0": 158,
+    "type": "application",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750369321,
+    "corrected": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "Blame the obstacles for the delay",
+      "Take responsibility for the delay and ask for help",
+      "Ignore the deadline and hope it gets extended",
+      "Wait for someone else to take action"
+     ],
+     "q": "A team member is struggling to meet a deadline due to unexpected obstacles. What should they do to go above the line?",
+     "why": "Taking responsibility and asking for help shows leadership and a willingness to learn and grow."
+    },
+    "pt": {
+     "opts": [
+      "Culpar os obstáculos pelo atraso",
+      "Assumir a responsabilidade pelo atraso e pedir ajuda",
+      "Ignorar o prazo e esperar que ele seja estendido",
+      "Esperar que alguém mais tome ação"
+     ],
+     "q": "Um membro da equipe está tendo dificuldade em cumprir um prazo devido a obstáculos inesperados. O que eles devem fazer para ir acima da linha?",
+     "why": "Assumir a responsabilidade e pedir ajuda mostra liderança e disposição para aprender e crescer."
+    },
+    "t0": 80,
+    "type": "scenario",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750369321,
+    "corrected": true
+   },
+   {
+    "a": 0,
+    "en": {
+     "opts": [
+      "Take responsibility for the mistake and apologize",
+      "Blame someone else for the mistake",
+      "Ignore the mistake and hope it doesn't affect the project",
+      "Wait for someone else to take action"
+     ],
+     "q": "A colleague makes a mistake that affects the team's project. How should they respond to go above the line?",
+     "why": "Taking responsibility and apologizing shows accountability and a willingness to learn from mistakes."
+    },
+    "pt": {
+     "opts": [
+      "Assumir a responsabilidade pelo erro e pedir desculpas",
+      "Culpar alguém mais pelo erro",
+      "Ignorar o erro e esperar que ele não afete o projeto",
+      "Esperar que alguém mais tome ação"
+     ],
+     "q": "Um colega comete um erro que afeta o projeto da equipe. Como eles devem responder para ir acima da linha?",
+     "why": "Assumir a responsabilidade e pedir desculpas mostra responsabilidade e disposição para aprender com os erros."
+    },
+    "t0": 105,
+    "type": "scenario",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750369321,
+    "corrected": true
+   }
+  ],
+  "10": [
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "Your life becomes less energetic",
+      "Your life has more energy, vitality, richness",
+      "You only solve simple problems",
+      "You become less attractive to others"
+     ],
+     "q": "What happens when you play and stay above the line?",
+     "why": "Playing above the line brings more energy, vitality, and richness to your life."
+    },
+    "pt": {
+     "opts": [
+      "A sua vida torna-se menos energética",
+      "A sua vida tem mais energia, vitalidade, riqueza",
+      "Você só resolve problemas simples",
+      "Você se torna menos atraente para os outros"
+     ],
+     "q": "O que acontece quando você joga e permanece acima da linha?",
+     "why": "Jogar acima da linha traz mais energia, vitalidade e riqueza para a sua vida."
+    },
+    "t0": 25,
+    "type": "recall",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750388890,
+    "corrected": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "The EdenRise Alignment Journey",
+      "The above the line, below the line module",
+      "Team culture module",
+      "Fire truck operation module"
+     ],
+     "q": "What module have you just completed?",
+     "why": "The transcript mentions completing the above the line, below the line module."
+    },
+    "pt": {
+     "opts": [
+      "A Jornada de Alinhamento EdenRise",
+      "O módulo acima da linha, abaixo da linha",
+      "Módulo de cultura de equipe",
+      "Módulo de operação de camião de bombeiros"
+     ],
+     "q": "Qual módulo você acaba de completar?",
+     "why": "A transcrição menciona a conclusão do módulo acima da linha, abaixo da linha."
+    },
+    "t0": 0,
+    "type": "recall",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750388890,
+    "verified": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "Play below the line",
+      "Play above the line",
+      "Solve all problems at once",
+      "Take a break from the training"
+     ],
+     "q": "What should you do to have a more enjoyable life?",
+     "why": "Playing above the line is said to make life more enjoyable."
+    },
+    "pt": {
+     "opts": [
+      "Jogar abaixo da linha",
+      "Jogar acima da linha",
+      "Resolver todos os problemas de uma vez",
+      "Fazer uma pausa no treinamento"
+     ],
+     "q": "O que você deve fazer para ter uma vida mais agradável?",
+     "why": "Jogar acima da linha é dito tornar a vida mais agradável."
+    },
+    "t0": 25,
+    "type": "application",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750388890,
+    "corrected": true
+   },
+   {
+    "a": 0,
+    "en": {
+     "opts": [
+      "Come back to the model",
+      "Forget about the training",
+      "Try to solve problems on your own",
+      "Ask someone else to remind you"
+     ],
+     "q": "What can you do if you need to remind yourself to play above the line?",
+     "why": "The transcript suggests coming back to the model as a way to remind yourself."
+    },
+    "pt": {
+     "opts": [
+      "Voltar ao modelo",
+      "Esquecer o treinamento",
+      "Tentar resolver problemas sozinho",
+      "Pedir a alguém mais para se lembrar"
+     ],
+     "q": "O que você pode fazer se precisar se lembrar de jogar acima da linha?",
+     "why": "A transcrição sugere voltar ao modelo como uma forma de se lembrar."
+    },
+    "t0": 0,
+    "type": "application",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750388890,
+    "corrected": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "They are playing above the line",
+      "They are playing below the line",
+      "They are not enjoying their work",
+      "They are not taking breaks"
+     ],
+     "q": "A colleague is struggling to solve problems and seems less vibrant. What might be the issue?",
+     "why": "Playing below the line might lead to struggling with problems and being less vibrant."
+    },
+    "pt": {
+     "opts": [
+      "Eles estão jogando acima da linha",
+      "Eles estão jogando abaixo da linha",
+      "Eles não estão desfrutando do trabalho",
+      "Eles não estão fazendo pausas"
+     ],
+     "q": "Um colega está tendo dificuldades em resolver problemas e parece menos vibrante. Qual pode ser o problema?",
+     "why": "Jogar abaixo da linha pode levar a dificuldades em resolver problemas e ser menos vibrante."
+    },
+    "t0": 25,
+    "type": "scenario",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750388890,
+    "verified": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "Play below the line",
+      "Play above the line",
+      "Take a long break",
+      "Focus on the next project"
+     ],
+     "q": "You've just completed a difficult project and feel drained. What can you do to regain energy?",
+     "why": "Playing above the line can bring more energy and vitality to your life."
+    },
+    "pt": {
+     "opts": [
+      "Jogar abaixo da linha",
+      "Jogar acima da linha",
+      "Fazer uma longa pausa",
+      "Focar no próximo projeto"
+     ],
+     "q": "Você acaba de concluir um projeto difícil e se sente esgotado. O que você pode fazer para recuperar energia?",
+     "why": "Jogar acima da linha pode trazer mais energia e vitalidade para a sua vida."
+    },
+    "t0": 0,
+    "type": "scenario",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750388890,
+    "corrected": true
+   }
+  ],
+  "11": [
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "As a source of emotional pain",
+      "As a stepping stone to achieving their desired outcome",
+      "As a reason to give up",
+      "As a personal attack"
+     ],
+     "q": "How do elite individuals in their field often view failure?",
+     "why": "They see failure as a necessary step towards success, rather than as a failure itself."
+    },
+    "pt": {
+     "opts": [
+      "Como uma fonte de dor emocional",
+      "Como um degrau para alcançar o resultado desejado",
+      "Como um motivo para desistir",
+      "Como um ataque pessoal"
+     ],
+     "q": "Como os indivíduos de elite em seu campo veem frequentemente o fracasso?",
+     "why": "Eles veem o fracasso como um passo necessário para o sucesso, em vez de como um fracasso em si."
+    },
+    "t0": 27,
+    "type": "recall",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750433602,
+    "verified": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "As a personal failure",
+      "As a stepping stone to success",
+      "As a reason to quit",
+      "As a source of shame"
+     ],
+     "q": "How did Thomas Edison view his many failures?",
+     "why": "He saw his failures as feedback, and believed that each failure brought him closer to finding the solution."
+    },
+    "pt": {
+     "opts": [
+      "Como um fracasso pessoal",
+      "Como um degrau para o sucesso",
+      "Como um motivo para desistir",
+      "Como uma fonte de vergonha"
+     ],
+     "q": "Como Thomas Edison via seus muitos fracassos?",
+     "why": "Ele via seus fracassos como feedback, e acreditava que cada fracasso o aproximava da solução."
+    },
+    "t0": 57,
+    "type": "recall",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750433602,
+    "corrected": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "Try to suppress the pain",
+      "Allow yourself to feel the pain and learn from it",
+      "Give up on your goal",
+      "Blame others for the failure"
+     ],
+     "q": "What should you do when experiencing emotional pain from a failure?",
+     "why": "You should allow yourself to feel the pain and learn from it, in order to grow and improve."
+    },
+    "pt": {
+     "opts": [
+      "Tentar suprimir a dor",
+      "Permitir-se sentir a dor e aprender com ela",
+      "Desistir do seu objetivo",
+      "Culpar os outros pelo fracasso"
+     ],
+     "q": "O que você deve fazer quando experimenta dor emocional por um fracasso?",
+     "why": "Você deve permitir-se sentir a dor e aprender com ela, para crescer e melhorar."
+    },
+    "t0": 137,
+    "type": "application",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750433602,
+    "verified": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "By dwelling on the negative emotions",
+      "By focusing on the learning elements and turning them into a positive outcome",
+      "By trying to forget the experience",
+      "By blaming others for the experience"
+     ],
+     "q": "How can you reframe the meaning of a painful experience?",
+     "why": "You can reframe the meaning of a painful experience by focusing on the learning elements and turning them into a positive outcome."
+    },
+    "pt": {
+     "opts": [
+      "Ao se concentrar nas emoções negativas",
+      "Ao se concentrar nos elementos de aprendizado e transformá-los em um resultado positivo",
+      "Ao tentar esquecer a experiência",
+      "Ao culpar os outros pela experiência"
+     ],
+     "q": "Como você pode redefinir o significado de uma experiência dolorosa?",
+     "why": "Você pode redefinir o significado de uma experiência dolorosa ao se concentrar nos elementos de aprendizado e transformá-los em um resultado positivo."
+    },
+    "t0": 167,
+    "type": "application",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750433602,
+    "corrected": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "Focusing on the potential negative consequences of failure",
+      "Focusing on growing and learning from the experience",
+      "Giving up on the assignment",
+      "Seeking help from a peer"
+     ],
+     "q": "A student is struggling with a difficult assignment and is feeling discouraged. What approach could help them overcome their fear of failure?",
+     "why": "Focusing on growing and learning from the experience could help them overcome their fear of failure and increase their confidence."
+    },
+    "pt": {
+     "opts": [
+      "Se concentrar nas possíveis consequências negativas do fracasso",
+      "Se concentrar no crescimento e aprendizado com a experiência",
+      "Desistir da tarefa",
+      "Procurar ajuda de um colega"
+     ],
+     "q": "Um aluno está tendo dificuldade com uma tarefa difícil e está se sentindo desanimado. Qual abordagem poderia ajudá-lo a superar o medo do fracasso?",
+     "why": "Se concentrar no crescimento e aprendizado com a experiência poderia ajudá-lo a superar o medo do fracasso e aumentar sua confiança."
+    },
+    "t0": 111,
+    "type": "scenario",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750433602,
+    "verified": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "A fixed mindset, believing that their abilities are fixed",
+      "A growth mindset, believing that their abilities can be developed",
+      "A pessimistic mindset, believing that they will fail",
+      "A complacent mindset, believing that they are already good enough"
+     ],
+     "q": "An employee is facing a challenging project and is unsure if they can succeed. What mindset could help them stay motivated and focused?",
+     "why": "A growth mindset, believing that their abilities can be developed, could help them stay motivated and focused on achieving their goal."
+    },
+    "pt": {
+     "opts": [
+      "Uma mentalidade fixa, acreditando que suas habilidades são fixas",
+      "Uma mentalidade de crescimento, acreditando que suas habilidades podem ser desenvolvidas",
+      "Uma mentalidade pessimista, acreditando que ele falhará",
+      "Uma mentalidade complacente, acreditando que ele já é bom o suficiente"
+     ],
+     "q": "Um funcionário está enfrentando um projeto desafiador e está incerto se pode ter sucesso. Qual mentalidade poderia ajudá-lo a se manter motivado e focado?",
+     "why": "Uma mentalidade de crescimento, acreditando que suas habilidades podem ser desenvolvidas, poderia ajudá-lo a se manter motivado e focado em alcançar seu objetivo."
+    },
+    "t0": 196,
+    "type": "scenario",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750433602,
+    "corrected": true
+   }
+  ],
+  "12": [
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "Focusing on what can be learned",
+      "Telling oneself a negative story",
+      "Ignoring the failure",
+      "Blaming others"
+     ],
+     "q": "What is a common negative pattern when experiencing failures or setbacks?",
+     "why": "The trainer mentions that they used to tell themselves a negative story about their failures, asking what's wrong with them."
+    },
+    "pt": {
+     "opts": [
+      "Focar no que pode ser aprendido",
+      "Contar a si mesmo uma história negativa",
+      "Ignorar a falha",
+      "Culpar os outros"
+     ],
+     "q": "Qual é um padrão negativo comum quando se experimentam falhas ou revezes?",
+     "why": "O treinador menciona que costumava contar a si mesmo uma história negativa sobre as suas falhas, perguntando o que estava errado com ele."
+    },
+    "t0": 30,
+    "type": "recall",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750454005,
+    "corrected": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "As a sign of weakness",
+      "As an opportunity to learn",
+      "As a reason to give up",
+      "As a threat to one's ego"
+     ],
+     "q": "How can challenges and setbacks be viewed in a positive way?",
+     "why": "The trainer mentions Thomas Edison as an example of someone who viewed failures as an opportunity to learn."
+    },
+    "pt": {
+     "opts": [
+      "Como um sinal de fraqueza",
+      "Como uma oportunidade para aprender",
+      "Como um motivo para desistir",
+      "Como uma ameaça ao ego"
+     ],
+     "q": "Como os desafios e revezes podem ser vistos de uma forma positiva?",
+     "why": "O treinador menciona Thomas Edison como um exemplo de alguém que via as falhas como uma oportunidade para aprender."
+    },
+    "t0": 115,
+    "type": "recall",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750454005,
+    "verified": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "Tell yourself a negative story",
+      "Focus on what can be learned",
+      "Blame others",
+      "Give up"
+     ],
+     "q": "What should you do when experiencing a setback or failure?",
+     "why": "The trainer emphasizes the importance of having a positive relationship with oneself and using challenges as opportunities for growth."
+    },
+    "pt": {
+     "opts": [
+      "Contar a si mesmo uma história negativa",
+      "Focar no que pode ser aprendido",
+      "Culpar os outros",
+      "Desistir"
+     ],
+     "q": "O que você deve fazer quando experimenta um revés ou falha?",
+     "why": "O treinador enfatiza a importância de ter uma relação positiva consigo mesmo e usar os desafios como oportunidades para crescimento."
+    },
+    "t0": 144,
+    "type": "application",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750454005,
+    "corrected": true
+   },
+   {
+    "a": 0,
+    "en": {
+     "opts": [
+      "Focusing on solutions",
+      "Dwelling on negative thoughts",
+      "Blaming others",
+      "Giving up"
+     ],
+     "q": "What is a key aspect of being mentally strong when facing challenges?",
+     "why": "The trainer mentions that looking for solutions is an important aspect of being mentally strong, as discussed in the first module."
+    },
+    "pt": {
+     "opts": [
+      "Focar em soluções",
+      "Permanecer em pensamentos negativos",
+      "Culpar os outros",
+      "Desistir"
+     ],
+     "q": "Qual é um aspecto fundamental para ser mentalmente forte quando enfrentar desafios?",
+     "why": "O treinador menciona que procurar soluções é um aspecto importante para ser mentalmente forte, como discutido no primeiro módulo."
+    },
+    "t0": 170,
+    "type": "application",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750454005,
+    "corrected": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "opts": [
+      "Tell them to focus on their weaknesses",
+      "Encourage them to view the challenge as an opportunity to learn",
+      "Suggest they blame someone else",
+      "Recommend they give up on the project"
+     ],
+     "q": "A colleague is struggling with a project and is feeling discouraged. What should you advise them to do?",
+     "why": "The trainer emphasizes the importance of having a positive relationship with oneself and using challenges as opportunities for growth."
+    },
+    "pt": {
+     "opts": [
+      "Dizer-lhes para focar nas suas fraquezas",
+      "Encorajá-los a ver o desafio como uma oportunidade para aprender",
+      "Sugerir que culpe alguém mais",
+      "Recomendar que desistam do projeto"
+     ],
+     "q": "Um colega está tendo dificuldades com um projeto e está se sentindo desanimado. O que você deve aconselhá-los a fazer?",
+     "why": "O treinador enfatiza a importância de ter uma relação positiva consigo mesmo e usar os desafios como oportunidades para crescimento."
+    },
+    "t0": 60,
+    "type": "scenario",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750454005,
+    "corrected": true
+   },
+   {
+    "a": 0,
+    "en": {
+     "opts": [
+      "Focus on finding solutions",
+      "Dwell on negative thoughts and emotions",
+      "Blame others for your situation",
+      "Give up and avoid the problem"
+     ],
+     "q": "You are facing a difficult situation in your personal life and are feeling overwhelmed. What should you do to move forward?",
+     "why": "The trainer mentions that looking for solutions is an important aspect of being mentally strong, as discussed in the first module."
+    },
+    "pt": {
+     "opts": [
+      "Focar em encontrar soluções",
+      "Permanecer em pensamentos e emoções negativas",
+      "Culpar os outros pela sua situação",
+      "Desistir e evitar o problema"
+     ],
+     "q": "Você está enfrentando uma situação difícil na sua vida pessoal e está se sentindo sobrecarregado. O que você deve fazer para seguir em frente?",
+     "why": "O treinador menciona que procurar soluções é um aspecto importante para ser mentalmente forte, como discutido no primeiro módulo."
+    },
+    "t0": 86,
+    "type": "scenario",
+    "gen": true,
+    "model": "llama-3.3-70b@workers-ai",
+    "src": "whisper-small",
+    "generatedAt": 1785750454005,
+    "corrected": true
+   }
   ]
  }
 }

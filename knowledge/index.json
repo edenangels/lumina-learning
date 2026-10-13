@@ -1,5 +1,5 @@
 {
- "generatedAt": 1788771679129,
+ "generatedAt": 1791903691069,
  "courses": {
   "alignment-journey": {
    "title": "The EdenRise Alignment Journey",
@@ -64,398 +64,7 @@
     },
     {
      "mod": 1,
-     "title": "Above the Line · Intro",
-     "language": "en",
-     "translated": "pt",
-     "segments": 35,
-     "chars": 5560,
-     "durationSec": 169,
-     "capability": "leadership",
-     "tags": [
-      "leadership",
-      "community",
-      "model",
-      "village",
-      "jabaraaj",
-      "simple",
-      "school",
-      "nepal",
-      "difficult",
-      "helped"
-     ],
-     "regime": null,
-     "summary": "Okay, welcome to the very first module above the line, below the line thinking. Now this is a simple powerful model to help you know how you're doing when it comes to pressure, comes to different stresses in your life. It's very very",
-     "url": "https://academy.edenrise.com/#/play/alignment-journey/1",
-     "moments": [
-      {
-       "t0": 82,
-       "teaches": "What was the impact of the above-the-line model on Jabaraaj's life?",
-       "audit": "verified"
-      },
-      {
-       "t0": 108,
-       "teaches": "What is the starting point for making positive changes according to the trainer?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 135,
-       "teaches": "What should you do after watching the animation video?",
-       "audit": "verified"
-      },
-      {
-       "t0": 161,
-       "teaches": "How should you approach the above-the-line model as presented in the animation?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 82,
-       "teaches": "You are facing a difficult situation at work, similar to Jabaraaj's experience. What should you do first?",
-       "audit": "verified"
-      },
-      {
-       "t0": 108,
-       "teaches": "A colleague is struggling to cope with stress. What principle should you apply to help them?",
-       "audit": "corrected"
-      }
-     ],
-     "questions": 6
-    },
-    {
-     "mod": 2,
-     "title": "Above the Line · Simple & Powerful Thinking",
-     "language": "en",
-     "translated": "pt",
-     "segments": 40,
-     "chars": 5307,
-     "durationSec": 177,
-     "capability": "leadership",
-     "tags": [
-      "leadership",
-      "community",
-      "choose",
-      "move",
-      "champions",
-      "roll",
-      "thinking",
-      "helps",
-      "respond",
-      "pain"
-     ],
-     "regime": null,
-     "summary": "Above the line is a simple and powerful thinking model that helps you get the most out of your unique potential by providing you a clear overview on how you choose to respond to the emotional pain you can experience as you move through the different challenges",
-     "url": "https://academy.edenrise.com/#/play/alignment-journey/2",
-     "moments": [
-      {
-       "t0": 27,
-       "teaches": "What does 'roll' stand for in the context of above the line thinking?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 54,
-       "teaches": "What is the primary motivation for humans to move away from pain, according to human behavioural researchers?",
-       "audit": "verified"
-      },
-      {
-       "t0": 83,
-       "teaches": "When faced with emotional pain, what should you do to build the mindset muscle of champions?",
-       "audit": "verified"
-      },
-      {
-       "t0": 112,
-       "teaches": "What should you do when you recognize you are staying below the line for too long?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 139,
-       "teaches": "A team member has just failed to meet a project deadline. What can they do to apply above the line thinking?",
-       "audit": "verified"
-      },
-      {
-       "t0": 165,
-       "teaches": "A colleague is struggling to cope with the pressure of repeated failures. What can you learn from Michael Jordan's appro",
-       "audit": "corrected"
-      }
-     ],
-     "questions": 6
-    },
-    {
-     "mod": 3,
-     "title": "Above the Line · Deep Dive",
-     "language": "en",
-     "translated": null,
-     "segments": 181,
-     "chars": 8996,
-     "durationSec": 609,
-     "capability": "leadership",
-     "tags": [
-      "leadership",
-      "community",
-      "pressure",
-      "model",
-      "personal",
-      "responsibility",
-      "action",
-      "feedback",
-      "meaning",
-      "yourself"
-     ],
-     "regime": null,
-     "summary": "Welcome back, trust you enjoyed the animation and it gave you an overview of this model. Now we're going to take a deep dive, look into it and unpack it together and explore how this can apply in our personal lives and in our working lives.",
-     "url": "https://academy.edenrise.com/#/play/alignment-journey/3",
-     "moments": [
-      {
-       "t0": 80,
-       "teaches": "What happens when we have pressure in life?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 105,
-       "teaches": "What does it mean to go above the line when there's pressure?",
-       "audit": "verified"
-      },
-      {
-       "t0": 131,
-       "teaches": "What should you do when you make a mistake at work?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 158,
-       "teaches": "What can you do when you're feeling stuck or blocked in a difficult situation?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 80,
-       "teaches": "A team member is struggling to meet a deadline due to unexpected obstacles. What should they do to go above the line?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 105,
-       "teaches": "A colleague makes a mistake that affects the team's project. How should they respond to go above the line?",
-       "audit": "corrected"
-      }
-     ],
-     "questions": 6
-    },
-    {
-     "mod": 4,
-     "title": "Above the Line · Summary",
-     "language": "en",
-     "translated": "pt",
-     "segments": 14,
-     "chars": 1649,
-     "durationSec": 51,
-     "capability": "leadership",
-     "tags": [
-      "leadership",
-      "community"
-     ],
-     "regime": null,
-     "summary": "Okay, congratulations. You've completed the above the line, below the line module. I trust you got a lot of value from it.",
-     "url": "https://academy.edenrise.com/#/play/alignment-journey/4",
-     "moments": [
-      {
-       "t0": 25,
-       "teaches": "What happens when you play and stay above the line?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 0,
-       "teaches": "What module have you just completed?",
-       "audit": "verified"
-      },
-      {
-       "t0": 25,
-       "teaches": "What should you do to have a more enjoyable life?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 0,
-       "teaches": "What can you do if you need to remind yourself to play above the line?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 25,
-       "teaches": "A colleague is struggling to solve problems and seems less vibrant. What might be the issue?",
-       "audit": "verified"
-      },
-      {
-       "t0": 0,
-       "teaches": "You've just completed a difficult project and feel drained. What can you do to regain energy?",
-       "audit": "corrected"
-      }
-     ],
-     "questions": 6
-    },
-    {
-     "mod": 5,
-     "title": "No Failure, Only Feedback · Intro",
-     "language": "en",
-     "translated": "pt",
-     "segments": 8,
-     "chars": 1835,
-     "durationSec": 68,
-     "capability": "leadership",
-     "tags": [
-      "leadership",
-      "community",
-      "failure"
-     ],
-     "regime": null,
-     "summary": "Warm welcome to this module. There is no failure only feedback. So what does this mean and why is this so important? In fact, this is so important that if this is not in place when I've been working with business leaders, athletes, if this component is not in ",
-     "url": "https://academy.edenrise.com/#/play/alignment-journey/5",
-     "moments": [
-      {
-       "t0": 0,
-       "teaches": "What is the core concept emphasized at the beginning of this module?",
-       "audit": "verified"
-      },
-      {
-       "t0": 26,
-       "teaches": "What is the main focus of this module?",
-       "audit": "verified"
-      },
-      {
-       "t0": 0,
-       "teaches": "How should you approach a situation where you have failed?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 26,
-       "teaches": "What should you do when faced with a challenge or setback?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 0,
-       "teaches": "A colleague is feeling discouraged after making a mistake. What should you say to them?",
-       "audit": "verified"
-      },
-      {
-       "t0": 26,
-       "teaches": "You are faced with a difficult task and are feeling anxious about the possibility of failure. What should you do?",
-       "audit": "verified"
-      }
-     ],
-     "questions": 6
-    },
-    {
-     "mod": 6,
-     "title": "No Failure, Only Feedback · Animation",
-     "language": "en",
-     "translated": null,
-     "segments": 50,
-     "chars": 3376,
-     "durationSec": 246,
-     "capability": "leadership",
-     "tags": [
-      "leadership",
-      "community",
-      "failure",
-      "failures",
-      "meaning",
-      "pain",
-      "feedback",
-      "place",
-      "three",
-      "outcome"
-     ],
-     "regime": null,
-     "summary": "The level of emotional pain we feel is directly related to the meaning we give an experience. This video explores the meaning we place on failure. What does failure mean to you?",
-     "url": "https://academy.edenrise.com/#/play/alignment-journey/6",
-     "moments": [
-      {
-       "t0": 27,
-       "teaches": "How do elite individuals in their field often view failure?",
-       "audit": "verified"
-      },
-      {
-       "t0": 57,
-       "teaches": "How did Thomas Edison view his many failures?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 137,
-       "teaches": "What should you do when experiencing emotional pain from a failure?",
-       "audit": "verified"
-      },
-      {
-       "t0": 167,
-       "teaches": "How can you reframe the meaning of a painful experience?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 111,
-       "teaches": "A student is struggling with a difficult assignment and is feeling discouraged. What approach could help them overcome t",
-       "audit": "verified"
-      },
-      {
-       "t0": 196,
-       "teaches": "An employee is facing a challenging project and is unsure if they can succeed. What mindset could help them stay motivat",
-       "audit": "corrected"
-      }
-     ],
-     "questions": 6
-    },
-    {
-     "mod": 7,
-     "title": "No Failure, Only Feedback · Summary",
-     "language": "en",
-     "translated": null,
-     "segments": 93,
-     "chars": 8788,
-     "durationSec": 579,
-     "capability": "leadership",
-     "tags": [
-      "leadership",
-      "community",
-      "failure",
-      "setbacks",
-      "challenges",
-      "relationship",
-      "setback",
-      "wrong",
-      "down",
-      "challenge"
-     ],
-     "regime": null,
-     "summary": "Okay, welcome back. I hope you enjoyed the animation and learned something from that, or at least it triggered some different ways to consider the things we experience in terms of challenges, setbacks, failures and so on. Now let's unpack this. Let's go a bit ",
-     "url": "https://academy.edenrise.com/#/play/alignment-journey/7",
-     "moments": [
-      {
-       "t0": 30,
-       "teaches": "What is a common negative pattern when experiencing failures or setbacks?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 115,
-       "teaches": "How can challenges and setbacks be viewed in a positive way?",
-       "audit": "verified"
-      },
-      {
-       "t0": 144,
-       "teaches": "What should you do when experiencing a setback or failure?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 170,
-       "teaches": "What is a key aspect of being mentally strong when facing challenges?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 60,
-       "teaches": "A colleague is struggling with a project and is feeling discouraged. What should you advise them to do?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 86,
-       "teaches": "You are facing a difficult situation in your personal life and are feeling overwhelmed. What should you do to move forwa",
-       "audit": "corrected"
-      }
-     ],
-     "questions": 6
-    },
-    {
-     "mod": 8,
-     "title": "ESIP · Introduction",
+     "title": "ESIP · The Framework",
      "language": "en",
      "translated": null,
      "segments": 235,
@@ -476,7 +85,7 @@
      ],
      "regime": null,
      "summary": "Hey, John here. A very warm welcome to the CAM model, otherwise known as ESIP. Now, this is a model that we use here in Eden Rise, which at first glance,",
-     "url": "https://academy.edenrise.com/#/play/alignment-journey/8",
+     "url": "https://academy.edenrise.com/#/play/alignment-journey/1",
      "moments": [
       {
        "t0": 139,
@@ -512,287 +121,7 @@
      "questions": 6
     },
     {
-     "mod": 9,
-     "title": "Goal Setting · Intro",
-     "language": "en",
-     "translated": "pt",
-     "segments": 12,
-     "chars": 2054,
-     "durationSec": 62,
-     "capability": "leadership",
-     "tags": [
-      "leadership",
-      "community",
-      "goals",
-      "setting",
-      "focus",
-      "animation"
-     ],
-     "regime": null,
-     "summary": "A very warm welcome to the Goal Setting Module. Setting Goals is long been known as a very powerful tool to help your clarity, your focus, to help companies have their focus, have teams have focus and to really know what you're putting your energies and collec",
-     "url": "https://academy.edenrise.com/#/play/alignment-journey/9",
-     "moments": [
-      {
-       "t0": 27,
-       "teaches": "What are the two primary ways of setting goals explored in this module?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 45,
-       "teaches": "What is the purpose of setting goals according to this module?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 27,
-       "teaches": "What should a team do to apply the goal setting principles from this module?",
-       "audit": "verified"
-      },
-      {
-       "t0": 54,
-       "teaches": "How should a team prioritize their goal setting process?",
-       "audit": "verified"
-      },
-      {
-       "t0": 27,
-       "teaches": "A new team member joins the farm and is unsure about how to contribute to the team's goals. What should they do?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 54,
-       "teaches": "The team is having trouble focusing on their goals. What can they do to improve their focus?",
-       "audit": "corrected"
-      }
-     ],
-     "questions": 6
-    },
-    {
-     "mod": 10,
-     "title": "Goal Setting · Animation",
-     "language": "en",
-     "translated": "pt",
-     "segments": 43,
-     "chars": 5660,
-     "durationSec": 200,
-     "capability": "leadership",
-     "tags": [
-      "leadership",
-      "community",
-      "goals",
-      "term",
-      "goal",
-      "towards",
-      "setting",
-      "medium",
-      "step",
-      "move"
-     ],
-     "regime": null,
-     "summary": "Setting goals is the first step in turning the invisible into the visible, Tony Robbins. The power of setting goals has long been known as a vital tool champions use for turning their dreams into reality.",
-     "url": "https://academy.edenrise.com/#/play/alignment-journey/10",
-     "moments": [
-      {
-       "t0": 26,
-       "teaches": "What is the primary asset that has helped golfing legend Jack Nicholas achieve his goals?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 83,
-       "teaches": "What should you ensure when setting long-term goals?",
-       "audit": "verified"
-      },
-      {
-       "t0": 109,
-       "teaches": "What should you do after setting a long-term goal?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 165,
-       "teaches": "What should you focus on to reach your goals, according to Steffi Graff's father?",
-       "audit": "verified"
-      },
-      {
-       "t0": 138,
-       "teaches": "You are working towards a medium-term goal, but you are feeling overwhelmed by the task. What can you do to build confid",
-       "audit": "corrected"
-      },
-      {
-       "t0": 193,
-       "teaches": "You have set a long-term goal, but you are struggling to make progress. What can you do to get back on track?",
-       "audit": "corrected"
-      }
-     ],
-     "questions": 6
-    },
-    {
-     "mod": 11,
-     "title": "Goal Setting · 90-Day Goals",
-     "language": "en",
-     "translated": "pt",
-     "segments": 168,
-     "chars": 18362,
-     "durationSec": 575,
-     "capability": "leadership",
-     "tags": [
-      "leadership",
-      "community",
-      "department",
-      "team",
-      "goals",
-      "goal",
-      "vision",
-      "angels",
-      "love"
-     ],
-     "regime": null,
-     "summary": "Hey team, a very warm welcome to your 90-day goal setting template. Now this works in partnership with the top five goals that you set every week. Now again, why goal setting important?",
-     "url": "https://academy.edenrise.com/#/play/alignment-journey/11",
-     "moments": [
-      {
-       "t0": 25,
-       "teaches": "Why is goal setting important for the company?",
-       "audit": "verified"
-      },
-      {
-       "t0": 51,
-       "teaches": "What is the recommended approach to completing the 90-day goal setting template?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 81,
-       "teaches": "What should you do when completing the department section of the 90-day goal setting template?",
-       "audit": "verified"
-      },
-      {
-       "t0": 112,
-       "teaches": "How should you approach defining the 'grand vision dream' for your department?",
-       "audit": "verified"
-      },
-      {
-       "t0": 141,
-       "teaches": "You are a new team member in the Building Maintenance Team department. You are struggling to define the 'grand vision dr",
-       "audit": "corrected"
-      },
-      {
-       "t0": 167,
-       "teaches": "You are completing the 90-day goal setting template and reach the 'B, do and have' section. You are unsure what to write",
-       "audit": "corrected"
-      }
-     ],
-     "questions": 6
-    },
-    {
-     "mod": 12,
-     "title": "Goal Setting · Top 5 Goals",
-     "language": "en",
-     "translated": "pt",
-     "segments": 157,
-     "chars": 19093,
-     "durationSec": 570,
-     "capability": "leadership",
-     "tags": [
-      "leadership",
-      "community",
-      "goals",
-      "team",
-      "together",
-      "track",
-      "helps",
-      "place",
-      "support",
-      "weekly"
-     ],
-     "regime": null,
-     "summary": "Hey, John here and a very warm welcome to the weekly top five goals system. Now this is really exciting and this is specific to the goal setting for the week. Now why is this important?",
-     "url": "https://academy.edenrise.com/#/play/alignment-journey/12",
-     "moments": [
-      {
-       "t0": 27,
-       "teaches": "What is one of the benefits of creating goals for the team?",
-       "audit": "verified"
-      },
-      {
-       "t0": 53,
-       "teaches": "What should be done with things that are important?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 115,
-       "teaches": "What should a team member do when they have achieved their weekly goals?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 144,
-       "teaches": "How should an individual's goals and subtasks be connected?",
-       "audit": "verified"
-      },
-      {
-       "t0": 84,
-       "teaches": "A team is struggling with their culture and values. What model can they use to diagnose and improve their situation?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 172,
-       "teaches": "Who is typically responsible for holding team members accountable for their weekly goals?",
-       "audit": "verified"
-      }
-     ],
-     "questions": 6
-    },
-    {
-     "mod": 13,
-     "title": "Goal Setting · Summary",
-     "language": "en",
-     "translated": "pt",
-     "segments": 17,
-     "chars": 3250,
-     "durationSec": 94,
-     "capability": "leadership",
-     "tags": [
-      "leadership",
-      "community",
-      "goals",
-      "goal",
-      "review"
-     ],
-     "regime": null,
-     "summary": "Welcome back. So there you have it. That's goal setting. That's our first look at it. We looked at the 90-day goals. We looked at the top five goals. It's important to know when going through this. The first time I'm going through this, just get it done. Doesn",
-     "url": "https://academy.edenrise.com/#/play/alignment-journey/13",
-     "moments": [
-      {
-       "t0": 28,
-       "teaches": "What analysis do we perform to gauge where we can improve at the end of the 90-day goal period?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 57,
-       "teaches": "Who is quoted as saying that nobody calibrates better than him?",
-       "audit": "verified"
-      },
-      {
-       "t0": 45,
-       "teaches": "What should you do when you're going through the goal-setting process for the first time?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 85,
-       "teaches": "What should you do after checking your progress on your weekly and 90-day goals?",
-       "audit": "corrected"
-      },
-      {
-       "t0": 28,
-       "teaches": "You've just completed your first 90-day goal period and you're reviewing your progress. You notice that you've fallen sh",
-       "audit": "corrected"
-      },
-      {
-       "t0": 57,
-       "teaches": "You're working on your goals and you realize that you need to make some adjustments to stay on track. What approach shou",
-       "audit": "verified"
-      }
-     ],
-     "questions": 6
-    },
-    {
-     "mod": 14,
+     "mod": 2,
      "title": "Beyond Fear · Intro",
      "language": "en",
      "translated": "pt",
@@ -809,7 +138,7 @@
      ],
      "regime": null,
      "summary": "A very warm welcome to this module on fear. False evidence appearing real. So often fear lives in our projected future in most cases and it has a structure to it and we're going to look at that coming up. Now particularly it's normally the perception that what",
-     "url": "https://academy.edenrise.com/#/play/alignment-journey/14",
+     "url": "https://academy.edenrise.com/#/play/alignment-journey/2",
      "moments": [
       {
        "t0": 27,
@@ -845,7 +174,7 @@
      "questions": 6
     },
     {
-     "mod": 15,
+     "mod": 3,
      "title": "Beyond Fear · Animation",
      "language": "en",
      "translated": null,
@@ -867,7 +196,7 @@
      ],
      "regime": null,
      "summary": "Fear. We all experience it in various forms and degrees of intensity. What is it for you? Not living up to your expectations? Letting your family or coach down? Looking bad in front of others? Or the feeling that you are a failure? Is it some of the above? All",
-     "url": "https://academy.edenrise.com/#/play/alignment-journey/15",
+     "url": "https://academy.edenrise.com/#/play/alignment-journey/3",
      "moments": [
       {
        "t0": 118,
@@ -903,7 +232,7 @@
      "questions": 6
     },
     {
-     "mod": 16,
+     "mod": 4,
      "title": "Beyond Fear · Unpack & Summary",
      "language": "en",
      "translated": null,
@@ -925,7 +254,7 @@
      ],
      "regime": null,
      "summary": "Welcome back, I trust you enjoyed the animation so let's unpack fear a bit more. So in this animation we saw the invitation to change the relationship that you have to fear. Now this is something that first begins with awareness.",
-     "url": "https://academy.edenrise.com/#/play/alignment-journey/16",
+     "url": "https://academy.edenrise.com/#/play/alignment-journey/4",
      "moments": [
       {
        "t0": 30,
@@ -961,7 +290,7 @@
      "questions": 6
     },
     {
-     "mod": 17,
+     "mod": 5,
      "title": "Body, Soul & Spirit · Intro",
      "language": "en",
      "translated": "pt",
@@ -979,7 +308,7 @@
      ],
      "regime": null,
      "summary": "Body, Soul and Spirit. Now this is more of a larger overarching module in terms of identifying categories within our personal development and journey as beings. And we're going to unpack all the details of each of the sections coming up.",
-     "url": "https://academy.edenrise.com/#/play/alignment-journey/17",
+     "url": "https://academy.edenrise.com/#/play/alignment-journey/5",
      "moments": [
       {
        "t0": 28,
@@ -1015,7 +344,7 @@
      "questions": 6
     },
     {
-     "mod": 18,
+     "mod": 6,
      "title": "Body, Soul & Spirit · Deep Dive",
      "language": "en",
      "translated": "pt",
@@ -1037,7 +366,7 @@
      ],
      "regime": null,
      "summary": "Welcome to the deep dive on body, soul and spirit. Let's begin with the physical body. The physical body is often referred to in ancient Biblical scriptures as the Earthly Vessel.",
-     "url": "https://academy.edenrise.com/#/play/alignment-journey/18",
+     "url": "https://academy.edenrise.com/#/play/alignment-journey/6",
      "moments": [
       {
        "t0": 30,
@@ -1563,6 +892,229 @@
       }
      ],
      "questions": 6
+    },
+    {
+     "mod": 5,
+     "title": "Go deeper · Goal Setting: the Animation",
+     "language": "en",
+     "translated": "pt",
+     "segments": 43,
+     "chars": 5660,
+     "durationSec": 200,
+     "capability": "leadership",
+     "tags": [
+      "leadership",
+      "goals",
+      "term",
+      "goal",
+      "towards",
+      "setting",
+      "medium",
+      "step",
+      "move"
+     ],
+     "regime": null,
+     "summary": "Setting goals is the first step in turning the invisible into the visible, Tony Robbins. The power of setting goals has long been known as a vital tool champions use for turning their dreams into reality.",
+     "url": "https://academy.edenrise.com/#/play/growth-journey/5",
+     "moments": [
+      {
+       "t0": 26,
+       "teaches": "What is the primary asset that has helped golfing legend Jack Nicholas achieve his goals?",
+       "audit": "corrected"
+      },
+      {
+       "t0": 83,
+       "teaches": "What should you ensure when setting long-term goals?",
+       "audit": "verified"
+      },
+      {
+       "t0": 109,
+       "teaches": "What should you do after setting a long-term goal?",
+       "audit": "corrected"
+      },
+      {
+       "t0": 165,
+       "teaches": "What should you focus on to reach your goals, according to Steffi Graff's father?",
+       "audit": "verified"
+      },
+      {
+       "t0": 138,
+       "teaches": "You are working towards a medium-term goal, but you are feeling overwhelmed by the task. What can you do to build confid",
+       "audit": "corrected"
+      },
+      {
+       "t0": 193,
+       "teaches": "You have set a long-term goal, but you are struggling to make progress. What can you do to get back on track?",
+       "audit": "corrected"
+      }
+     ],
+     "questions": 6
+    },
+    {
+     "mod": 6,
+     "title": "Go deeper · Your 90-Day Goals",
+     "language": "en",
+     "translated": "pt",
+     "segments": 168,
+     "chars": 18362,
+     "durationSec": 575,
+     "capability": "leadership",
+     "tags": [
+      "leadership",
+      "department",
+      "team",
+      "goals",
+      "goal",
+      "vision",
+      "community",
+      "angels",
+      "love"
+     ],
+     "regime": null,
+     "summary": "Hey team, a very warm welcome to your 90-day goal setting template. Now this works in partnership with the top five goals that you set every week. Now again, why goal setting important?",
+     "url": "https://academy.edenrise.com/#/play/growth-journey/6",
+     "moments": [
+      {
+       "t0": 25,
+       "teaches": "Why is goal setting important for the company?",
+       "audit": "verified"
+      },
+      {
+       "t0": 51,
+       "teaches": "What is the recommended approach to completing the 90-day goal setting template?",
+       "audit": "corrected"
+      },
+      {
+       "t0": 81,
+       "teaches": "What should you do when completing the department section of the 90-day goal setting template?",
+       "audit": "verified"
+      },
+      {
+       "t0": 112,
+       "teaches": "How should you approach defining the 'grand vision dream' for your department?",
+       "audit": "verified"
+      },
+      {
+       "t0": 141,
+       "teaches": "You are a new team member in the Building Maintenance Team department. You are struggling to define the 'grand vision dr",
+       "audit": "corrected"
+      },
+      {
+       "t0": 167,
+       "teaches": "You are completing the 90-day goal setting template and reach the 'B, do and have' section. You are unsure what to write",
+       "audit": "corrected"
+      }
+     ],
+     "questions": 6
+    },
+    {
+     "mod": 7,
+     "title": "Go deeper · Your Top 5 Goals",
+     "language": "en",
+     "translated": "pt",
+     "segments": 157,
+     "chars": 19093,
+     "durationSec": 570,
+     "capability": "leadership",
+     "tags": [
+      "leadership",
+      "goals",
+      "team",
+      "together",
+      "track",
+      "helps",
+      "place",
+      "support",
+      "weekly"
+     ],
+     "regime": null,
+     "summary": "Hey, John here and a very warm welcome to the weekly top five goals system. Now this is really exciting and this is specific to the goal setting for the week. Now why is this important?",
+     "url": "https://academy.edenrise.com/#/play/growth-journey/7",
+     "moments": [
+      {
+       "t0": 27,
+       "teaches": "What is one of the benefits of creating goals for the team?",
+       "audit": "verified"
+      },
+      {
+       "t0": 53,
+       "teaches": "What should be done with things that are important?",
+       "audit": "corrected"
+      },
+      {
+       "t0": 115,
+       "teaches": "What should a team member do when they have achieved their weekly goals?",
+       "audit": "corrected"
+      },
+      {
+       "t0": 144,
+       "teaches": "How should an individual's goals and subtasks be connected?",
+       "audit": "verified"
+      },
+      {
+       "t0": 84,
+       "teaches": "A team is struggling with their culture and values. What model can they use to diagnose and improve their situation?",
+       "audit": "corrected"
+      },
+      {
+       "t0": 172,
+       "teaches": "Who is typically responsible for holding team members accountable for their weekly goals?",
+       "audit": "verified"
+      }
+     ],
+     "questions": 6
+    },
+    {
+     "mod": 8,
+     "title": "Go deeper · Goal Setting: Summary",
+     "language": "en",
+     "translated": "pt",
+     "segments": 17,
+     "chars": 3250,
+     "durationSec": 94,
+     "capability": "leadership",
+     "tags": [
+      "leadership",
+      "goals",
+      "goal",
+      "review"
+     ],
+     "regime": null,
+     "summary": "Welcome back. So there you have it. That's goal setting. That's our first look at it. We looked at the 90-day goals. We looked at the top five goals. It's important to know when going through this. The first time I'm going through this, just get it done. Doesn",
+     "url": "https://academy.edenrise.com/#/play/growth-journey/8",
+     "moments": [
+      {
+       "t0": 28,
+       "teaches": "What analysis do we perform to gauge where we can improve at the end of the 90-day goal period?",
+       "audit": "corrected"
+      },
+      {
+       "t0": 57,
+       "teaches": "Who is quoted as saying that nobody calibrates better than him?",
+       "audit": "verified"
+      },
+      {
+       "t0": 45,
+       "teaches": "What should you do when you're going through the goal-setting process for the first time?",
+       "audit": "corrected"
+      },
+      {
+       "t0": 85,
+       "teaches": "What should you do after checking your progress on your weekly and 90-day goals?",
+       "audit": "corrected"
+      },
+      {
+       "t0": 28,
+       "teaches": "You've just completed your first 90-day goal period and you're reviewing your progress. You notice that you've fallen sh",
+       "audit": "corrected"
+      },
+      {
+       "t0": 57,
+       "teaches": "You're working on your goals and you realize that you need to make some adjustments to stay on track. What approach shou",
+       "audit": "verified"
+      }
+     ],
+     "questions": 6
     }
    ]
   },
@@ -2028,6 +1580,288 @@
       {
        "t0": 183,
        "teaches": "You notice that a team member is consistently making valuable contributions to the team. What should you do to recognize",
+       "audit": "corrected"
+      }
+     ],
+     "questions": 6
+    },
+    {
+     "mod": 8,
+     "title": "Go deeper · Above the Line: Simple & Powerful Thinking",
+     "language": "en",
+     "translated": "pt",
+     "segments": 40,
+     "chars": 5307,
+     "durationSec": 177,
+     "capability": "leadership",
+     "tags": [
+      "leadership",
+      "community",
+      "choose",
+      "move",
+      "champions",
+      "roll",
+      "thinking",
+      "helps",
+      "respond",
+      "pain"
+     ],
+     "regime": null,
+     "summary": "Above the line is a simple and powerful thinking model that helps you get the most out of your unique potential by providing you a clear overview on how you choose to respond to the emotional pain you can experience as you move through the different challenges",
+     "url": "https://academy.edenrise.com/#/play/land-team-journey/8",
+     "moments": [
+      {
+       "t0": 27,
+       "teaches": "What does 'roll' stand for in the context of above the line thinking?",
+       "audit": "corrected"
+      },
+      {
+       "t0": 54,
+       "teaches": "What is the primary motivation for humans to move away from pain, according to human behavioural researchers?",
+       "audit": "verified"
+      },
+      {
+       "t0": 83,
+       "teaches": "When faced with emotional pain, what should you do to build the mindset muscle of champions?",
+       "audit": "verified"
+      },
+      {
+       "t0": 112,
+       "teaches": "What should you do when you recognize you are staying below the line for too long?",
+       "audit": "corrected"
+      },
+      {
+       "t0": 139,
+       "teaches": "A team member has just failed to meet a project deadline. What can they do to apply above the line thinking?",
+       "audit": "verified"
+      },
+      {
+       "t0": 165,
+       "teaches": "A colleague is struggling to cope with the pressure of repeated failures. What can you learn from Michael Jordan's appro",
+       "audit": "corrected"
+      }
+     ],
+     "questions": 6
+    },
+    {
+     "mod": 9,
+     "title": "Go deeper · Above the Line: Deep Dive",
+     "language": "en",
+     "translated": null,
+     "segments": 181,
+     "chars": 8996,
+     "durationSec": 609,
+     "capability": "leadership",
+     "tags": [
+      "leadership",
+      "community",
+      "pressure",
+      "model",
+      "personal",
+      "responsibility",
+      "action",
+      "feedback",
+      "meaning",
+      "yourself"
+     ],
+     "regime": null,
+     "summary": "Welcome back, trust you enjoyed the animation and it gave you an overview of this model. Now we're going to take a deep dive, look into it and unpack it together and explore how this can apply in our personal lives and in our working lives.",
+     "url": "https://academy.edenrise.com/#/play/land-team-journey/9",
+     "moments": [
+      {
+       "t0": 80,
+       "teaches": "What happens when we have pressure in life?",
+       "audit": "corrected"
+      },
+      {
+       "t0": 105,
+       "teaches": "What does it mean to go above the line when there's pressure?",
+       "audit": "verified"
+      },
+      {
+       "t0": 131,
+       "teaches": "What should you do when you make a mistake at work?",
+       "audit": "corrected"
+      },
+      {
+       "t0": 158,
+       "teaches": "What can you do when you're feeling stuck or blocked in a difficult situation?",
+       "audit": "corrected"
+      },
+      {
+       "t0": 80,
+       "teaches": "A team member is struggling to meet a deadline due to unexpected obstacles. What should they do to go above the line?",
+       "audit": "corrected"
+      },
+      {
+       "t0": 105,
+       "teaches": "A colleague makes a mistake that affects the team's project. How should they respond to go above the line?",
+       "audit": "corrected"
+      }
+     ],
+     "questions": 6
+    },
+    {
+     "mod": 10,
+     "title": "Go deeper · Above the Line: Summary",
+     "language": "en",
+     "translated": "pt",
+     "segments": 14,
+     "chars": 1649,
+     "durationSec": 51,
+     "capability": "leadership",
+     "tags": [
+      "leadership",
+      "community"
+     ],
+     "regime": null,
+     "summary": "Okay, congratulations. You've completed the above the line, below the line module. I trust you got a lot of value from it.",
+     "url": "https://academy.edenrise.com/#/play/land-team-journey/10",
+     "moments": [
+      {
+       "t0": 25,
+       "teaches": "What happens when you play and stay above the line?",
+       "audit": "corrected"
+      },
+      {
+       "t0": 0,
+       "teaches": "What module have you just completed?",
+       "audit": "verified"
+      },
+      {
+       "t0": 25,
+       "teaches": "What should you do to have a more enjoyable life?",
+       "audit": "corrected"
+      },
+      {
+       "t0": 0,
+       "teaches": "What can you do if you need to remind yourself to play above the line?",
+       "audit": "corrected"
+      },
+      {
+       "t0": 25,
+       "teaches": "A colleague is struggling to solve problems and seems less vibrant. What might be the issue?",
+       "audit": "verified"
+      },
+      {
+       "t0": 0,
+       "teaches": "You've just completed a difficult project and feel drained. What can you do to regain energy?",
+       "audit": "corrected"
+      }
+     ],
+     "questions": 6
+    },
+    {
+     "mod": 11,
+     "title": "Go deeper · No Failure: the Animation",
+     "language": "en",
+     "translated": null,
+     "segments": 50,
+     "chars": 3376,
+     "durationSec": 246,
+     "capability": "leadership",
+     "tags": [
+      "leadership",
+      "community",
+      "failure",
+      "failures",
+      "meaning",
+      "pain",
+      "feedback",
+      "place",
+      "three",
+      "outcome"
+     ],
+     "regime": null,
+     "summary": "The level of emotional pain we feel is directly related to the meaning we give an experience. This video explores the meaning we place on failure. What does failure mean to you?",
+     "url": "https://academy.edenrise.com/#/play/land-team-journey/11",
+     "moments": [
+      {
+       "t0": 27,
+       "teaches": "How do elite individuals in their field often view failure?",
+       "audit": "verified"
+      },
+      {
+       "t0": 57,
+       "teaches": "How did Thomas Edison view his many failures?",
+       "audit": "corrected"
+      },
+      {
+       "t0": 137,
+       "teaches": "What should you do when experiencing emotional pain from a failure?",
+       "audit": "verified"
+      },
+      {
+       "t0": 167,
+       "teaches": "How can you reframe the meaning of a painful experience?",
+       "audit": "corrected"
+      },
+      {
+       "t0": 111,
+       "teaches": "A student is struggling with a difficult assignment and is feeling discouraged. What approach could help them overcome t",
+       "audit": "verified"
+      },
+      {
+       "t0": 196,
+       "teaches": "An employee is facing a challenging project and is unsure if they can succeed. What mindset could help them stay motivat",
+       "audit": "corrected"
+      }
+     ],
+     "questions": 6
+    },
+    {
+     "mod": 12,
+     "title": "Go deeper · No Failure: Summary",
+     "language": "en",
+     "translated": null,
+     "segments": 93,
+     "chars": 8788,
+     "durationSec": 579,
+     "capability": "leadership",
+     "tags": [
+      "leadership",
+      "community",
+      "failure",
+      "setbacks",
+      "challenges",
+      "relationship",
+      "setback",
+      "wrong",
+      "down",
+      "challenge"
+     ],
+     "regime": null,
+     "summary": "Okay, welcome back. I hope you enjoyed the animation and learned something from that, or at least it triggered some different ways to consider the things we experience in terms of challenges, setbacks, failures and so on. Now let's unpack this. Let's go a bit ",
+     "url": "https://academy.edenrise.com/#/play/land-team-journey/12",
+     "moments": [
+      {
+       "t0": 30,
+       "teaches": "What is a common negative pattern when experiencing failures or setbacks?",
+       "audit": "corrected"
+      },
+      {
+       "t0": 115,
+       "teaches": "How can challenges and setbacks be viewed in a positive way?",
+       "audit": "verified"
+      },
+      {
+       "t0": 144,
+       "teaches": "What should you do when experiencing a setback or failure?",
+       "audit": "corrected"
+      },
+      {
+       "t0": 170,
+       "teaches": "What is a key aspect of being mentally strong when facing challenges?",
+       "audit": "corrected"
+      },
+      {
+       "t0": 60,
+       "teaches": "A colleague is struggling with a project and is feeling discouraged. What should you advise them to do?",
+       "audit": "corrected"
+      },
+      {
+       "t0": 86,
+       "teaches": "You are facing a difficult situation in your personal life and are feeling overwhelmed. What should you do to move forwa",
        "audit": "corrected"
       }
      ],

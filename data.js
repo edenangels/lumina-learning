@@ -71,12 +71,12 @@ const PATH_RATIONALES = [
 const GOAL_PRESETS = {
   /* outcome goals (John, 13 Oct 2026: "Land Team is not a goal") — each sequences the
      filmed courses toward something a learner can want */
-  'Show up Above the Line':       ['land-team-journey', 'alignment-journey', 'growth-journey'],
+  'Show up Above the Line':       ['alignment-journey', 'land-team-journey', 'growth-journey'],
   'Purpose & goals that stick':   ['growth-journey', 'alignment-journey', 'land-team-journey'],
   'Fire-season ready':            ['fire-truck-training', 'land-team-journey'],
   'Work well with AI':            ['ai-literacy', 'land-team-journey'],
   /* kept so paths chosen before 13 Oct 2026 still resolve; shown as "The full journey" */
-  'Land Team':                    ['land-team-journey', 'fire-truck-training', 'alignment-journey', 'ai-literacy']
+  'Land Team':                    ['alignment-journey', 'land-team-journey', 'fire-truck-training', 'ai-literacy']
 };
 const GOALS_EN = { 'Land Team': 'The full Land Team journey' };
 
