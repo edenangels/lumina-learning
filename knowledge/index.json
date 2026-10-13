@@ -1,5 +1,5 @@
 {
- "generatedAt": 1791903691069,
+ "generatedAt": 1791904661779,
  "courses": {
   "alignment-journey": {
    "title": "The EdenRise Alignment Journey",
@@ -442,7 +442,7 @@
       },
       {
        "t0": 107,
-       "teaches": "What should you do before starting the engine every morning?",
+       "teaches": "What must you do every morning before you drive the truck?",
        "audit": "corrected"
       },
       {
@@ -456,8 +456,8 @@
        "audit": "verified"
       },
       {
-       "t0": 165,
-       "teaches": "What should you do if the fire truck is not moving straight while driving?",
+       "t0": 159,
+       "teaches": "You released the handbrake and are waiting for brake pressure. What tells you the truck is ready to move?",
        "audit": "corrected"
       }
      ],
@@ -603,7 +603,7 @@
      "moments": [
       {
        "t0": 54,
-       "teaches": "What happens when the emergency switch is activated on the Stefinator?",
+       "teaches": "What happens when the emergency switch on the fire truck is activated?",
        "audit": "verified"
       },
       {
@@ -895,7 +895,7 @@
     },
     {
      "mod": 5,
-     "title": "Go deeper · Goal Setting: the Animation",
+     "title": "Goal Setting: the Animation",
      "language": "en",
      "translated": "pt",
      "segments": 43,
@@ -952,7 +952,7 @@
     },
     {
      "mod": 6,
-     "title": "Go deeper · Your 90-Day Goals",
+     "title": "Your 90-Day Goals",
      "language": "en",
      "translated": "pt",
      "segments": 168,
@@ -1009,7 +1009,7 @@
     },
     {
      "mod": 7,
-     "title": "Go deeper · Your Top 5 Goals",
+     "title": "Your Top 5 Goals",
      "language": "en",
      "translated": "pt",
      "segments": 157,
@@ -1066,7 +1066,7 @@
     },
     {
      "mod": 8,
-     "title": "Go deeper · Goal Setting: Summary",
+     "title": "Goal Setting: Summary",
      "language": "en",
      "translated": "pt",
      "segments": 17,
@@ -1587,7 +1587,7 @@
     },
     {
      "mod": 8,
-     "title": "Go deeper · Above the Line: Simple & Powerful Thinking",
+     "title": "Above the Line: Simple & Powerful Thinking",
      "language": "en",
      "translated": "pt",
      "segments": 40,
@@ -1645,7 +1645,7 @@
     },
     {
      "mod": 9,
-     "title": "Go deeper · Above the Line: Deep Dive",
+     "title": "Above the Line: Deep Dive",
      "language": "en",
      "translated": null,
      "segments": 181,
@@ -1703,7 +1703,7 @@
     },
     {
      "mod": 10,
-     "title": "Go deeper · Above the Line: Summary",
+     "title": "Above the Line: Summary",
      "language": "en",
      "translated": "pt",
      "segments": 14,
@@ -1753,7 +1753,7 @@
     },
     {
      "mod": 11,
-     "title": "Go deeper · No Failure: the Animation",
+     "title": "No Failure: the Animation",
      "language": "en",
      "translated": null,
      "segments": 50,
@@ -1811,7 +1811,7 @@
     },
     {
      "mod": 12,
-     "title": "Go deeper · No Failure: Summary",
+     "title": "No Failure: Summary",
      "language": "en",
      "translated": null,
      "segments": 93,

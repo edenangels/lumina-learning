@@ -67,8 +67,24 @@ const coursePct = id => {
   return Math.max(pct, endowed);
 };
 const isDone = id => !!(prog(id) && prog(id).done);
+/* per-course certification: passing THAT course's quiz. Rebuilt once from the ledger for
+   learners who passed before this record existed — the ledger already holds every attempt. */
+function certsInit() {
+  if (S.certs) return;
+  S.certs = {};
+  (S.ledger || []).forEach(e => {
+    if (e.type !== 'quiz_pass' || !e.courseId) return;
+    const p = S.certs[e.courseId] || {};
+    S.certs[e.courseId] = { passed: true, score: Math.max(p.score || 0, e.score || 0), at: p.at || Date.parse(e.at) || Date.now(), attempts: (p.attempts || 0) + 1 };
+  });
+}
+const certOf = id => { certsInit(); const r = S.certs[id]; return r && r.passed ? r : null; };
 const inPath = id => S.path.includes(id);
-const courseMins = c => c.moduleDurations ? c.moduleDurations.reduce((a, b) => a + (b || 12), 0) : c.modules.length * 12;
+/* A course may end with optional "go deeper" lessons (c.coreModules = how many are required).
+   Completion, the course length and the certificate's hours count the required ones only. */
+const coreN = c => Math.min((c && c.coreModules) || ((c && c.modules) || []).length, ((c && c.modules) || []).length);
+const courseMins = c => c.moduleDurations ? c.moduleDurations.slice(0, coreN(c)).reduce((a, b) => a + (b || 12), 0) : coreN(c) * 12;
+const deepMins = c => c.moduleDurations ? c.moduleDurations.slice(coreN(c)).reduce((a, b) => a + (b || 12), 0) : (c.modules.length - coreN(c)) * 12;
 const moduleDur = (c, i) => (c.moduleDurations && c.moduleDurations[i]) ? c.moduleDurations[i] + 'm' : '12m';
 /* studio meta (admin-managed, loaded from Firestore courses/__meta) */
 let studioMeta = null;
@@ -870,12 +886,25 @@ function renderAnalytics() {
   </div>${footerHTML()}</div>`;
 }
 
+/* John (13 Oct 2026): "when you listen to it, you feel like I want to do that course". The page
+   now says what you will be able to do, and how the course works, before the lesson list. */
+function courseIntroHTML(c) {
+  const oc = (_lang() === 'pt' && c.outcomes_pt) || c.outcomes;
+  if (!oc || !oc.length) return '';
+  const steps = t('how_steps').split('|');
+  return `<section class="course-intro">
+    <div class="ci-col"><h2>${t('outcomes_h')}</h2><ul class="ci-list">${oc.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>
+    <div class="ci-col"><h2>${t('how_h')}</h2><ol class="ci-steps">${steps.map(x => `<li>${esc(x)}</li>`).join('')}</ol>
+      ${coreN(c) < c.modules.length ? `<p class="ci-note">${t('deep_note').replace('{n}', c.modules.length - coreN(c)).replace('{m}', fmtMins(deepMins(c)))}</p>` : ''}</div>
+  </section>`;
+}
 function renderCourse(id) {
   const c = courseById(id);
   if (!c) { location.hash = '#/home'; return ''; }
   if (myMissions === null && S.profile && S.profile.uid && window.EdenMissions) { myMissions = []; loadMyMissions(); }
   const p = prog(id);
   const cur = p && !p.done ? (p.mod || 0) : -1;
+  const _deepAt = coreN(c) < c.modules.length ? coreN(c) : -1;
   const modules = c.modules.map((m, i) => {
     const mm = modMedia(c, i);
     const soon = mm && mm.type === 'soon';
@@ -909,7 +938,7 @@ function renderCourse(id) {
       <span class="m-dur">${moduleDur(c, i)}</span>
       <button class="m-play">▶</button>
     ${tags}${links}</div>`;
-  }).join('');
+  }).map((h, i) => (i === _deepAt ? `<div class="deep-divider"><b>${t('deep_h')}</b><span>${t('deep_sub')}</span></div>` : '') + h).join('');
   return `<div class="page">
     <div class="course-hero">
       <div class="bg t-grad-${c.grad}"${c.poster ? ` style="background-image:url('${c.poster}');background-size:cover;background-position:center"` : ''}></div>
@@ -918,7 +947,7 @@ function renderCourse(id) {
         <div class="course-info">
           <div class="hero-meta">
             <span class="match">${c.ai ? t('in_ai_rotation') : tcat(c.cat)}</span><span class="sep"></span>
-            <span>${c.modules.length} ${t('modules')}</span><span class="sep"></span>
+            <span>${coreN(c)} ${t('modules')}${coreN(c) < c.modules.length ? ` + ${c.modules.length - coreN(c)} ${t('optional_lbl')}` : ''}</span><span class="sep"></span>
             <span>${fmtMins(courseMins(c))}</span><span class="sep"></span><span>${t(c.level) || c.level}</span>
             ${/* A course with no ratings yet must say nothing, not "★ undefined ·
                    0 learners". Absent proof is fine; invented or broken proof is not. */''}
@@ -934,20 +963,24 @@ function renderCourse(id) {
                  add-to-path — so the page could not answer "what now?". The
                  secondary is the honest second choice for the state you are in;
                  the rest are quiet text, present but not competing. -->
-            <button class="btn btn-primary" data-action="play" data-id="${id}">▶&nbsp; ${isDone(id) ? t('rewatch') : p ? `${t('resume_module')} ${(p.mod || 0) + 1}` : t('start_course')}</button>
+            ${isDone(id) && !certOf(id)
+              ? `<button class="btn btn-primary" data-action="quiz" data-id="${id}">🎯&nbsp; ${t('take_cert_quiz')}</button>`
+              : `<button class="btn btn-primary" data-action="play" data-id="${id}">▶&nbsp; ${isDone(id) ? t('rewatch') : p ? `${t('resume_module')} ${(p.mod || 0) + 1}` : t('start_course')}</button>`}
             ${isDone(id)
-              ? `<button class="btn btn-glass" data-action="quiz" data-id="${id}">${t('quiz_me')}</button>`
+              ? (certOf(id) ? `<button class="btn btn-glass" data-action="cert-dl" data-id="${id}">⤓ ${t('cert_dl')}</button>` : `<button class="btn btn-glass" data-action="play" data-id="${id}">▶ ${t('rewatch')}</button>`)
               : `<button class="btn btn-glass" data-action="toggle-path" data-id="${id}">${inPath(id) ? t('in_my_path') : t('my_path')}</button>`}
             <div class="course-quiet">
-              ${isDone(id) ? `<button class="link-quiet" data-action="toggle-path" data-id="${id}">${inPath(id) ? t('in_my_path') : t('my_path')}</button>` : `<button class="link-quiet" data-action="quiz" data-id="${id}">${t('quiz_me')}</button>`}
+              ${isDone(id) ? `<button class="link-quiet" data-action="toggle-path" data-id="${id}">${inPath(id) ? t('in_my_path') : t('my_path')}</button>` : (p && (p.mod || 0) > 0) ? `<button class="link-quiet" data-action="quiz" data-id="${id}">${t('quiz_me')}</button>` : ''}
               <button class="link-quiet" data-action="ai-overview" data-id="${id}">${t('ai_overview')}</button>
             </div>
           </div>
+          ${certOf(id) ? `<p class="cert-status ok">✓ ${t('certified_lbl')} · ${certOf(id).score}% · ${fmtCertDate(new Date(certOf(id).at))}</p>` : ''}
           ${coursePct(id) > 0 && !isDone(id) ? `<div class="hero-progress"><div class="track"><div class="fill" style="width:${coursePct(id)}%"></div></div><span>${coursePct(id)}% ${t('complete')}</span></div>` : ''}
           ${isDone(id) ? (() => { const rs = recertState(c); return `<div class="hero-progress"><span class="due ${rs && rs.st !== 'ok' ? '' : 'ok'}" style="margin:0;">${rs && rs.st === 'expired' ? ' ' + t('comp_expired') + ' — ' + t('comp_renew').toLowerCase() : rs && rs.st === 'expiring' ? ' ' + t('comp_expiring') + ' (' + rs.days + 'd)' : '✓ ' + t('completed') + (p.score ? ' · ' + t('scored') + ' ' + p.score + '%' : '')}</span></div>`; })() : ''}
         </div>
       </div>
     </div>
+    ${courseIntroHTML(c)}
     <div class="rail-head" style="margin-top:14px;"><h2>${t('modules_h')}</h2><span class="hint">${t('tap_module')}</span></div>
     <div class="module-list">${modules}</div>
     <div class="page-pad" style="padding-top:0;">
@@ -2705,6 +2738,8 @@ function fmtCertDate(d) {
 }
 function premiumCourseCert(courseId) {
   const c = courseById(courseId); if (!c || !isDone(courseId)) return;
+  const cert = certOf(courseId);
+  if (!cert) { toast(t('cert_needs_quiz'), '🎯'); openQuiz(courseId); return; }
   const pt = _lang() === 'pt', h = Math.round(courseMins(c) / 6) / 10;
   openPrintDoc(buildCertHTML({
     docTitle: (pt ? 'Documento Comprovativo — ' : 'Training Record — ') + ctitle(c),
@@ -2715,9 +2750,9 @@ function premiumCourseCert(courseId) {
     /* REQ-L-003 names the trainer, not only the supplying organisation — the
        educator object is where that name now comes from */
     trainer: (() => { const e = educatorFor(c); return e ? e.name + (e.external ? (pt ? ' (externo)' : ' (external)') : '') : ''; })(),
-    meta: `${h}h · <b>${fmtCertDate(certDate(c.id))}</b>`,
+    meta: `${h}h · ${pt ? 'Avaliação' : 'Assessed'} ${cert.score}% · <b>${fmtCertDate(certDate(c.id))}</b>`,
   }));
-  ledgerAppend('cert_issued', { courseId, kind: 'course' });
+  ledgerAppend('cert_issued', { courseId, kind: 'course', score: cert.score });
 }
 function premiumJourneyCert(id) {
   const j = JOURNEYS.find(x => x.id === id); if (!j) return;
@@ -5734,7 +5769,7 @@ function showTakeaways(c, mod, next) {
   if (next && next.kind === 'course-done') {
     $('#takeList').innerHTML += `<div class="take-extra">
       ${ratingStarsHTML(next.courseId)}
-      <button class="btn btn-glass btn-sm" data-action="cert-dl" data-id="${next.courseId}"> ${t('cert_dl')}</button>
+      ${certOf(next.courseId) ? `<button class="btn btn-glass btn-sm" data-action="cert-dl" data-id="${next.courseId}">⤓ ${t('cert_dl')}</button>` : `<p class="cert-hint">🎯 ${t('cert_needs_quiz')}</p>`}
     </div>
     ${(S.intentions || {})[next.courseId] ? '' : `<div class="intent-box">
       <div class="ob-eyebrow"> ${t('intent_h')}</div>
@@ -5918,6 +5953,7 @@ function resolveTakeaways(toQuiz) {
 function resolveTakeawaysNext(n, toQuiz) {
   if (toQuiz && n.courseId) { closePlayer(); setTimeout(() => openQuiz(n.courseId), 250); return; }   /* watch → assess loop */
   if (n.kind === 'next') openPlayer(n.courseId, n.mod);
+  else if (n.kind === 'end') closePlayer();
   else if (n.kind === 'soon') { closePlayer(); setTimeout(() => toast(_lang() === 'pt' ? 'É tudo por agora — o resto da jornada está a caminho' : 'That’s every lesson available so far — the rest of the journey is coming soon', ''), 400); }
   else if (n.kind === 'course-done') {
     closePlayer();
@@ -7259,10 +7295,11 @@ function completeModule(courseId, mod) {
      LandFlow's person_shown, and the worker gets the return message in Telegram. Guarded: the
      Academy must work even if LandFlow is unreachable. */
   try { window.lfModuleComplete && window.lfModuleComplete(courseId, mod); } catch (e) {}
-  if (mod >= c.modules.length - 1) ledgerAppend('course_complete', { courseId });
+  const _wasDone = !!p.done, _lastCore = coreN(c) - 1;
+  if (mod >= _lastCore && !_wasDone) ledgerAppend('course_complete', { courseId });
   if (S.review[courseId] === mod) { delete S.review[courseId]; toast('Review module cleared — nice recovery', '↺'); }
   bumpStreak();
-  if (mod >= c.modules.length - 1) {
+  if (mod >= _lastCore && !_wasDone) {
     p.done = true; p.pct = 100; delete p.mod;
     p.doneAt = p.doneAt || Date.now();   /* spaced-repetition anchor */
     save();
@@ -7273,11 +7310,11 @@ function completeModule(courseId, mod) {
   } else {
     const nextMedia = modMedia(c, mod + 1);
     p.mod = mod + 1;
-    p.pct = Math.round((p.mod / c.modules.length) * 100);
+    if (!_wasDone) p.pct = Math.round((p.mod / coreN(c)) * 100);
     save();
     awardXp(XP.module, 'module');
     checkBadges();
-    showTakeaways(c, mod, Object.assign((nextMedia && nextMedia.type === 'soon') ? { kind: 'soon' } : { kind: 'next', courseId, mod: mod + 1 }, { checkFor: { courseId, mod } }));
+    showTakeaways(c, mod, Object.assign(mod >= c.modules.length - 1 ? { kind: 'end' } : (nextMedia && nextMedia.type === 'soon') ? { kind: 'soon' } : { kind: 'next', courseId, mod: mod + 1 }, { checkFor: { courseId, mod } }));
   }
 }
 
@@ -7303,7 +7340,7 @@ async function generateAIQuiz(c) {
   return aiQuizCache[key];
 }
 function startQuiz(c, qs, ai) {
-  quiz = { courseId: c.id, qs, idx: 0, sel: null, score: 0, answered: false, ai: !!ai };
+  quiz = { courseId: c.id, qs, idx: 0, sel: null, score: 0, answered: false, ai: !!ai, intro: true };
   $('#quizModal').classList.add('open');
   drawQuiz();
 }
@@ -7341,9 +7378,27 @@ function openQuiz(courseId) {
 function drawQuiz() {
   const c = courseById(quiz.courseId);
   const box = $('#quizBody');
+  if (quiz.intro) {
+    /* say what this is BEFORE question one: how many, the pass mark, and what passing earns */
+    const best = certOf(c.id);
+    box.innerHTML = `<div class="q-intro">
+      <div class="ob-eyebrow">${esc(ctitle(c))}</div>
+      <div class="ob-title" style="font-size:26px;margin-top:6px;">${t('quiz_intro_h')}</div>
+      <p class="m-sub">${quiz.qs.length} ${t('quiz_intro_n')} · ${t('quiz_intro_rules')}</p>
+      ${best ? `<p class="cert-status ok">✓ ${t('certified_lbl')} · ${best.score}%</p>` : `<p class="m-sub">${t('quiz_intro_earn')}</p>`}
+      <div class="q-foot"><button class="ob-skip" data-action="quiz-close">${t('quiz_exit')}</button><span style="flex:1"></span>
+        <button class="btn btn-primary btn-sm" id="quizStart">${t('quiz_start')}</button></div></div>`;
+    $('#quizStart').addEventListener('click', () => { quiz.intro = false; drawQuiz(); });
+    return;
+  }
   if (quiz.idx >= quiz.qs.length) {
     const pctScore = Math.round(quiz.score / quiz.qs.length * 100);
     const pass = pctScore >= 70;
+    certsInit();
+    { const prev = S.certs[quiz.courseId] || {}, attempts = (prev.attempts || 0) + 1;
+      S.certs[quiz.courseId] = pass
+        ? { passed: true, score: Math.max(prev.score || 0, pctScore), at: prev.at || Date.now(), attempts }
+        : Object.assign({}, prev, { attempts, last: pctScore }); }
     S.quizScores = (S.quizScores || []).concat(pctScore).slice(-30);
     if (pass) { S.quizzesPassed++; save(); awardXp(XP.quiz, 'quiz passed'); checkBadges(); }
     else {
@@ -7364,11 +7419,13 @@ function drawQuiz() {
       </div>
       <h3>${pass ? (_lang() === 'pt' ? 'Verificado ✓' : 'Verified ✓') : (_lang() === 'pt' ? 'Quase lá' : 'Almost there')}</h3>
       <p class="m-sub">${pass
-        ? (_lang() === 'pt' ? `${quiz.score}/${quiz.qs.length} certas. Competência verificada — o seu certificado está pronto.` : `${quiz.score}/${quiz.qs.length} right. Skill verified — your certificate is ready.`)
-        : (_lang() === 'pt' ? `${quiz.score}/${quiz.qs.length} certas — o certificado pede 70%. Reveja o módulo e tente de novo; as tentativas são ilimitadas.` : `${quiz.score}/${quiz.qs.length} right — the certificate needs 70%. Rewatch the module and try again; attempts are unlimited.`)}</p>
+        ? (isDone(c.id)
+          ? (_lang() === 'pt' ? `${quiz.score}/${quiz.qs.length} certas. Competência verificada — o seu comprovativo está pronto.` : `${quiz.score}/${quiz.qs.length} right. Skill verified — your certificate is ready.`)
+          : (_lang() === 'pt' ? `${quiz.score}/${quiz.qs.length} certas. Passou — termine as lições e o comprovativo fica pronto.` : `${quiz.score}/${quiz.qs.length} right. Passed — finish the lessons and your certificate is ready.`))
+        : (_lang() === 'pt' ? `${quiz.score}/${quiz.qs.length} certas — o comprovativo pede 70%. Reveja o módulo e tente de novo; as tentativas são ilimitadas.` : `${quiz.score}/${quiz.qs.length} right — the certificate needs 70%. Rewatch the module and try again; attempts are unlimited.`)}</p>
       <div class="q-foot" style="justify-content:center;gap:10px;flex-wrap:wrap;">
         ${pass
-          ? `<button class="btn btn-primary btn-sm" data-action="cert-dl" data-id="${c.id}">⤓ ${t('cert_dl')}</button><button class="btn btn-glass btn-sm" data-action="quiz-close">${_lang() === 'pt' ? 'Continuar' : 'Continue'}</button>`
+          ? `${isDone(c.id) ? `<button class="btn btn-primary btn-sm" data-action="cert-dl" data-id="${c.id}">⤓ ${t('cert_dl')}</button>` : ''}<button class="btn btn-glass btn-sm" data-action="quiz-close">${_lang() === 'pt' ? 'Continuar' : 'Continue'}</button>`
           : `<button class="btn btn-primary btn-sm" data-action="quiz" data-id="${c.id}">${_lang() === 'pt' ? 'Tentar de novo' : 'Try again'}</button><button class="btn btn-glass btn-sm" data-action="quiz-close">${_lang() === 'pt' ? 'Rever módulo' : 'Review module'}</button>`}
       </div></div>`;
     return;
@@ -7419,6 +7476,9 @@ function drawQuiz() {
         else if (i === quiz.sel && i !== q.a) x.classList.add('wrong');
       });
       if (quiz.sel === q.a) quiz.score++;
+      /* say it in words, not only in a border colour — João could not tell right from wrong */
+      const _ok = quiz.sel === q.a, rg = box.querySelector('[role="radiogroup"]');
+      if (rg) rg.insertAdjacentHTML('afterend', `<div class="q-feedback ${_ok ? 'ok' : 'no'}"><b>${_ok ? t('q_right') : t('q_wrong')}</b>${_ok ? '' : ` ${t('q_answer_is')} <b>${esc(q.opts[q.a])}</b>.`}${q.why ? `<span>${esc(q.why)}</span>` : ''}</div>`);
       else { /* practice-what-you-missed: wrong answers resurface first in the review deck */
         S.missedQ = ((S.missedQ || []).filter(m => m.q !== q.q)).concat({ q: q.q, back: q.opts[q.a], courseId: quiz.courseId, at: Date.now() }).slice(-30);
         save();

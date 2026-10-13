@@ -3,26 +3,26 @@
  "modules": {
   "0": [
    {
-    "a": 3,
+    "a": 0,
     "en": {
-     "opts": [
-      "The engine starts immediately",
-      "The brakes loosen",
-      "The fire truck can be driven",
-      "The red lights stop shining"
-     ],
      "q": "What happens when the pressure for the brakes is low?",
-     "why": "The brakes don't loosen when the pressure is low, indicated by the red lights shining."
+     "opts": [
+      "The red lights shine and the truck cannot be driven",
+      "The brakes loosen",
+      "The engine starts immediately",
+      "The truck can be driven normally"
+     ],
+     "why": "Below 10 bar the brakes do not release: the red lights shine, and you cannot drive until the pressure builds up."
     },
     "pt": {
+     "q": "O que acontece quando a pressão dos travões está baixa?",
      "opts": [
-      "O motor arranca imediatamente",
-      "Os travões se soltam",
-      "O camião dos bombeiros pode ser conduzido",
-      "As luzes vermelhas param de piscar"
+      "As luzes vermelhas acendem e o camião não pode andar",
+      "Os travões soltam-se",
+      "O motor arranca de imediato",
+      "O camião pode andar normalmente"
      ],
-     "q": "O que acontece quando a pressão para os travões é baixa?",
-     "why": "Os travões não se soltam quando a pressão é baixa, indicado pelas luzes vermelhas a piscar."
+     "why": "Abaixo de 10 bar os travões não soltam: as luzes vermelhas acendem e não pode conduzir até a pressão subir."
     },
     "t0": 25,
     "type": "recall",
@@ -30,7 +30,8 @@
     "model": "llama-3.3-70b@workers-ai",
     "src": "whisper-small",
     "generatedAt": 1785749993444,
-    "corrected": true
+    "corrected": true,
+    "correctedBy": "human 2026-10-13: no option was true (transcript m0 0:25)"
    },
    {
     "a": 3,
@@ -71,7 +72,7 @@
       "Start the engine and let it fill the brake system",
       "Drive the fire truck to test it"
      ],
-     "q": "What should you do before starting the engine every morning?",
+     "q": "What must you do every morning before you drive the truck?",
      "why": "You should fill the brake system before starting the engine every morning to ensure it holds for the whole day."
     },
     "pt": {
@@ -81,7 +82,7 @@
       "Arrancar o motor e deixar que encha o sistema de travões",
       "Conduzir o camião dos bombeiros para testá-lo"
      ],
-     "q": "O que deve fazer antes de arrancar o motor todas as manhãs?",
+     "q": "O que tem de fazer todas as manhãs antes de conduzir o camião?",
      "why": "Deve encher o sistema de travões antes de arrancar o motor todas as manhãs para garantir que ele dure o dia todo."
     },
     "t0": 107,
@@ -90,7 +91,8 @@
     "model": "llama-3.3-70b@workers-ai",
     "src": "whisper-small",
     "generatedAt": 1785749993444,
-    "corrected": true
+    "corrected": true,
+    "correctedBy": "human 2026-10-13: reviewed against transcript"
    },
    {
     "a": 2,
@@ -153,34 +155,35 @@
     "verified": true
    },
    {
-    "a": 2,
+    "a": 0,
     "en": {
+     "q": "You released the handbrake and are waiting for brake pressure. What tells you the truck is ready to move?",
      "opts": [
-      "Use the buttons that block the axles",
-      "Check the pressure for the brakes",
-      "Use the gear sign to adjust the gears",
-      "Stop the fire truck and check the terrain"
+      "The red lights go off",
+      "The engine gets louder",
+      "The handbrake light turns on",
+      "The water pump starts"
      ],
-     "q": "What should you do if the fire truck is not moving straight while driving?",
-     "why": "You should check the terrain and adjust the gears if the fire truck is not moving straight while driving."
+     "why": "When the pressure is OK the red lights go off — then the truck can roll."
     },
     "pt": {
+     "q": "Soltou o travão de mão e está à espera da pressão dos travões. O que lhe diz que o camião está pronto a andar?",
      "opts": [
-      "Usar os botões que bloqueiam os eixos",
-      "Verificar a pressão para os travões",
-      "Usar o sinal de marchas para ajustar as marchas",
-      "Parar o camião dos bombeiros e verificar o terreno"
+      "As luzes vermelhas apagam-se",
+      "O motor fica mais ruidoso",
+      "A luz do travão de mão acende",
+      "A bomba de água arranca"
      ],
-     "q": "O que deve fazer se o camião dos bombeiros não estiver a mover-se em linha reta enquanto conduz?",
-     "why": "Deve verificar o terreno e ajustar as marchas se o camião dos bombeiros não estiver a mover-se em linha reta enquanto conduz."
+     "why": "Quando a pressão está boa, as luzes vermelhas apagam-se — e o camião pode andar."
     },
-    "t0": 165,
+    "t0": 159,
     "type": "scenario",
     "gen": true,
     "model": "llama-3.3-70b@workers-ai",
     "src": "whisper-small",
     "generatedAt": 1785749993444,
-    "corrected": true
+    "corrected": true,
+    "correctedBy": "human 2026-10-13: reviewed against transcript (old item misread 2:47)"
    }
   ],
   "1": [
@@ -557,7 +560,7 @@
       "The lights turn on",
       "The pump starts working"
      ],
-     "q": "What happens when the emergency switch is activated on the Stefinator?",
+     "q": "What happens when the emergency switch on the fire truck is activated?",
      "why": "The emergency switch turns off the engine completely."
     },
     "pt": {
@@ -567,7 +570,7 @@
       "As luzes se acendem",
       "A bomba começa a funcionar"
      ],
-     "q": "O que acontece quando o interruptor de emergência é ativado no Stefinator?",
+     "q": "O que acontece quando o interruptor de emergência é ativado no camião de incêndio?",
      "why": "O interruptor de emergência desliga o motor completamente."
     },
     "t0": 54,
@@ -576,7 +579,9 @@
     "model": "llama-3.3-70b@workers-ai",
     "src": "whisper-small",
     "generatedAt": 1785750055774,
-    "verified": true
+    "verified": true,
+    "corrected": true,
+    "correctedBy": "human 2026-10-13: reviewed against transcript (Whisper misheard \"camião de incêndio\")"
    },
    {
     "a": 0,

@@ -9,6 +9,8 @@
 const CATALOG = [
   {
     id: 'land-team-journey', title: 'Above the Line', cat: 'Leadership', grad: 4, icon: 'compass',
+    outcomes: ['Catch yourself below the line under pressure — and step back above it', 'Treat every mistake as feedback, not failure', 'Own outcomes and clarify instead of assuming — fewer misunderstandings on the land', 'Build the habits people trust: excellence, attention to detail, learning and gratitude'],
+    outcomes_pt: ['Apanhar-se abaixo da linha sob pressão — e voltar para cima', 'Tratar cada erro como feedback, não como fracasso', 'Assumir os resultados e esclarecer em vez de supor — menos mal-entendidos na terra', 'Criar os hábitos em que as pessoas confiam: excelência, atenção ao detalhe, aprender e gratidão'],
     /* 340 learners and 4.9 stars were invented. This platform's whole claim is
        that its records are provable — inventing the social proof on the front of
        it is the one lie that discredits everything behind it. Zero until real. */
@@ -21,9 +23,10 @@ const CATALOG = [
        "Go deeper" block — appended, not interleaved, so every hour already recorded
        against modules 1-8 keeps pointing at the lesson it was earned on. The two old
        one-minute "Intro" clips were dropped: modules 1 and 2 ARE the intros now. */
+    coreModules: 8,   /* the 5 'Go deeper' lessons after these are optional */
     modules: ['Above the Line, Below the Line', 'No Failure, Only Feedback', 'Total Responsibility', "Don't Assume, Clarify", 'Benchmarking Excellence', 'Attention to Detail', 'Lifelong Learner', 'The Science of Gratitude',
-      'Go deeper · Above the Line: Simple & Powerful Thinking', 'Go deeper · Above the Line: Deep Dive', 'Go deeper · Above the Line: Summary',
-      'Go deeper · No Failure: the Animation', 'Go deeper · No Failure: Summary'],
+      'Above the Line: Simple & Powerful Thinking', 'Above the Line: Deep Dive', 'Above the Line: Summary',
+      'No Failure: the Animation', 'No Failure: Summary'],
     moduleDurations: [4, 4, 6, 6, 6, 5, 5, 5, 3, 10, 1, 4, 10],   /* real Vimeo lengths: 4:09 4:04 5:40 5:40 5:35 5:29 5:21 5:28 · 2:59 10:09 0:52 4:07 9:39 */
     /* The Portuguese cut, from the "Approved PT" Vimeo folder. The academy plays
        whichever matches the reader's language (modMedia in core/app.js).
@@ -66,6 +69,8 @@ const CATALOG = [
   },
   {
     id: 'growth-journey', title: 'Ultimate Purpose', cat: 'Leadership', grad: 3, icon: 'compass',
+    outcomes: ['Name the purpose that gets you up in the morning', 'Set 90-day and top-5 goals you actually keep', 'Build kaizen: one small improvement every day', 'Swap limiting beliefs for winning ones — and read the six needs behind every reaction'],
+    outcomes_pt: ['Dar nome ao propósito que o faz levantar de manhã', 'Definir objetivos a 90 dias e os 5 principais — e cumpri-los', 'Criar o kaizen: uma pequena melhoria todos os dias', 'Trocar crenças limitadoras por crenças vencedoras — e ler as seis necessidades por trás de cada reação'],
     /* The Land Team's SECOND journey. Vimeo folders "2nd Course" (EN 30238825,
        PT 30238997), uploaded 13 Aug → 2 Sep 2026. Module numbering on Vimeo
        runs 1,2,3,4,6 — there is no "5." in either folder, so this course ships
@@ -82,8 +87,9 @@ const CATALOG = [
     /* 13 Oct 2026 (John): everything goal-setting lives HERE. The 90-day / top-5 workshop
        lessons from the old Alignment Journey are appended as a "Go deeper" block (appended
        so recorded hours keep their module). The one-minute old intro was dropped. */
+    coreModules: 5,   /* the 4 goal-setting workshop lessons after these are optional */
     modules: ['Ultimate Purpose', 'Goal Setting', 'Kaizen', 'Winning Beliefs', 'Six Core Human Needs',
-      'Go deeper · Goal Setting: the Animation', 'Go deeper · Your 90-Day Goals', 'Go deeper · Your Top 5 Goals', 'Go deeper · Goal Setting: Summary'],
+      'Goal Setting: the Animation', 'Your 90-Day Goals', 'Your Top 5 Goals', 'Goal Setting: Summary'],
     moduleDurations: [6, 6, 7, 6, 5, 3, 10, 10, 2],   /* real Vimeo lengths: 5:41 6:17 6:32 5:33 5:03 · 3:20 9:35 9:31 1:34 */
     moduleMedia: [
       { type: 'vimeo', id: '1217934850', h: 'dca2bb30cf' },   /* 1. Ultimate purpose */
@@ -107,6 +113,8 @@ const CATALOG = [
   },
   {
     id: 'fire-truck-training', title: 'Fire Truck Training', cat: 'Stewardship', grad: 4, icon: 'fire', recertMonths: 12, featured: true, updated: '2026-07',
+    outcomes: ['Start and drive the truck safely — brake pressure, handbrake and gears', 'Fill the tank from the pump house, the gravity tank or a well', 'Handle hills and narrow tracks, and work the pump and fire gun as a pair', 'Shut down safely and keep the truck ready all season'],
+    outcomes_pt: ['Arrancar e conduzir o camião em segurança — pressão dos travões, travão de mão e mudanças', 'Encher o depósito na casa das bombas, no depósito por gravidade ou num poço', 'Lidar com encostas e caminhos estreitos, e trabalhar a bomba e a agulheta a dois', 'Desligar em segurança e manter o camião pronto toda a época'],
     level: 'All levels', rating: 5.0, learners: 0, isNew: true, poster: 'media/covers/fire-truck-training.webp',
     /* The poster is a title card — it carries its own giant lettering, so at
        hero scale the course name appeared twice and the four coloured badges
@@ -128,6 +136,8 @@ const CATALOG = [
   },
   {
     id: 'alignment-journey', title: 'The EdenRise Alignment Journey', cat: 'Leadership', grad: 1, icon: 'compass', featured: true, updated: '2026-07',
+    outcomes: ['Feel genuinely welcomed — and know how EdenRise works together', 'Use ESIP, our shared frame for how we think, decide and act', 'Move through fear instead of working around it', 'Look after body, soul and spirit so you bring your whole self to the work'],
+    outcomes_pt: ['Sentir-se verdadeiramente bem-vindo — e saber como a EdenRise trabalha em conjunto', 'Usar o ESIP, a nossa estrutura comum para pensar, decidir e agir', 'Atravessar o medo em vez de o contornar', 'Cuidar do corpo, da alma e do espírito para trazer a pessoa inteira para o trabalho'],
     level: 'All levels', rating: 5.0, learners: 0, isNew: true, poster: 'media/covers/alignment-journey.webp', heroArt: 'media/covers/alignment-journey-hero.webp',
     hook: 'One team, one way of working — starting with a warm welcome.',
     hookSub: 'John\'s welcome, the ESIP framework, moving beyond fear, and caring for body, soul and spirit.',
@@ -154,6 +164,8 @@ const CATALOG = [
   },
   {
     id: 'ai-literacy', title: 'Level Up with AI', cat: 'Leadership', grad: 2, icon: 'compass', recertMonths: 12,
+    outcomes: ['Know what AI is, what it isn\'t, and where it goes wrong', 'Get real help from our AI tutor', 'Keep guest and team data safe', 'Understand what the EU AI Act asks of us'],
+    outcomes_pt: ['Saber o que a IA é, o que não é, e onde falha', 'Tirar ajuda real do nosso tutor de IA', 'Proteger os dados de hóspedes e da equipa', 'Perceber o que o Regulamento IA da UE nos pede'],
     level: 'All levels', rating: 5.0, learners: 0, isNew: true, updated: '2026-07',
     /* Cards and the course page render the title in our own type directly
        beside the artwork, so a poster carrying its own lettering printed the
@@ -468,8 +480,8 @@ const COURSE_PT = {
     'Para Além do Medo · Introdução', 'Para Além do Medo · Animação', 'Para Além do Medo · Desmontar e Sintetizar',
     'Corpo, Alma e Espírito · Introdução', 'Corpo, Alma e Espírito · Análise Profunda'
   ] },
-  'growth-journey': { title:'Propósito Último', desc:'A segunda jornada da Equipa da Terra — do propósito à prática diária. Porque se levanta, os objetivos que daí decorrem, a disciplina das pequenas melhorias, as crenças que o sustentam e as seis necessidades por trás de cada reação.', hook:'Saiba porque se levanta — e defina objetivos que ficam.', hookSub:'Propósito, objetivos a 90 dias, kaizen e as crenças que o sustentam numa época difícil.', modules:['Propósito Último', 'Definição de Objetivos', 'Kaizen', 'Crenças Vencedoras', 'As Seis Necessidades Humanas', 'Aprofundar · Definição de Objetivos: Animação', 'Aprofundar · Os Seus Objetivos a 90 Dias', 'Aprofundar · Os Seus 5 Principais Objetivos', 'Aprofundar · Definição de Objetivos: Síntese'] },
-  'land-team-journey': { title:'Acima da Linha', desc:'A jornada de crescimento da Equipa da Terra — a mentalidade e os hábitos que moldam como trabalhamos a terra, e uns aos outros. Começa com uma pergunta que muda a forma como aparecemos.', modules:['Acima da Linha, Abaixo da Linha','Não Há Fracasso, Só Feedback','Responsabilidade Total','Comunicação — Esclareça','Benchmark de Excelência','Atenção ao Detalhe','Seja Aprendiz','A Ciência da Gratidão','Aprofundar · Acima da Linha: Pensamento Simples e Poderoso','Aprofundar · Acima da Linha: Análise Profunda','Aprofundar · Acima da Linha: Síntese','Aprofundar · Sem Fracasso: a Animação','Aprofundar · Sem Fracasso: Síntese'], hook:'Escolha como aparece — mesmo nos dias difíceis.', hookSub:'Oito hábitos de mentalidade que fazem de si alguém em quem a equipa pode confiar.' },
+  'growth-journey': { title:'Propósito Último', desc:'A segunda jornada da Equipa da Terra — do propósito à prática diária. Porque se levanta, os objetivos que daí decorrem, a disciplina das pequenas melhorias, as crenças que o sustentam e as seis necessidades por trás de cada reação.', hook:'Saiba porque se levanta — e defina objetivos que ficam.', hookSub:'Propósito, objetivos a 90 dias, kaizen e as crenças que o sustentam numa época difícil.', modules:['Propósito Último', 'Definição de Objetivos', 'Kaizen', 'Crenças Vencedoras', 'As Seis Necessidades Humanas', 'Definição de Objetivos: Animação', 'Os Seus Objetivos a 90 Dias', 'Os Seus 5 Principais Objetivos', 'Definição de Objetivos: Síntese'] },
+  'land-team-journey': { title:'Acima da Linha', desc:'A jornada de crescimento da Equipa da Terra — a mentalidade e os hábitos que moldam como trabalhamos a terra, e uns aos outros. Começa com uma pergunta que muda a forma como aparecemos.', modules:['Acima da Linha, Abaixo da Linha','Não Há Fracasso, Só Feedback','Responsabilidade Total','Comunicação — Esclareça','Benchmark de Excelência','Atenção ao Detalhe','Seja Aprendiz','A Ciência da Gratidão','Acima da Linha: Pensamento Simples e Poderoso','Acima da Linha: Análise Profunda','Acima da Linha: Síntese','Sem Fracasso: a Animação','Sem Fracasso: Síntese'], hook:'Escolha como aparece — mesmo nos dias difíceis.', hookSub:'Oito hábitos de mentalidade que fazem de si alguém em quem a equipa pode confiar.' },
   'land-literacy': { title:'Ler a Terra', desc:'Antes de mudar uma paisagem, aprenda a lê-la. Declive, água, solo, sol e sucessão — a literacia com que começa todo o ato de zeladoria.', modules:['Ficar quieto: como observar','Ler o declive e a água','O solo ao toque e à vista','Sol, sombra e exposição','Sucessão e o que a terra quer','Mapear o seu terreno'] },
   'living-soil': { title:'Solo Vivo', desc:'O solo não é terra morta — é uma comunidade viva. Conheça o microbioma sob os seus pés e as práticas que o alimentam em vez de o esgotar.', modules:['A teia alimentar do solo','Porque deixámos de lavrar','Compostagem como inoculante','Culturas de cobertura e raízes vivas','Cobertura morta e solo nu','Ler uma análise de solo'] },
   'water-cycles': { title:'A Água e a Paisagem Viva', desc:'Domine o pequeno ciclo da água de que a sua terra depende. Este programa adapta-se ao seu terreno — a IA da EdenRise reordena cada módulo conforme o que já sabe.', modules:['O pequeno ciclo da água','Para onde vai a sua água','Abrandar, espalhar, infiltrar','Valas de infiltração em curva de nível','Charcos e represas','Reidratar terra seca','Águas cinzentas, com cuidado','Proteger uma horta da seca','Ler uma bacia','Nascentes e olheiros','Medir a infiltração','Avaliação final'] },

@@ -1,5 +1,5 @@
 {
- "generatedAt": 1791903701284,
+ "generatedAt": 1791904670515,
  "nodes": [
   {
    "id": "course:alignment-journey",
@@ -673,7 +673,7 @@
   {
    "id": "module:growth-journey:5",
    "kind": "module",
-   "title": "Go deeper · Goal Setting: the Animation",
+   "title": "Goal Setting: the Animation",
    "course": "growth-journey",
    "mod": 5,
    "url": "https://academy.edenrise.com/#/play/growth-journey/5",
@@ -717,7 +717,7 @@
   {
    "id": "module:growth-journey:6",
    "kind": "module",
-   "title": "Go deeper · Your 90-Day Goals",
+   "title": "Your 90-Day Goals",
    "course": "growth-journey",
    "mod": 6,
    "url": "https://academy.edenrise.com/#/play/growth-journey/6",
@@ -736,7 +736,7 @@
   {
    "id": "module:growth-journey:7",
    "kind": "module",
-   "title": "Go deeper · Your Top 5 Goals",
+   "title": "Your Top 5 Goals",
    "course": "growth-journey",
    "mod": 7,
    "url": "https://academy.edenrise.com/#/play/growth-journey/7",
@@ -775,7 +775,7 @@
   {
    "id": "module:growth-journey:8",
    "kind": "module",
-   "title": "Go deeper · Goal Setting: Summary",
+   "title": "Goal Setting: Summary",
    "course": "growth-journey",
    "mod": 8,
    "url": "https://academy.edenrise.com/#/play/growth-journey/8",
@@ -1101,7 +1101,7 @@
   {
    "id": "module:land-team-journey:8",
    "kind": "module",
-   "title": "Go deeper · Above the Line: Simple & Powerful Thinking",
+   "title": "Above the Line: Simple & Powerful Thinking",
    "course": "land-team-journey",
    "mod": 8,
    "url": "https://academy.edenrise.com/#/play/land-team-journey/8",
@@ -1130,7 +1130,7 @@
   {
    "id": "module:land-team-journey:9",
    "kind": "module",
-   "title": "Go deeper · Above the Line: Deep Dive",
+   "title": "Above the Line: Deep Dive",
    "course": "land-team-journey",
    "mod": 9,
    "url": "https://academy.edenrise.com/#/play/land-team-journey/9",
@@ -1139,7 +1139,7 @@
   {
    "id": "module:land-team-journey:10",
    "kind": "module",
-   "title": "Go deeper · Above the Line: Summary",
+   "title": "Above the Line: Summary",
    "course": "land-team-journey",
    "mod": 10,
    "url": "https://academy.edenrise.com/#/play/land-team-journey/10",
@@ -1148,7 +1148,7 @@
   {
    "id": "module:land-team-journey:11",
    "kind": "module",
-   "title": "Go deeper · No Failure: the Animation",
+   "title": "No Failure: the Animation",
    "course": "land-team-journey",
    "mod": 11,
    "url": "https://academy.edenrise.com/#/play/land-team-journey/11",
@@ -1172,7 +1172,7 @@
   {
    "id": "module:land-team-journey:12",
    "kind": "module",
-   "title": "Go deeper · No Failure: Summary",
+   "title": "No Failure: Summary",
    "course": "land-team-journey",
    "mod": 12,
    "url": "https://academy.edenrise.com/#/play/land-team-journey/12",
@@ -3475,27 +3475,27 @@
   },
   {
    "from": "module:alignment-journey:0",
-   "to": "module:growth-journey:0",
+   "to": "module:land-team-journey:12",
    "rel": "similar",
-   "w": 0.758
+   "w": 0.759
   },
   {
    "from": "module:alignment-journey:1",
    "to": "module:growth-journey:7",
    "rel": "similar",
-   "w": 0.78
+   "w": 0.797
+  },
+  {
+   "from": "module:alignment-journey:1",
+   "to": "module:land-team-journey:12",
+   "rel": "similar",
+   "w": 0.76
   },
   {
    "from": "module:alignment-journey:1",
    "to": "module:alignment-journey:0",
    "rel": "similar",
    "w": 0.756
-  },
-  {
-   "from": "module:alignment-journey:1",
-   "to": "module:land-team-journey:12",
-   "rel": "similar",
-   "w": 0.75
   },
   {
    "from": "module:alignment-journey:2",
@@ -3513,7 +3513,7 @@
    "from": "module:alignment-journey:2",
    "to": "module:land-team-journey:9",
    "rel": "similar",
-   "w": 0.766
+   "w": 0.762
   },
   {
    "from": "module:alignment-journey:3",
@@ -3525,13 +3525,13 @@
    "from": "module:alignment-journey:3",
    "to": "module:land-team-journey:11",
    "rel": "similar",
-   "w": 0.795
+   "w": 0.797
   },
   {
    "from": "module:alignment-journey:4",
    "to": "module:land-team-journey:12",
    "rel": "similar",
-   "w": 0.812
+   "w": 0.818
   },
   {
    "from": "module:alignment-journey:5",
@@ -3609,7 +3609,7 @@
    "from": "module:growth-journey:0",
    "to": "module:growth-journey:7",
    "rel": "similar",
-   "w": 0.786
+   "w": 0.8
   },
   {
    "from": "module:growth-journey:0",
@@ -3619,21 +3619,21 @@
   },
   {
    "from": "module:growth-journey:1",
-   "to": "module:growth-journey:7",
+   "to": "module:growth-journey:8",
    "rel": "similar",
-   "w": 0.851
+   "w": 0.869
   },
   {
    "from": "module:growth-journey:1",
    "to": "module:growth-journey:5",
    "rel": "similar",
-   "w": 0.848
+   "w": 0.868
   },
   {
    "from": "module:growth-journey:1",
-   "to": "module:growth-journey:8",
+   "to": "module:growth-journey:7",
    "rel": "similar",
-   "w": 0.843
+   "w": 0.866
   },
   {
    "from": "module:growth-journey:2",
@@ -3667,9 +3667,9 @@
   },
   {
    "from": "module:growth-journey:3",
-   "to": "module:land-team-journey:3",
+   "to": "module:land-team-journey:8",
    "rel": "similar",
-   "w": 0.793
+   "w": 0.795
   },
   {
    "from": "module:growth-journey:4",
@@ -3687,73 +3687,73 @@
    "from": "module:growth-journey:5",
    "to": "module:growth-journey:8",
    "rel": "similar",
-   "w": 0.877
+   "w": 0.853
   },
   {
    "from": "module:growth-journey:5",
    "to": "module:growth-journey:7",
    "rel": "similar",
-   "w": 0.842
-  },
-  {
-   "from": "module:growth-journey:6",
-   "to": "module:growth-journey:8",
-   "rel": "similar",
-   "w": 0.893
+   "w": 0.805
   },
   {
    "from": "module:growth-journey:6",
    "to": "module:growth-journey:7",
    "rel": "similar",
-   "w": 0.89
+   "w": 0.877
   },
   {
    "from": "module:growth-journey:6",
-   "to": "module:growth-journey:5",
+   "to": "module:growth-journey:8",
    "rel": "similar",
-   "w": 0.83
+   "w": 0.861
+  },
+  {
+   "from": "module:growth-journey:6",
+   "to": "module:growth-journey:1",
+   "rel": "similar",
+   "w": 0.826
   },
   {
    "from": "module:growth-journey:7",
    "to": "module:growth-journey:8",
    "rel": "similar",
-   "w": 0.879
+   "w": 0.85
   },
   {
    "from": "module:land-team-journey:0",
    "to": "module:land-team-journey:8",
    "rel": "similar",
-   "w": 0.87
+   "w": 0.879
   },
   {
    "from": "module:land-team-journey:0",
    "to": "module:land-team-journey:9",
    "rel": "similar",
-   "w": 0.852
+   "w": 0.865
   },
   {
    "from": "module:land-team-journey:0",
    "to": "module:land-team-journey:10",
    "rel": "similar",
-   "w": 0.809
+   "w": 0.818
   },
   {
    "from": "module:land-team-journey:1",
    "to": "module:land-team-journey:12",
    "rel": "similar",
-   "w": 0.832
+   "w": 0.86
+  },
+  {
+   "from": "module:land-team-journey:1",
+   "to": "module:land-team-journey:11",
+   "rel": "similar",
+   "w": 0.825
   },
   {
    "from": "module:land-team-journey:1",
    "to": "module:land-team-journey:6",
    "rel": "similar",
    "w": 0.807
-  },
-  {
-   "from": "module:land-team-journey:1",
-   "to": "module:land-team-journey:11",
-   "rel": "similar",
-   "w": 0.8
   },
   {
    "from": "module:land-team-journey:2",
@@ -3766,6 +3766,12 @@
    "to": "module:growth-journey:0",
    "rel": "similar",
    "w": 0.783
+  },
+  {
+   "from": "module:land-team-journey:3",
+   "to": "module:growth-journey:3",
+   "rel": "similar",
+   "w": 0.793
   },
   {
    "from": "module:land-team-journey:3",
@@ -3787,9 +3793,9 @@
   },
   {
    "from": "module:land-team-journey:4",
-   "to": "module:growth-journey:3",
+   "to": "module:growth-journey:7",
    "rel": "similar",
-   "w": 0.783
+   "w": 0.785
   },
   {
    "from": "module:land-team-journey:5",
@@ -3819,7 +3825,7 @@
    "from": "module:land-team-journey:7",
    "to": "module:growth-journey:0",
    "rel": "similar",
-   "w": 0.763
+   "w": 0.762
   },
   {
    "from": "module:land-team-journey:7",
@@ -3837,37 +3843,25 @@
    "from": "module:land-team-journey:8",
    "to": "module:land-team-journey:9",
    "rel": "similar",
-   "w": 0.883
+   "w": 0.856
   },
   {
    "from": "module:land-team-journey:8",
    "to": "module:land-team-journey:10",
    "rel": "similar",
-   "w": 0.843
+   "w": 0.827
   },
   {
-   "from": "module:land-team-journey:9",
-   "to": "module:land-team-journey:10",
+   "from": "module:land-team-journey:10",
+   "to": "module:land-team-journey:9",
    "rel": "similar",
-   "w": 0.845
+   "w": 0.814
   },
   {
    "from": "module:land-team-journey:11",
    "to": "module:land-team-journey:12",
    "rel": "similar",
-   "w": 0.89
-  },
-  {
-   "from": "module:land-team-journey:11",
-   "to": "module:growth-journey:5",
-   "rel": "similar",
-   "w": 0.83
-  },
-  {
-   "from": "module:land-team-journey:12",
-   "to": "module:land-team-journey:9",
-   "rel": "similar",
-   "w": 0.824
+   "w": 0.876
   }
  ],
  "stats": {
@@ -3883,7 +3877,7 @@
    "deeper": 5,
    "beside": 6,
    "related": 21,
-   "similar": 68
+   "similar": 67
   }
  },
  "orphans": []

@@ -30,7 +30,9 @@
   /* ── the one entry point, called from app.js at module_complete ── */
   window.lfModuleComplete = function (courseId, mod) {
     var a = q(); a.push({ course_id: courseId, mod: mod, at: Date.now() }); qset(a);
-    if (!tok()) { pairChip(); return; }
+    /* deferred: this runs inside completeModule, a beat BEFORE the takeaways card opens —
+       checked immediately, the screen still looked free and the bar landed on top of the card */
+    if (!tok()) { setTimeout(pairChip, 1500); return; }
     flush(true);
   };
 
