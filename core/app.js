@@ -449,6 +449,7 @@ function cardHTML(c, opts = {}) {
   /* "AI PATH" was on 5 of 6 cards — a label on everything carries no
      information. Only genuinely rare, actionable states earn the one chip. */
   if (c.required) chips.push(`<span class="chip">${t('assigned_tag')}</span>`);
+  else if (isComingSoon(c)) chips.push(`<span class="chip chip-soon">${t('coming_soon')}</span>`);
   else if (c.isNew) chips.push(`<span class="chip">${t('new')}</span>`);
   /* status reads as text, not as another bubble */
   let foot = '';
@@ -499,7 +500,7 @@ function pathStepperHTML() {
     const c = courseById(id); if (!c) return '';
     const st = pathStatus(id); const p = prog(id);
     const node = st === 'done' ? '✓' : st === 'current' ? '▶' : svgIcon(c.icon);
-    const sub = st === 'done' ? `${t('completed')}${p && p.score ? ' · ' + p.score + '%' : ''}` : st === 'current' ? `${t('in_progress')} · ${coursePct(id)}%` : (S.path.indexOf(id) === S.path.findIndex(x => !isDone(x)) + 1 ? t('next_up') : t('locked'));
+    const sub = (isComingSoon(c) && st !== 'done') ? t('coming_soon') : st === 'done' ? `${t('completed')}${p && p.score ? ' · ' + p.score + '%' : ''}` : st === 'current' ? `${t('in_progress')} · ${coursePct(id)}%` : (S.path.indexOf(id) === S.path.findIndex(x => !isDone(x)) + 1 ? t('next_up') : t('locked'));
     return `<div class="seg ${st}" data-action="open-course" data-id="${id}"><div class="snode">${node}</div><div class="sl">${ctitle(c)}</div><div class="sd">${sub}</div></div>`;
   }).join('')}</div>`;
 }
@@ -592,7 +593,7 @@ function pathRowHTML() {
     const n = S.path.indexOf(id) + 1;
     const sub = st === 'done' ? t('completed')
       : st === 'current' ? `${pct}% · ${fmtMins(Math.round(courseMins(c) * (100 - pct) / 100))} ${t('left')}`
-      : t('unlocks_after');
+      : isComingSoon(c) ? t('coming_soon') : t('unlocks_after');
     /* The FIRST row on the homepage was the only surface still drawing flat
        boxes while every one of these courses owns a filmed cover. Netflix's
        numbered row is artwork with the numeral over it, never a list with a
@@ -663,7 +664,7 @@ function renderHome() {
     const st = pathStatus(id); const p = prog(id);
     const nodeCls = st === 'done' ? 'node-done' : st === 'current' ? 'node-active' : 'node-locked';
     const node = st === 'done' ? '✓' : st === 'current' ? '▶' : S.path.indexOf(id) + 1;
-    const sub = st === 'done' ? `${t('completed')}${p && p.note ? ' · ' + tnote(p.note) : p && p.score ? ' · ' + t('scored') + ' ' + p.score + '%' : ''}` : st === 'current' ? `${t('in_progress')} · ${t('adapted_today')}` : t('unlocks_after');
+    const sub = st === 'done' ? `${t('completed')}${p && p.note ? ' · ' + tnote(p.note) : p && p.score ? ' · ' + t('scored') + ' ' + p.score + '%' : ''}` : st === 'current' ? `${t('in_progress')} · ${t('adapted_today')}` : isComingSoon(c) ? t('coming_soon') : t('unlocks_after');
     return `<div class="path-step ${st === 'current' ? 'step-active' : ''}" data-action="open-course" data-id="${id}">
       <div class="step-node ${nodeCls}">${node}</div>
       <div class="step-info"><div class="t">${ctitle(c)}</div><div class="s">${sub}</div></div></div>`;
@@ -729,7 +730,7 @@ function renderHome() {
     </div>
     ${pathStepperHTML()}
     <div class="path-banner-foot">
-      <div class="why"> <span><b>${t('why_order')}</b>&nbsp; ${PATH_RATIONALES[S.rationaleIdx % PATH_RATIONALES.length]}</span></div>
+      ${(S.quizScores || []).length ? `<div class="why"> <span><b>${t('why_order')}</b>&nbsp; ${PATH_RATIONALES[S.rationaleIdx % PATH_RATIONALES.length]}</span></div>` : `<div class="why"><span>${t('path_intro')}</span></div>`}
     </div>
   </section>
   <section class="stats">
@@ -808,7 +809,7 @@ function renderPaths() {
       <div class="left">
         <span class="ai-tag">${t('active_path')} · ${doneCount}/${S.path.length}</span>
         <h2>${t('your_path_to')} ${tgoal(S.goal)}</h2>
-        <p class="sub">${PATH_RATIONALES[S.rationaleIdx % PATH_RATIONALES.length]}</p>
+        <p class="sub">${(S.quizScores || []).length ? PATH_RATIONALES[S.rationaleIdx % PATH_RATIONALES.length] : t('path_intro')}</p>
       </div>
       <button class="btn btn-glass" data-action="regen-path" id="regenBtn">${t('regenerate_path')}</button>
     </div>
@@ -827,6 +828,7 @@ function renderLive() {
   return `<div class="page"><div class="page-pad">
     <h1 class="page-title">${t('live_title')}</h1>
     <p class="page-sub">${t('live_sub')}</p>
+    ${liveList().length ? '' : `<div class="empty-note">${t('live_empty')}</div>`}
     ${liveList().map(s => `
       <div class="live-card">
         <div class="live-thumb t-grad-${s.grad}">${svgIcon(s.icon)}${s.live ? '<span class="live-badge">● LIVE</span>' : ''}</div>
@@ -963,7 +965,9 @@ function renderCourse(id) {
                  add-to-path — so the page could not answer "what now?". The
                  secondary is the honest second choice for the state you are in;
                  the rest are quiet text, present but not competing. -->
-            ${isDone(id) && !certOf(id)
+            ${isComingSoon(c)
+              ? `<button class="btn btn-glass" disabled>⏳&nbsp; ${t('coming_soon')}</button>`
+              : isDone(id) && !certOf(id)
               ? `<button class="btn btn-primary" data-action="quiz" data-id="${id}">🎯&nbsp; ${t('take_cert_quiz')}</button>`
               : `<button class="btn btn-primary" data-action="play" data-id="${id}">▶&nbsp; ${isDone(id) ? t('rewatch') : p ? `${t('resume_module')} ${(p.mod || 0) + 1}` : t('start_course')}</button>`}
             ${isDone(id)
@@ -5254,6 +5258,8 @@ const modMedia = (c, i) => (c.moduleMedia && c.moduleMedia[i]) || null;
 const realModuleCount = c => !c || !c.moduleMedia ? 0
   : Object.values(c.moduleMedia).filter(m => m && (m.type === 'vimeo' || m.type === 'youtube')).length;
 const hasRealContent = c => realModuleCount(c) > 0;
+/* scripted but not yet filmed: every lesson is a 'soon' placeholder */
+const isComingSoon = c => !!(c && c.moduleMedia && c.moduleMedia.length && c.moduleMedia.every(m => m && m.type === 'soon'));
 let playing = null; /* {courseId, mod} */
 let saveTimer = 0;
 let sim = { timer: null, t: 0, dur: 20, running: false };
@@ -8633,7 +8639,7 @@ function drawOnboard() {
       <p class="ob-sub">${t('ob_q2_sub')}</p>
       <div class="ob-grid">${goals.map(g => `
         <div class="ob-option ${ob.goal === g ? 'sel' : ''}" data-goal="${g}">
-          <span class="oi">${svgIcon((courseById(GOAL_PRESETS[g][0]) || {}).icon || 'leaf')}</span><div>${tgoal(g)}<div class="od">${GOAL_PRESETS[g].length} ${t('courses_adaptive')}</div></div>
+          <span class="oi">${svgIcon((courseById(GOAL_PRESETS[g][0]) || {}).icon || 'leaf')}</span><div>${tgoal(g)}<div class="od">${(() => { const ids = GOAL_PRESETS[g], live = ids.filter(x => { const cc = courseById(x); return cc && !isComingSoon(cc); }).length, soon = ids.length - live; return `${live} ${t('courses_adaptive')}${soon ? ` · ${soon} ${t('coming_soon').toLowerCase()}` : ''}`; })()}</div></div>
         </div>`).join('')}
       </div>
       <div class="ob-foot">

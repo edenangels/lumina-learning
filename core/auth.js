@@ -544,7 +544,7 @@ window.EdenForum = {
       const posts = snap.docs.map(d => Object.assign({ id: d.id }, d.data())).filter(p => ofCompany(p));
       posts.sort((a, b) => (ms(b.lastActivity) || ms(b.createdAt)) - (ms(a.lastActivity) || ms(a.createdAt)));
       cb(posts);
-    }, err => { console.error('[forum] channel sub', err); cb([]); });
+    }, err => { if (!(err && err.code === 'permission-denied')) console.error('[forum] channel sub', err); cb([]); });   /* guests are refused by the rules on purpose */
   },
   subscribeThread(postId, cb) {
     const q = query(collection(db, 'forum_posts', postId, 'replies'));

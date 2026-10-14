@@ -188,12 +188,9 @@ const CATALOG = [
 ];
 /* designed brand covers — every course ships with art (land-team-journey keeps its filmed cover) */
 CATALOG.forEach(c => { if (!c.poster) c.poster = 'media/covers/' + c.id + '.svg'; });
-const LIVE_SESSIONS = [
-  { id: 'live-now', title: 'Field Hours: Live Soil Clinic', host: 'Marta Oliveira · Head of Regeneration', when: 'LIVE NOW', live: true, viewers: 47, grad: 7, icon: 'sprout', desc: 'Bring a photo or sample of your soil — Marta reads it live and prescribes the first three things to do.' },
-  { id: 'exec-ama', title: 'Founder AMA: Why Regeneration', host: 'João Amaral · Founder', when: 'Fri 14:00 WET', grad: 1, icon: 'tree', desc: 'Unfiltered Q&A on building EdenRise and stewarding land in the Baixo Alentejo.' },
-  { id: 'water-workshop', title: 'Workshop: Map Your Water', host: 'Dev Santos · Water Lead', when: 'Tue 17 · 16:00 WET', grad: 5, icon: 'drop', desc: 'Hands-on, 90 minutes. Bring a map of your land and leave with a water plan sketched on contour.' },
-  { id: 'season-circle', title: 'Seasonal Circle: Midsummer', host: 'Marta Oliveira · Head of Regeneration', when: 'Thu 19 · 19:00 WET', grad: 6, icon: 'sun', desc: 'A gathering to mark midsummer — what to tend, what to harvest, what to let rest.' }
-];
+/* No invented sessions (13 Oct 2026, John: no fiction on the storefront). Real ones come from the
+   studio (studioMeta.live) the day someone schedules one; the page shows an honest empty state. */
+const LIVE_SESSIONS = [];
 const COURSE_HOOKS = {
   'ai-literacy': ['AI is on the team now. Use it well.', 'The literacy every EU workplace must have — practical, honest, ours.'],
   /* benefit/outcome-driven headlines (John, 13 Oct 2026) — drafts for John to refine */

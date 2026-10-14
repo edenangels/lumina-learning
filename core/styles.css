@@ -1703,6 +1703,8 @@ html:not(.is-admin) [data-admin] { display: none !important; }
 .deep-divider span { font-size: 13px; color: var(--text-faint); }
 #vimeoWrap.ended::after { content: ''; position: absolute; inset: 0; background: var(--bg); }
 .ai-close { margin-left: 6px; }
+.chip.chip-soon { background: rgba(255,255,255,.1); color: var(--text-faint); }
+.empty-note { padding: 28px 22px; border: 1px dashed var(--line); border-radius: 12px; color: var(--text-faint); text-align: center; margin: 10px 0 20px; }
 .take-card { width: 100%; max-width: 520px; background: linear-gradient(180deg, rgba(26,35,27,.98), rgba(15,21,16,.99)); border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent); border-radius: 14px; padding: 36px 34px 30px; text-align: left; animation: authIn .5s cubic-bezier(.2,.7,.3,1); box-shadow: 0 40px 120px rgba(0,0,0,.6); }
 .take-spark { font-size: 30px; margin-bottom: 14px; animation: takePop .6s cubic-bezier(.3,1.6,.4,1) both; }
 @keyframes takePop { from { transform: scale(0) rotate(-30deg); opacity: 0; } to { transform: none; opacity: 1; } }
