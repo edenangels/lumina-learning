@@ -7601,7 +7601,7 @@ function drawPalette(q) {
   palIdx = 0;
   let html = '';
   if (courses.length) html += `<div class="palette-group">${q ? t('pal_courses') : t('pal_recent')}</div>` + courses.map(c =>
-    `<div class="palette-item" data-pal="course:${c.id}"><span class="pi-icon t-grad-${c.grad}">${svgIcon(c.icon)}</span><div><div>${esc(c.title)}</div><div class="pi-meta">${esc(c.cat)} · ${fmtMins(courseMins(c))} · ★ ${c.rating}</div></div></div>`).join('');
+    `<div class="palette-item" data-pal="course:${c.id}"><span class="pi-icon t-grad-${c.grad}">${svgIcon(c.icon)}</span><div><div>${esc(c.title)}</div><div class="pi-meta">${esc(c.cat)} · ${fmtMins(courseMins(c))}${c.rating ? ` · ★ ${c.rating}` : ''}</div></div></div>`).join('');
   if (acts.length) html += `<div class="palette-group">Actions</div>` + acts.map((a, i) =>
     `<div class="palette-item" data-pal="act:${PALETTE_ACTIONS.indexOf(a)}"><span class="pi-icon" style="background:var(--surface-2)">${a.icon}</span><div>${a.t}</div></div>`).join('');
   /* inside-the-lessons hits: the palette searches what the trainer SAYS, not
