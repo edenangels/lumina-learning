@@ -4291,7 +4291,8 @@ function answerDaily(el) {
 
 /* ================= Nudges & notifications ================= */
 function nextLesson() {
-  const id = S.path.find(x => !isDone(x)); if (!id) return null;
+  /* never nudge toward a lesson nobody can open yet */
+  const id = S.path.find(x => !isDone(x) && !isComingSoon(courseById(x))); if (!id) return null;
   const c = courseById(id); if (!c) return null;
   const p = prog(id); const mi = p && !p.done ? (p.mod || 0) : 0;
   return { course: ctitle(c), mod: (cmods(c)[mi] || ''), route: '#/course/' + id };
@@ -7960,8 +7961,7 @@ function regenPath() {
     const done = S.path.filter(isDone);
     const rest = S.path.filter(x => !isDone(x));
     if (rest.length > 2) { const cur = rest.shift(); rest.push(rest.shift()); rest.unshift(cur); } /* keep current, rotate the queue */
-    const pool = ['forecasting', 'metrics', 'systems'].filter(x => !S.path.includes(x));
-    if (pool.length && S.path.length < 7) rest.splice(2, 0, pool[0]);
+    /* (the old demo used to splice in made-up course ids here — a re-plan only reorders real courses) */
     S.path = [...done, ...rest];
     S.rationaleIdx = (S.rationaleIdx + 1) % PATH_RATIONALES.length;
     save(); render();
@@ -8395,7 +8395,7 @@ document.addEventListener('click', e => {
     }
     case 'me-tab': meTab = el.dataset.v; render(); break;
     case 'cockpit-retry': initAdmin(); break;
-    case 'reset-demo': localStorage.removeItem(STATE_KEY); location.hash = '#/home'; location.reload(); break;
+    case 'reset-demo': { try { Object.keys(localStorage).filter(k => k.startsWith(BRAND_SLUG)).forEach(k => localStorage.removeItem(k)); } catch (e) {} localStorage.removeItem(STATE_KEY); location.hash = '#/home'; location.reload(); break; }
   }
 });
 
