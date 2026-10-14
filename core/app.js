@@ -501,6 +501,7 @@ function pathStepperHTML() {
     const st = pathStatus(id); const p = prog(id);
     const node = st === 'done' ? '✓' : st === 'current' ? '▶' : svgIcon(c.icon);
     const sub = (isComingSoon(c) && st !== 'done') ? t('coming_soon') : st === 'done' ? `${t('completed')}${p && p.score ? ' · ' + p.score + '%' : ''}` : st === 'current' ? `${t('in_progress')} · ${coursePct(id)}%` : (S.path.indexOf(id) === S.path.findIndex(x => !isDone(x)) + 1 ? t('next_up') : t('locked'));
+    if (isComingSoon(c) && st !== 'done') return `<div class="seg soon" aria-disabled="true"><div class="snode">⏳</div><div class="sl">${t('coming_soon')}</div><div class="sd"></div></div>`;
     return `<div class="seg ${st}" data-action="open-course" data-id="${id}"><div class="snode">${node}</div><div class="sl">${ctitle(c)}</div><div class="sd">${sub}</div></div>`;
   }).join('')}</div>`;
 }
@@ -598,6 +599,8 @@ function pathRowHTML() {
        boxes while every one of these courses owns a filmed cover. Netflix's
        numbered row is artwork with the numeral over it, never a list with a
        bullet — and this row is what a buyer sees before anything else. */
+    /* unfilmed step: a nameless placeholder — the name on a card nobody can open reads as a broken promise (João, 14 Oct) */
+    if (isComingSoon(c) && st !== 'done') return `<div class="pstep soon" aria-disabled="true"><span class="pstep-n">${n}</span><span class="pstep-t">${t('coming_soon')}</span></div>`;
     const art = c.poster ? ` style="background-image:url('${c.poster}')"` : '';
     /* a locked step still opens its course page — John could not even read what was coming */
     return `<button class="pstep ${st}${c.poster ? ' has-art' : ''}" data-action="open-course" data-id="${id}"${art}>
