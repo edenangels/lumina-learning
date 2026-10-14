@@ -5759,10 +5759,10 @@ function takeawaysFor(c, mod) {
   const m = cmods(c)[mod] || ctitle(c);
   return _lang() === 'pt'
     ? [`A prática central de “${m}” — comece pequeno e repita até virar hábito.`,
-       `Como isto se liga ao seu trabalho diário na terra e à sua equipa.`,
+       `Como isto se liga ao seu trabalho de todos os dias e à sua equipa.`,
        `Uma pergunta para levar: o que mudaria se aplicasse isto amanhã?`]
     : [`The core practice from “${m}” — start small and repeat it until it's habit.`,
-       `How this connects to your daily work on the land, and to your team.`,
+       `How this connects to your everyday work, and to your team.`,
        `A question to carry: what would change if you applied this tomorrow?`];
 }
 let pendingNext = null; /* what happens after the takeaways card */
@@ -8642,7 +8642,7 @@ function drawOnboard() {
       <p class="ob-sub">${t('ob_q2_sub')}</p>
       <div class="ob-grid">${goals.map(g => `
         <div class="ob-option ${ob.goal === g ? 'sel' : ''}" data-goal="${g}">
-          <span class="oi">${svgIcon((courseById(GOAL_PRESETS[g][0]) || {}).icon || 'leaf')}</span><div>${tgoal(g)}<div class="od">${(() => { const ids = GOAL_PRESETS[g], live = ids.filter(x => { const cc = courseById(x); return cc && !isComingSoon(cc); }).length, soon = ids.length - live; return `${live} ${t('courses_adaptive')}${soon ? ` · ${soon} ${t('coming_soon').toLowerCase()}` : ''}`; })()}</div></div>
+          <span class="oi">${svgIcon((courseById(GOAL_PRESETS[g][0]) || {}).icon || 'leaf')}</span><div>${tgoal(g)}<div class="od">${(() => { const ids = GOAL_PRESETS[g], live = ids.filter(x => { const cc = courseById(x); return cc && !isComingSoon(cc); }).length, soon = ids.length - live; return `${live} ${live === 1 ? t('course_adaptive_one') : t('courses_adaptive')}${soon ? ` · ${soon} ${t('coming_soon').toLowerCase()}` : ''}`; })()}</div></div>
         </div>`).join('')}
       </div>
       <div class="ob-foot">
