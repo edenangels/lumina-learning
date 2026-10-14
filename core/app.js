@@ -632,8 +632,9 @@ function renderHome() {
      this particular viewer happened to open last — and the viewer loses
      nothing, because "Continue learning" carries their place one row below. */
   const _pin = BRAND.heroCourse && courseById(BRAND.heroCourse);
-  const brandHero = _pin && !isDone(_pin.id) ? _pin : null;   /* a finished course is not a billboard */
   const _last = lastPlayed && courseById(lastPlayed[0]);
+  const _inProgress = _last && !isDone(_last.id) && coursePct(_last.id) > 0;
+  const brandHero = _pin && !isDone(_pin.id) && !_inProgress ? _pin : null;   /* the pin leads for a fresh learner; a course in progress leads for everyone else */
   const featured = brandHero
     || (_last && !isDone(_last.id) ? _last : null)
     || realOnes.find(c => !isDone(c.id)) || realOnes[0]
@@ -946,7 +947,7 @@ function renderCourse(id) {
   }).map((h, i) => (i === _deepAt ? `<div class="deep-divider"><b>${t('deep_h')}</b><span>${t('deep_sub')}</span></div>` : '') + h).join('');
   return `<div class="page">
     <div class="course-hero">
-      <div class="bg t-grad-${c.grad}"${c.poster ? ` style="background-image:url('${c.poster}');background-size:cover;background-position:center"` : ''}></div>
+      <div class="bg t-grad-${c.grad}"${(c.heroArt || c.poster) ? ` style="background-image:url('${c.heroArt || c.poster}');background-size:cover;background-position:center"` : ''}></div>
       <div class="course-hero-inner">
         ${c.poster ? `<div class="course-poster has-poster" style="background-image:url('${c.poster}')"></div>` : `<div class="course-poster t-grad-${c.grad}">${svgIcon(c.icon)}</div>`}
         <div class="course-info">
@@ -1375,10 +1376,11 @@ function tourShow(i) {
 }
 function endTour() {
   const ov = $('#tourOv'); if (ov) ov.remove();
-  S.tourDone = true; save();
+  S.tourDone = true; save(); try { localStorage.setItem(BRAND_SLUG + '-tour-done', '1'); } catch (e) {}
 }
 function maybeTour() {
-  if (window.__tourShown || !S.onboarded || S.tourDone) return;
+  let _tourFlag = false; try { _tourFlag = localStorage.getItem(BRAND_SLUG + '-tour-done') === '1'; } catch (e) {}
+  if (window.__tourShown || !S.onboarded || S.tourDone || _tourFlag) return;
   if ((location.hash || '#/home').indexOf('#/home') !== 0 && location.hash !== '') return;
   window.__tourShown = true;
   setTimeout(() => {
@@ -5409,6 +5411,7 @@ function openPlayer(courseId, mod, startAt) {
     videoEl.style.display = 'none';
     vimeoWrap.classList.add('on');
     vimeoWrap.innerHTML = `<iframe src="https://player.vimeo.com/video/${media.id}?${media.h ? 'h=' + media.h + '&' : ''}title=0&byline=0&portrait=0&badge=0&autoplay=${_openPaused ? 0 : 1}&autopause=0&dnt=1&player_id=0&app_id=58479" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen title="${cmods(c)[mod]}"></iframe>`;
+    vimeoWrap.insertAdjacentHTML('beforeend', `<div class="replay-veil"><p class="veil-note"></p><button class="btn btn-primary btn-sm" data-action="replay-lesson">↺ ${t('watch_again')}</button></div>`);
     armVimeo(c, mod);
   } else {
     if (watchEv) watchEv.method = 'video-timeupdate';
@@ -5449,6 +5452,8 @@ function openPlayer(courseId, mod, startAt) {
     scrollSurely(strip, Math.max(0, target));
   }, 260);
   $('#playerComplete').style.display = (media && media.type === 'soon') ? 'none' : '';
+  { const pp = prog(courseId); const dm = isDone(courseId) || (pp && !pp.done && (pp.mod || 0) > mod) || (S.trainingLog || []).some(e => e.courseId === courseId && e.mod === mod);
+    $('#playerComplete').textContent = dm ? (mod + 1 < c.modules.length ? t('next_lesson_btn') : t('back_to_course')) : t('mark_complete'); }
   playerEl.classList.add('open');
   playerChrome.show(true);
   if ($('#notesDrawer').classList.contains('open')) refreshNotesDrawer();
@@ -5593,13 +5598,14 @@ function armVimeo(c, mod) {
       const p = prog(c.id); if (p && d.percent) p.pct = Math.max(p.pct || 0, Math.round(d.percent * 100));
     });
     vimeoPlayer.on('ended', () => {
+      vimeoWrap.classList.add('ended');   /* our curtain over Vimeo's "more from" screen, with a replay control */
+      const vn = vimeoWrap.querySelector('.veil-note'); if (vn) vn.textContent = '';
       if (done || !playing || playing.courseId !== c.id || playing.mod !== mod) return;
       /* the same discipline the <video> branch has always had: reaching the end
          of the timeline is not the same as having watched the lesson, and a
          scrubbed-through lesson must not mint a compliance hour */
-      if (watchEv && watchEv.dur && watchCoverage() < WATCH_MIN_COVERAGE) { toast(t('watch_more'), 'ℹ️'); return; }
+      if (watchEv && watchEv.dur && watchCoverage() < WATCH_MIN_COVERAGE) { const vn = vimeoWrap.querySelector('.veil-note'); if (vn) vn.textContent = `${t('watch_more')} (${Math.round(watchCoverage() * 100)}%)`; toast(t('watch_more'), 'ℹ️'); return; }
       done = true;
-      vimeoWrap.classList.add('ended');   /* our curtain over Vimeo's "more from" screen — only now, when the lesson really completed */
       completeModule(c.id, mod);
     });
   }).catch(() => {});
@@ -5986,7 +5992,7 @@ function resolveTakeaways(toQuiz) {
 }
 function resolveTakeawaysNext(n, toQuiz) {
   if (toQuiz && n.courseId) { closePlayer(); setTimeout(() => openQuiz(n.courseId), 250); return; }   /* watch → assess loop */
-  if (n.kind === 'next') openPlayer(n.courseId, n.mod);
+  if (n.kind === 'next') { _openPaused = true; openPlayer(n.courseId, n.mod); }   /* the learner presses play; nothing starts on its own after a check */
   else if (n.kind === 'end') closePlayer();
   else if (n.kind === 'soon') { closePlayer(); setTimeout(() => toast(_lang() === 'pt' ? 'É tudo por agora — o resto da jornada está a caminho' : 'That’s every lesson available so far — the rest of the journey is coming soon', ''), 400); }
   else if (n.kind === 'course-done') {
@@ -8313,6 +8319,7 @@ document.addEventListener('click', e => {
     }
     case 'open-reviews': openReviewSession(); break;
     case 'daily-dismiss': S.dailyDismissed = el.dataset.day; save(); render(); break;
+    case 'replay-lesson': { vimeoWrap.classList.remove('ended'); try { vimeoPlayer && vimeoPlayer.setCurrentTime(0).then(() => vimeoPlayer.play()).catch(() => {}); } catch (e) {} break; }
     case 'ask-moment': {
       const am = $('#askModal'); if (am) { window._askReturn = am.classList.contains('open'); am.classList.remove('open'); } setTutorOpen(false);
       ledgerAppend('moment_open', { courseId: el.dataset.id, mod: +el.dataset.mod, t: +el.dataset.t, via: 'ask' });
@@ -8450,7 +8457,19 @@ addEventListener('keydown', e => {
   if (el.matches('[data-action], [role="button"]')) { e.preventDefault(); el.click(); }
 });
 $('#playerBack').addEventListener('click', closePlayer);
-$('#playerComplete').addEventListener('click', () => { if (playing) completeModule(playing.courseId, playing.mod); else closePlayer(); });
+$('#playerComplete').addEventListener('click', () => {
+  if (!playing) { closePlayer(); return; }
+  const c = courseById(playing.courseId), p = prog(playing.courseId);
+  const doneMod = isDone(playing.courseId) || (p && !p.done && (p.mod || 0) > playing.mod) || (S.trainingLog || []).some(e => e.courseId === playing.courseId && e.mod === playing.mod);
+  if (doneMod) {   /* already recorded: this button is now "next lesson" (or back to the course) */
+    if (c && playing.mod + 1 < c.modules.length) { _openPaused = true; openPlayer(playing.courseId, playing.mod + 1); }
+    else closePlayer();
+    return;
+  }
+  /* the same gate the natural end has — a scrubbed-to-the-end lesson is not a watched lesson */
+  if (watchEv && watchEv.dur && watchCoverage() < WATCH_MIN_COVERAGE) { toast(t('watch_more'), 'ℹ️'); return; }
+  completeModule(playing.courseId, playing.mod);
+});
 $('#aiFab').addEventListener('click', () => setTutorOpen(!tutorPanel.classList.contains('open')));
 const _tutorClose = $('#tutorCloseBtn'); if (_tutorClose) _tutorClose.addEventListener('click', () => setTutorOpen(false));
 $('#aiSend').addEventListener('click', sendTutor);
@@ -8882,9 +8901,15 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
      (no existing controller) and against reload loops. Kills stale-cache. */
   if (navigator.serviceWorker.controller) {
     let _swReloaded = false;
+    /* a new version waits until the learner is not inside a lesson, a check, a quiz or
+       onboarding (every deploy was reloading mid-video and dropping people on the home page) */
+    window._swBusy = () => !!document.querySelector('#player.open, .player.open, #quizModal.open, .ck-ov.on, .take-overlay.open, #onboard.open, #askModal.open');
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (_swReloaded) return; _swReloaded = true; location.reload();
+      if (_swReloaded) return;
+      if (window._swBusy()) { window._swPending = true; return; }
+      _swReloaded = true; location.reload();
     });
+    addEventListener('hashchange', () => { if (window._swPending && !window._swBusy()) { window._swPending = false; _swReloaded = true; location.reload(); } });
   }
   addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js').then(reg => {

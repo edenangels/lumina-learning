@@ -1713,6 +1713,13 @@ html:not(.is-admin) [data-admin] { display: none !important; }
 .hero-h1 .hw.grad-text { padding-right: .08em; }
 /* curtain stays clickable-through, and the learner can always replay */
 #vimeoWrap.ended::after { pointer-events: none; }
+#vimeoWrap .replay-veil { display: none; position: absolute; inset: 0; z-index: 3; place-items: center; align-content: center; gap: 10px; text-align: center; padding: 20px; }
+#vimeoWrap.ended .replay-veil { display: grid; }
+#vimeoWrap .veil-note { margin: 0; color: var(--text-faint); font-size: 14px; max-width: 420px; }
+#vimeoWrap .veil-note:empty { display: none; }
+/* the tutor must open ABOVE the full-screen player — it was opening behind it and surfacing later on the home page */
+.ai-panel { z-index: 520; }
+.ai-fab { z-index: 519; }
 /* today's question: closable */
 .daily-head { position: relative; }
 .daily-x { position: absolute; top: -4px; right: -4px; background: none; border: 0; color: var(--text-faint); font-size: 15px; cursor: pointer; padding: 6px; line-height: 1; }
