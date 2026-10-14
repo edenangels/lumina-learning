@@ -729,7 +729,7 @@ function renderHome() {
         <h2>${t('your_path_to')} ${tgoal(S.goal)}</h2>
         <p class="sub">${t('path_intro')}</p>
       </div>
-      <button class="btn btn-glass" data-action="regen-path" id="regenBtn">${t('regenerate_path')}</button>
+      ${S.path.filter(id => !isComingSoon(courseById(id))).length >= 3 ? `<button class="btn btn-glass" data-action="regen-path" id="regenBtn">${t('regenerate_path')}</button>` : ''}
     </div>
     ${pathStepperHTML()}
     <div class="path-banner-foot">
@@ -763,7 +763,7 @@ let libFilter = 'All', libQuery = '';
 let libTag = null;
 function topicsHTML() {
   if (!KNOW) { loadKnowledgeIdx().then(k => { if (k && (location.hash || '').includes('library')) render(); }); return ''; }
-  const cloud = tagCloud(16);
+  const cloud = tagCloud(12);
   if (!cloud.length) return '';
   const lessons = libTag ? allLessons().filter(l => (l.tags || []).includes(libTag)) : [];
   return `<div class="topics-band">
@@ -814,7 +814,7 @@ function renderPaths() {
         <h2>${t('your_path_to')} ${tgoal(S.goal)}</h2>
         <p class="sub">${(S.quizScores || []).length ? PATH_RATIONALES[S.rationaleIdx % PATH_RATIONALES.length] : t('path_intro')}</p>
       </div>
-      <button class="btn btn-glass" data-action="regen-path" id="regenBtn">${t('regenerate_path')}</button>
+      ${S.path.filter(id => !isComingSoon(courseById(id))).length >= 3 ? `<button class="btn btn-glass" data-action="regen-path" id="regenBtn">${t('regenerate_path')}</button>` : ''}
     </div>
     ${pathStepperHTML()}
   </section>
@@ -1741,6 +1741,11 @@ function momentsHTML(moments, opts) {
         <span class="ask-go">▶</span>
       </div>`).join('')}</div>`;
 }
+/* The Ask bar is a question desk, not the tutor: say what to do, in a few sentences, from the
+   lessons — no Socratic hand-back (João: "it read as if it was asking ME what I would do"). */
+const askStyle = () => (_lang() === 'pt'
+  ? 'Responde de forma direta e prática em 3 a 5 frases curtas, com base APENAS nas lições abaixo, citando a lição e o minuto. Não termines com uma pergunta. Pergunta: '
+  : 'Answer directly and practically in 3 to 5 short sentences, grounded ONLY in the lessons below, naming the lesson and minute. Do not end with a question. Question: ');
 async function openAsk(q, via) {
   q = (q || '').trim(); if (!q) return;
   via = via || 'typed';
@@ -1783,7 +1788,7 @@ async function openAsk(q, via) {
       /* the answer streams into place under the moments; links are resolved once it is complete */
       $('#askBody').insertAdjacentHTML('beforeend', `<p class="ask-answer streaming" id="askLive"></p>`);
       const live = $('#askLive');
-      const g = await gatewayStream({ messages: [{ role: 'user', content: q }], grounding: groundingText(moments) + learnerContext(), maxTokens: 350 }, live);
+      const g = await gatewayStream({ messages: [{ role: 'user', content: askStyle() + q }], grounding: groundingText(moments) + learnerContext(), maxTokens: 350 }, live);
       if (g && g.reply && $('#askQ') && $('#askQ').textContent === q) {
         live.classList.remove('streaming'); live.removeAttribute('id');
         live.innerHTML = linkifyAnswer(g.reply, moments);
@@ -1829,7 +1834,7 @@ function askBarHTML() {
   return `<section class="page-pad ask-line-wrap"><div class="ask-line">
     <span class="ask-ic">✦</span>
     <input id="askInput" placeholder="${t('ask_ph')}" aria-label="${t('ask_h')}">
-    <button class="ask-go" data-action="ask-go" aria-label="${t('ask_go')}">→</button>
+    <button class="ask-go" data-action="ask-go" aria-label="${t('ask_go')}">${t('ask_go')} →</button>
   </div></section>`;
 }
 
@@ -4267,8 +4272,9 @@ function dailyDropHTML() {
   const d = dailyQuestion();
   if (!d) return '';
   if (d.answered) return `<section class="daily done"><div class="daily-head"><span class="daily-ic"></span><div><b>${t('daily_title')}</b><span class="daily-sub">${d.correct ? t('daily_correct') : t('daily_wrong')} · ${t('daily_tomorrow')}</span></div><span class="daily-streak">🔥 ${S.streak || 0} ${t('daily_streak')}</span></div></section>`;
+  if (S.dailyDismissed === d.dayKey) return '';
   return `<section class="daily" id="dailyDrop">
-    <div class="daily-head"><span class="daily-ic"></span><div><b>${t('daily_title')}</b><span class="daily-sub">${t('daily_sub')} · ${t('daily_from')} ${ctitle(d.c)}</span></div><span class="daily-streak">🔥 ${S.streak || 0} ${t('daily_streak')}</span></div>
+    <div class="daily-head"><span class="daily-ic"></span><div><b>${t('daily_title')}</b><span class="daily-sub">${t('daily_sub')} · ${t('daily_from')} ${ctitle(d.c)}</span></div><span class="daily-streak">🔥 ${S.streak || 0} ${t('daily_streak')}</span><button class="daily-x" data-action="daily-dismiss" data-day="${d.dayKey}" aria-label="${t('close')}" title="${t('close')}">✕</button></div>
     <div class="daily-q">${d.q.q}</div>
     <div class="daily-opts">${d.q.opts.map((o, i) => `<button class="daily-opt" data-action="daily-answer" data-opt="${i}" data-a="${d.q.a}">${o}</button>`).join('')}</div>
   </section>`;
@@ -4784,7 +4790,20 @@ function makeFocusable(root) {
     if (!el.hasAttribute('role')) el.setAttribute('role', 'button');
   });
 }
+/* The path can only hold real courses, must include the goal's courses, and leads with what is
+   filmed. Runs on every render so a stale path (a removed course, an old re-plan) heals itself. */
+function normalizePath() {
+  try {
+    const known = (S.path || []).filter(id => courseById(id));
+    const preset = (S.goal && typeof GOAL_PRESETS === 'object' && GOAL_PRESETS[S.goal]) || [];
+    const merged = [...known]; preset.forEach(id => { if (courseById(id) && !merged.includes(id)) merged.push(id); });
+    const live = merged.filter(id => !isComingSoon(courseById(id))), soon = merged.filter(id => isComingSoon(courseById(id)));
+    const next = [...live, ...soon];
+    if (next.join() !== (S.path || []).join()) { S.path = next; save(); }
+  } catch (e) {}
+}
 function render() {
+  normalizePath();
   /* One line of cross-route continuity. renderNow() is fully synchronous, so
      the transition captures a clean before/after with no extra bookkeeping. */
   if (document.startViewTransition && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -5043,7 +5062,10 @@ function linkifyAnswer(text, moments) {
 async function copyLink(hash) {
   const url = absLink(hash);
   try { await navigator.clipboard.writeText(url); toast(t('link_copied'), '🔗'); }
-  catch (e) { prompt(t('link_copy'), url); }
+  catch (e) {
+    try { const ta = document.createElement('textarea'); ta.value = url; ta.style.cssText = 'position:fixed;opacity:0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast(t('link_copied'), '🔗'); }
+    catch (e2) { prompt(t('link_copy'), url); }
+  }
 }
 addEventListener('hashchange', () => { if (!handlePlayLink()) render(); });
 if (handlePlayLink()) {} 
@@ -5499,6 +5521,8 @@ const playerChrome = (() => {
   return { show, hide, toggle, arm, onPlay, onPause, get playing() { return playingNow; } };
 })();
 function closePlayer(fromPop) {
+  /* came here from an Ask answer: bring the answer back when the lesson closes */
+  if (window._askReturn) { window._askReturn = false; setTimeout(() => { const am = $('#askModal'); if (am) am.classList.add('open'); }, 350); }
   /* if WE pushed the sentinel and the close came from ✕/ESC, consume it so the
      next BACK doesn't mysteriously do nothing */
   if (_playerPushed && !fromPop) {
@@ -5560,7 +5584,7 @@ function armVimeo(c, mod) {
     if (_seekTo) { const t = _seekTo; _seekTo = null; vimeoPlayer.setCurrentTime(t).catch(() => {}); }
     let done = false;
     if (watchEv && watchEv.key === c.id + ':' + mod) watchEv.method = 'vimeo-timeupdate';
-    vimeoPlayer.on('play', playerChrome.onPlay);
+    vimeoPlayer.on('play', () => { vimeoWrap.classList.remove('ended'); playerChrome.onPlay(); });
     vimeoPlayer.on('pause', playerChrome.onPause);
     vimeoPlayer.on('timeupdate', d => {
       if (!d || !playing || playing.courseId !== c.id || playing.mod !== mod) return;
@@ -5569,13 +5593,13 @@ function armVimeo(c, mod) {
       const p = prog(c.id); if (p && d.percent) p.pct = Math.max(p.pct || 0, Math.round(d.percent * 100));
     });
     vimeoPlayer.on('ended', () => {
-      vimeoWrap.classList.add('ended');   /* our curtain, not Vimeo's "more from" screen */
       if (done || !playing || playing.courseId !== c.id || playing.mod !== mod) return;
       /* the same discipline the <video> branch has always had: reaching the end
          of the timeline is not the same as having watched the lesson, and a
          scrubbed-through lesson must not mint a compliance hour */
       if (watchEv && watchEv.dur && watchCoverage() < WATCH_MIN_COVERAGE) { toast(t('watch_more'), 'ℹ️'); return; }
       done = true;
+      vimeoWrap.classList.add('ended');   /* our curtain over Vimeo's "more from" screen — only now, when the lesson really completed */
       completeModule(c.id, mod);
     });
   }).catch(() => {});
@@ -8288,8 +8312,9 @@ document.addEventListener('click', e => {
       break;
     }
     case 'open-reviews': openReviewSession(); break;
+    case 'daily-dismiss': S.dailyDismissed = el.dataset.day; save(); render(); break;
     case 'ask-moment': {
-      const am = $('#askModal'); if (am) am.classList.remove('open'); setTutorOpen(false);
+      const am = $('#askModal'); if (am) { window._askReturn = am.classList.contains('open'); am.classList.remove('open'); } setTutorOpen(false);
       ledgerAppend('moment_open', { courseId: el.dataset.id, mod: +el.dataset.mod, t: +el.dataset.t, via: 'ask' });
       openPlayer(el.dataset.id, +el.dataset.mod, +el.dataset.t);
       break;
@@ -8642,7 +8667,7 @@ function drawOnboard() {
       <p class="ob-sub">${t('ob_q2_sub')}</p>
       <div class="ob-grid">${goals.map(g => `
         <div class="ob-option ${ob.goal === g ? 'sel' : ''}" data-goal="${g}">
-          <span class="oi">${svgIcon((courseById(GOAL_PRESETS[g][0]) || {}).icon || 'leaf')}</span><div>${tgoal(g)}<div class="od">${(() => { const ids = GOAL_PRESETS[g], live = ids.filter(x => { const cc = courseById(x); return cc && !isComingSoon(cc); }).length, soon = ids.length - live; return `${live} ${live === 1 ? t('course_adaptive_one') : t('courses_adaptive')}${soon ? ` · ${soon} ${t('coming_soon').toLowerCase()}` : ''}`; })()}</div></div>
+          <span class="oi">${svgIcon((courseById(GOAL_PRESETS[g][0]) || {}).icon || 'leaf')}</span><div>${tgoal(g)}<div class="od">${(() => { const ids = GOAL_PRESETS[g], live = ids.filter(x => { const cc = courseById(x); return cc && !isComingSoon(cc); }).length, soon = ids.length - live; return `${live} ${live === 1 ? t('course_ready_one') : t('courses_ready')}${soon ? ` · ${soon} ${t('coming_soon').toLowerCase()}` : ''}`; })()}</div></div>
         </div>`).join('')}
       </div>
       <div class="ob-foot">
