@@ -1411,9 +1411,14 @@ function maybeTour() {
   let _tourFlag = false; try { _tourFlag = localStorage.getItem(BRAND_SLUG + '-tour-done') === '1'; } catch (e) {}
   if (window.__tourShown || !S.onboarded || S.tourDone || _tourFlag) return;
   if ((location.hash || '#/home').indexOf('#/home') !== 0 && location.hash !== '') return;
+  /* not while the sign-in gate is up (a returning browser whose session expired saw the
+     tour float over the sign-in card on the live site, 16 Oct 2026); the next render retries */
+  const gateUp = () => { const g = document.getElementById('authGate'); return !!(g && g.getClientRects().length); };
+  if (gateUp()) return;
   window.__tourShown = true;
   setTimeout(() => {
-    /* never over the player, a quiz, onboarding or any other overlay */
+    /* never over the player, a quiz, onboarding, the sign-in gate or any other overlay */
+    if (gateUp()) { window.__tourShown = false; return; }
     if (document.querySelector('.player-overlay.open, .modal-backdrop.open, .take-overlay.open, .onboard-overlay.open, .ck-ov.on')) return;
     if ((location.hash || '#/home').indexOf('#/home') !== 0 && location.hash !== '') return;
     startTour();
