@@ -316,6 +316,8 @@ const companyNif = () => (window.EdenCompany && EdenCompany.nif) || '';
 function toast(msg, icon = '') {
   const t = document.createElement('div');
   t.className = 'toast';
+  /* no emoji on the storefront (João, 16 Oct 2026) — a pictograph icon becomes a plain dot */
+  icon = String(icon || '').replace(/[\p{Extended_Pictographic}\uFE0F]/gu, '').trim() || '·';
   t.innerHTML = `<span>${icon}</span><span>${msg}</span>`;
   $('#toasts').appendChild(t);
   setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 350); }, 2600);
@@ -501,7 +503,7 @@ function pathStepperHTML() {
     const st = pathStatus(id); const p = prog(id);
     const node = st === 'done' ? '✓' : st === 'current' ? '▶' : svgIcon(c.icon);
     const sub = (isComingSoon(c) && st !== 'done') ? t('coming_soon') : st === 'done' ? `${t('completed')}${p && p.score ? ' · ' + p.score + '%' : ''}` : st === 'current' ? `${t('in_progress')} · ${coursePct(id)}%` : (S.path.indexOf(id) === S.path.findIndex(x => !isDone(x)) + 1 ? t('next_up') : t('locked'));
-    if (isComingSoon(c) && st !== 'done') return `<div class="seg soon" aria-disabled="true"><div class="snode">⏳</div><div class="sl">${t('coming_soon')}</div><div class="sd"></div></div>`;
+    if (isComingSoon(c) && st !== 'done') return `<div class="seg soon" aria-disabled="true"><div class="snode">·</div><div class="sl">${t('coming_soon')}</div><div class="sd"></div></div>`;
     return `<div class="seg ${st}" data-action="open-course" data-id="${id}"><div class="snode">${node}</div><div class="sl">${ctitle(c)}</div><div class="sd">${sub}</div></div>`;
   }).join('')}</div>`;
 }
@@ -682,7 +684,6 @@ function renderHome() {
     ${(featured.heroArt || featured.poster) ? `<div class="hero-art${featured.heroFit ? ' fit-' + featured.heroFit : ''}" style="background-image:url('${featured.heroArt || featured.poster}')"></div>` : ''}
     <div class="orb orb-1"></div><div class="orb orb-2"></div><div class="hero-fade"></div><div class="hero-rim" aria-hidden="true"></div>
     <div class="hero-content">
-      <span class="hero-eyebrow">${t('featured_eyebrow')}</span>
       <h1 class="hero-h1">${words.map((wd, i) => `<span class="hw" style="--i:${i}">${esc(wd)}</span>`).join(' ')} <span class="hw grad-text" style="--i:${words.length}">${esc(lastWord)}</span></h1>
       <!-- THREE facts, like a Netflix billboard. Was five plus a boxed chip:
            goal-match, modules, duration, level, CERTIFIED. Level and the
@@ -714,14 +715,12 @@ function renderHome() {
        on one page and a stats row duplicated from #/me. A returning learner has
        one job — carry on — and everything here either serves that or teases
        what is next. -->
-  ${askBarHTML()}
   ${recallStripHTML()}
   ${loopStripHTML()}
   ${railHTML(t('continue_learning'), t('synced_devices'), continuing.map(c => cardHTML(c)), null, 'featured-row')}
   ${pathRowHTML()}
   ${railHTML(t('assigned_you'), t('from_stewardship'), assigned.filter(notHero).map(c => cardHTML(c)))}
   ${railHTML(t('featured_h'), t('featured_sub'), featuredCourses.filter(notHero).map(c => cardHTML(c)))}
-  ${dailyDropHTML()}
   <section class="path-banner">
     <div class="shimmer"></div>
     <div class="path-banner-head">
@@ -790,7 +789,6 @@ function renderLibrary() {
     <div class="lib-search">⌕ <input id="libSearch" placeholder="${t('filter_library')}" value="${esc(libQuery)}"></div>
     <div class="filter-row">${cats.map(c => `<button class="filter-chip ${c === libFilter ? 'active' : ''}" data-action="lib-filter" data-cat="${c}">${c === 'All' ? t('all') : tcat(c)}</button>`).join('')}</div>
     <button class="link-quiet lib-ask" data-action="ai-missing">${t('missing_ask')}</button>
-    ${topicsHTML()}
     <div class="grid">${list.filter(c => !isHowto(c)).map(c => cardHTML(c)).join('')}</div>
     ${list.filter(c => !isHowto(c)).length ? '' : `<p class="empty-note">${t('nothing_matches')}</p>`}
     ${list.some(isHowto) ? `<div class="howto-shelf">
@@ -828,10 +826,41 @@ function renderPaths() {
   ${footerHTML()}</div>`;
 }
 
+/* João, 16 Oct 2026: "need a calendar for this section, so we know when the
+   live workshops are". A month grid; a session with a real date marks its day. */
+let calCursor = null;
+function sessionDate(sess) { const d = sess && (sess.date || sess.at || sess.when); const x = d ? new Date(d) : null; return x && !isNaN(x) ? x : null; }
+function liveCalendarHTML() {
+  const now = new Date();
+  const cur = calCursor || new Date(now.getFullYear(), now.getMonth(), 1);
+  const pt = _lang() === 'pt';
+  const MONTHS = pt ? ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'] : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const DAYS = pt ? ['S', 'T', 'Q', 'Q', 'S', 'S', 'D'] : ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+  const first = new Date(cur.getFullYear(), cur.getMonth(), 1), lead = (first.getDay() + 6) % 7;
+  const nDays = new Date(cur.getFullYear(), cur.getMonth() + 1, 0).getDate();
+  const byDay = {};
+  liveList().forEach(sess => { const d = sessionDate(sess); if (d && d.getFullYear() === cur.getFullYear() && d.getMonth() === cur.getMonth()) (byDay[d.getDate()] = byDay[d.getDate()] || []).push(sess); });
+  const todayKey = now.getFullYear() === cur.getFullYear() && now.getMonth() === cur.getMonth() ? now.getDate() : -1;
+  let cells = '';
+  for (let i = 0; i < lead; i++) cells += '<span class="cal-cell cal-pad"></span>';
+  for (let d = 1; d <= nDays; d++) {
+    const has = byDay[d];
+    cells += `<span class="cal-cell${d === todayKey ? ' cal-today' : ''}${has ? ' cal-has' : ''}" ${has ? `title="${attr(has.map(x => x.title).join(' · '))}"` : ''}>${d}${has ? '<i></i>' : ''}</span>`;
+  }
+  return `<section class="live-cal">
+    <div class="cal-head">
+      <button class="cal-nav" data-action="cal-prev" aria-label="${t('cal_prev')}">‹</button>
+      <b>${MONTHS[cur.getMonth()]} ${cur.getFullYear()}</b>
+      <button class="cal-nav" data-action="cal-next" aria-label="${t('cal_next')}">›</button>
+    </div>
+    <div class="cal-grid">${DAYS.map(d => `<span class="cal-dow">${d}</span>`).join('')}${cells}</div>
+  </section>`;
+}
 function renderLive() {
   return `<div class="page"><div class="page-pad">
     <h1 class="page-title">${t('live_title')}</h1>
     <p class="page-sub">${t('live_sub')}</p>
+    ${liveCalendarHTML()}
     ${liveList().length ? '' : `<div class="empty-note">${t('live_empty')}</div>`}
     ${liveList().map(s => `
       <div class="live-card">
@@ -970,7 +999,7 @@ function renderCourse(id) {
                  secondary is the honest second choice for the state you are in;
                  the rest are quiet text, present but not competing. -->
             ${isComingSoon(c)
-              ? `<button class="btn btn-glass" disabled>⏳&nbsp; ${t('coming_soon')}</button>`
+              ? `<button class="btn btn-glass" disabled>${t('coming_soon')}</button>`
               : isDone(id) && !certOf(id)
               ? `<button class="btn btn-primary" data-action="quiz" data-id="${id}">🎯&nbsp; ${t('take_cert_quiz')}</button>`
               : `<button class="btn btn-primary" data-action="play" data-id="${id}">▶&nbsp; ${isDone(id) ? t('rewatch') : p ? `${t('resume_module')} ${(p.mod || 0) + 1}` : t('start_course')}</button>`}
@@ -1002,14 +1031,14 @@ function renderCourse(id) {
 
 const footerHTML = () => `
 <footer>
-  <div class="logo"><span class="logo-mark"><svg class="er-mark" viewBox="0 0 30 38" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 37.5V15a11 11 0 0 1 22 0v22.5" stroke="rgba(166,195,165,.5)" stroke-width="1"/><g transform="translate(15 0)"><path d="M0 33V13" stroke="#b27a52" stroke-width="1.1" stroke-linecap="round"/><g fill="#b27a52"><path d="M0 0C-3.4-3-3.4-9 0-12 3.4-9 3.4-3 0 0Z" transform="translate(0 13)"/><path d="M0 0C-3.1-2.6-3.1-8 0-11 3.1-8 3.1-2.6 0 0Z" transform="translate(0 18) rotate(36)"/><path d="M0 0C-3.1-2.6-3.1-8 0-11 3.1-8 3.1-2.6 0 0Z" transform="translate(0 18) rotate(-36)"/><path d="M0 0C-2.9-2.4-2.9-7.4 0-10 2.9-7.4 2.9-2.4 0 0Z" transform="translate(0 23) rotate(60)"/><path d="M0 0C-2.9-2.4-2.9-7.4 0-10 2.9-7.4 2.9-2.4 0 0Z" transform="translate(0 23) rotate(-60)"/><path d="M0 0C-2.6-2.1-2.6-6.6 0-9 2.6-6.6 2.6-2.1 0 0Z" transform="translate(0 28) rotate(104)"/><path d="M0 0C-2.6-2.1-2.6-6.6 0-9 2.6-6.6 2.6-2.1 0 0Z" transform="translate(0 28) rotate(-104)"/></g></g></svg></span><span class="logo-word"><span class="er-name">${brandName().toUpperCase()}</span><span class="er-sub">${BRAND.wordSub || 'Academy'}</span></span></div>
+  <div class="logo"><span class="logo-mark">${(window.BRAND && BRAND.logoSvg) || ((document.querySelector('.logo-mark svg') || {}).outerHTML || '')}</span><span class="logo-word"><span class="er-name">${brandName().toUpperCase()}</span><span class="er-sub">${BRAND.wordSub || 'Academy'}</span></span></div>
   <span>${t('footer_tag')}</span>
   <div class="links">
     <button data-action="goto" data-route="#/admin" data-admin>Admin console</button>
     <button data-action="ai-open">Help</button>
     <button data-action="tour-start">${t('tour_replay')}</button>
     <button data-action="privacy-note">Privacy</button>
-    <button data-action="reset-demo">Reset demo</button>
+    <button data-action="reset-demo" data-admin>Reset demo</button>
   </div>
 </footer>`;
 
@@ -1725,7 +1754,7 @@ function modelLabelOf(m) { return /llama-3\.3/.test(m || '') ? 'Llama 3.3 70B' :
 /* A question asked out loud is answered out loud — the first two sentences,
    in the learner's language, and it can be silenced from the modal. */
 function speakBack(text) {
-  if (S.speak === false || typeof speechSynthesis === 'undefined') return;
+  if (S.speak !== true || typeof speechSynthesis === 'undefined') return;
   const sentences = String(text).replace(/\*\*/g, '').match(/[^.!?]+[.!?]?/g) || [];
   const short = sentences.slice(0, 2).join(' ').trim().slice(0, 280); if (!short) return;
   try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(short); u.lang = _lang() === 'pt' ? 'pt-PT' : 'en-GB'; speechSynthesis.speak(u); } catch (e) {}
@@ -1733,13 +1762,12 @@ function speakBack(text) {
 function momentsHTML(moments, opts) {
   if (!moments.length) return '';
   const compact = opts && opts.compact;
-  return `${compact ? '' : `<div class="ob-eyebrow" style="margin-top:4px;">⏱ ${t('ask_moments')}</div>`}
+  return `${compact ? '' : `<div class="ob-eyebrow" style="margin-top:4px;">${t('ask_moments')}</div>`}
     <div class="ask-moments${compact ? ' compact' : ''}">${moments.map(m => `
       <div class="ask-moment" data-action="${m.kind === 'reel' ? 'ask-reel' : 'ask-moment'}" data-id="${esc(String(m.kind === 'reel' ? m.mod : m.course))}" data-mod="${m.mod}" data-t="${Math.max(0, m.t0 - (m.kind === 'reel' ? 2 : 4))}" role="button" tabindex="0">
         <span class="am-tc">${fmtTc(m.t0)}</span>
         <div class="am-body"><b>${esc(m.title)}</b><span class="am-course">${esc(m.courseTitle)}</span>
           <p>“${esc(m.text.length > 150 ? m.text.slice(0, 150) + '…' : m.text)}”</p></div>
-        <button class="am-link" data-action="copy-link" data-href="${deepLink(m)}" aria-label="${t('link_copy')}" title="${t('link_copy')}">🔗</button>
         <span class="ask-go">▶</span>
       </div>`).join('')}</div>`;
 }
@@ -1754,7 +1782,7 @@ async function openAsk(q, via) {
   logAsk(q, via);
   ensureAskModal();
   $('#askQ').textContent = q;
-  const eb = $('#askModal .ob-eyebrow'); if (eb) eb.innerHTML = `✦ ${t('ask_h')} <span class="grounded-inline">· 🔒 ${t('grounded_note')}</span>${via === 'voice' ? `<button class="ask-speak" data-action="ask-speak" aria-label="${t('ask_speak')}" title="${t('ask_speak')}">${S.speak === false ? '🔇' : '🔊'}</button>` : ''}`;
+  const eb = $('#askModal .ob-eyebrow'); if (eb) eb.innerHTML = `✦ ${t('ask_h')} <span class="grounded-inline">· ${t('grounded_note')}</span>${via === 'voice' ? `<button class="ask-speak" data-action="ask-speak" aria-label="${t('ask_speak')}" title="${t('ask_speak')}">${S.speak === false ? '🔇' : '🔊'}</button>` : ''}`;
   $('#askBody').innerHTML = `<div class="studio-status"><span class="orb-spin" style="width:20px;height:20px;"></span> ${t('ask_thinking')}</div>`;
   $('#askModal').classList.add('open');
   /* MOMENTS FIRST — found locally in the real transcripts, rendered before any
@@ -1795,9 +1823,9 @@ async function openAsk(q, via) {
         live.classList.remove('streaming'); live.removeAttribute('id');
         live.innerHTML = linkifyAnswer(g.reply, moments);
         live.insertAdjacentHTML('afterend', `<div class="ask-model">✦ ${t('ask_by')} ${esc(modelLabelOf(g.model))}</div>`);
-        if (via === 'voice') speakBack(g.reply);
+        if (via === 'voice' && S.speak === true) speakBack(g.reply);
       } else if (live) live.remove();
-    } catch (e) { const live = $('#askLive'); if (live) live.remove(); if (via === 'voice' && moments.length) speakBack(`${moments[0].title}. ${moments[0].text}`); }
+    } catch (e) { const live = $('#askLive'); if (live) live.remove(); if (via === 'voice' && S.speak === true && moments.length) speakBack(`${moments[0].title}. ${moments[0].text}`); }
     return;
   }
   try {
@@ -1815,7 +1843,7 @@ async function openAsk(q, via) {
           <span class="ask-go">→</span>
         </div>`).join('')}</div>` : ''}
       ${aiModelLabel() ? `<div class="ask-model">✦ ${t('ask_by')} ${esc(aiModelLabel())}</div>` : ''}`;
-    if (via === 'voice') speakBack(j.answer || '');
+    if (via === 'voice' && S.speak === true) speakBack(j.answer || '');
   } catch (e) {
     /* the model failed; the lesson quotes still answer */
     $('#askBody').innerHTML = momentsHTML(moments) || `<div class="auth-err on">${t('ask_fail')}</div>`;
@@ -1830,7 +1858,7 @@ function recallStripHTML() {
   }
   if (!recent.length) return '';
   return `<section class="page-pad ask-recent"><span class="ask-recent-k">${t('recall_recent')}</span>${recent.map(a =>
-    `<button class="chip ask-again" data-action="ask-again" data-q="${esc(a.q)}">${a.via === 'voice' ? '🎙 ' : ''}${esc(a.q.length > 44 ? a.q.slice(0, 44) + '…' : a.q)}</button>`).join('')}</section>`;
+    `<button class="chip ask-again" data-action="ask-again" data-q="${esc(a.q)}">${esc(a.q.length > 44 ? a.q.slice(0, 44) + '…' : a.q)}</button>`).join('')}</section>`;
 }
 function askBarHTML() {
   return `<section class="page-pad ask-line-wrap"><div class="ask-line">
@@ -4238,7 +4266,7 @@ function renderProgress(embedded) {
       <p class="sect-sub sub-auto">${t('path_points')}</p>
       ${pathStepperHTML()}
     </div>
-  </div>${footerHTML()}</div>`;
+  </div>${embedded ? '' : footerHTML()}</div>`;   /* embedded in #/me, which adds its own footer: two footers showed (João, 16 Oct 2026) */
 }
 
 /* ---------- real streak — counts actual learning days ---------- */
@@ -4270,17 +4298,31 @@ function dailyQuestion() {
   const qs = courseQuizFor(c);
   return { c, q: qs[seed % qs.length], dayKey };
 }
-function dailyDropHTML() {
+function dailyDropHTML(inSheet) {
   const d = dailyQuestion();
   if (!d) return '';
-  if (d.answered) return `<section class="daily done"><div class="daily-head"><span class="daily-ic"></span><div><b>${t('daily_title')}</b><span class="daily-sub">${d.correct ? t('daily_correct') : t('daily_wrong')} · ${t('daily_tomorrow')}</span></div><span class="daily-streak">🔥 ${S.streak || 0} ${t('daily_streak')}</span></div></section>`;
-  if (S.dailyDismissed === d.dayKey) return '';
+  if (!inSheet) return '';   /* the home card is retired; the sheet is the only place it renders */
+  if (d.answered) return `<section class="daily done"><div class="daily-head"><span class="daily-ic"></span><div><b>${t('daily_title')}</b><span class="daily-sub">${d.correct ? t('daily_correct') : t('daily_wrong')} · ${t('daily_tomorrow')}</span></div><span class="daily-streak">${svgIcon('fire')} ${S.streak || 0} ${t('daily_streak')}</span></div></section>`;
   return `<section class="daily" id="dailyDrop">
-    <div class="daily-head"><span class="daily-ic"></span><div><b>${t('daily_title')}</b><span class="daily-sub">${t('daily_sub')} · ${t('daily_from')} ${ctitle(d.c)}</span></div><span class="daily-streak">🔥 ${S.streak || 0} ${t('daily_streak')}</span><button class="daily-x" data-action="daily-dismiss" data-day="${d.dayKey}" aria-label="${t('close')}" title="${t('close')}">✕</button></div>
+    <div class="daily-head"><span class="daily-ic"></span><div><b>${t('daily_title')}</b><span class="daily-sub">${t('daily_sub')} · ${t('daily_from')} ${ctitle(d.c)}</span></div><span class="daily-streak">${svgIcon('fire')} ${S.streak || 0} ${t('daily_streak')}</span></div>
     <div class="daily-q">${d.q.q}</div>
     <div class="daily-opts">${d.q.opts.map((o, i) => `<button class="daily-opt" data-action="daily-answer" data-opt="${i}" data-a="${d.q.a}">${o}</button>`).join('')}</div>
   </section>`;
 }
+/* The question used to sit on the home page; now it waits in the bell and opens
+   here, greeting by the hour. The sheet reuses dailyDropHTML, so answering,
+   XP and the streak work exactly as before. */
+function dayGreeting() { const h = new Date().getHours(); return t(h < 12 ? 'greet_morning' : h < 19 ? 'greet_afternoon' : 'greet_evening'); }
+function openDailyModal() {
+  let m = $('#dailyModal');
+  if (!m) { m = document.createElement('div'); m.id = 'dailyModal'; m.className = 'daily-ov'; m.setAttribute('role', 'dialog'); m.setAttribute('aria-modal', 'true'); m.addEventListener('click', e => { if (e.target === m) closeDailyModal(); }); document.body.appendChild(m); }
+  const card = dailyDropHTML(true);
+  if (!card) return;
+  m.innerHTML = `<div class="daily-sheet"><div class="daily-greet"><span>${dayGreeting()}, ${esc(displayName().split(' ')[0])}.</span><button class="daily-x" data-action="daily-close" aria-label="${t('close')}">✕</button></div>${card}</div>`;
+  m.classList.add('open');
+  try { makeFocusable(m); } catch (e) {}
+}
+function closeDailyModal() { const m = $('#dailyModal'); if (m) m.classList.remove('open'); updateBell(); }
 function answerDaily(el) {
   const d = dailyQuestion();   /* capture the course before S.daily marks it answered */
   const chosen = +el.dataset.opt, correct = chosen === +el.dataset.a;
@@ -4311,6 +4353,8 @@ function computeNudges() {
   const rank = myRank();
   const nl = nextLesson();
   /* transfer loop: an application check-in is due — the highest-value nudge there is */
+  const dq = dailyQuestion();
+  if (dq && !dq.answered) out.push({ id: 'daily', icon: '?', title: t('nudge_daily_t'), body: t('nudge_daily_b'), action: 'daily-open' });
   const due = dueApplicationChecks();
   if (due.length) out.push({ id: 'appcheck', icon: '', title: t('nudge_appcheck_t'), body: t('nudge_appcheck_b').replace('{c}', titleOf(due[0].courseId)), route: '#/progress' });
   if (rank.total >= 2) {
@@ -4318,7 +4362,7 @@ function computeNudges() {
     else out.push({ id: 'top', icon: '', title: t('nudge_top_t'), body: t('nudge_top_b'), route: '#/progress' });
   }
   if (lv.next != null && lv.toNext <= 140) out.push({ id: 'level', icon: '', title: t('nudge_level_t'), body: t('nudge_level_b').replace('{xp}', lv.toNext).replace('{lvl}', tlevel(lv.idx + 1)), route: '#/library' });
-  if (S.streak > 0) out.push({ id: 'streak', icon: '🔥', title: t('nudge_streak_t').replace('{n}', S.streak), body: t('nudge_streak_b'), route: nl ? nl.route : '#/library' });
+  if (S.streak > 0) out.push({ id: 'streak', icon: svgIcon('fire'), title: t('nudge_streak_t').replace('{n}', S.streak), body: t('nudge_streak_b'), route: nl ? nl.route : '#/library' });
   if (nl) out.push({ id: 'lesson', icon: '▶', title: t('nudge_lesson_t'), body: t('nudge_lesson_b').replace('{mod}', nl.mod).replace('{course}', nl.course), route: nl.route });
   const done = CATALOG.filter(c => isDone(c.id)).length;
   if (done === 2 && !(S.badges || []).includes('grove')) out.push({ id: 'badge', icon: '', title: t('nudge_badge_t'), body: t('nudge_badge_b'), route: '#/library' });
@@ -4345,7 +4389,7 @@ function updateBell() {
 function nudgePanelHTML() {
   const ns = computeNudges();
   if (!ns.length) return `<div class="nudge-empty">${t('nudge_empty')}</div>`;
-  return `<div class="nudge-head">${(ns.length === 1 ? t('nudge_today_one') : t('nudge_today')).replace('{n}', ns.length)}</div>` + ns.map(n => `<button class="nudge" data-action="goto" data-route="${n.route}">
+  return `<div class="nudge-head">${(ns.length === 1 ? t('nudge_today_one') : t('nudge_today')).replace('{n}', ns.length)}</div>` + ns.map(n => `<button class="nudge" data-action="${n.action || 'goto'}" data-route="${n.route || ''}">
     <span class="nudge-ic">${n.icon}</span>
     <div class="nudge-txt"><div class="nudge-t">${n.title}</div><div class="nudge-b">${n.body}</div></div>
   </button>`).join('');
@@ -4455,7 +4499,7 @@ function membersDirHTML() {
     <div class="member-tile" data-action="member-card" data-uid="${m.uid}">
       ${memberDot(m)}
       <div class="mt-info"><b>${esc(m.name || 'Learner')}</b>${m.username ? `<span class="post-handle">@${esc(m.username)}</span>` : ''}
-      <span class="mt-meta">${levelFor(m.xp || 0) ? tlevel(levelFor(m.xp || 0).idx) : ''} · ${m.xp || 0} XP · 🔥${m.streak || 0}</span></div>
+      <span class="mt-meta">${levelFor(m.xp || 0) ? tlevel(levelFor(m.xp || 0).idx) : ''} · ${m.xp || 0} XP · ${svgIcon('fire')} ${m.streak || 0}</span></div>
       ${isOnline(m) ? `<span class="mt-on">● ${t('comm_online')}</span>` : ''}
     </div>`).join('')}</div>`;
 }
@@ -4593,7 +4637,7 @@ function showMemberCard(el) {
   card.className = 'member-card-pop';
   card.innerHTML = `<div class="mc-head"><span class="m-ava lg ${isOnline(m) ? 'online' : ''}">${esc(m.initials || 'ER')}</span>
     <div><b>${esc(m.name || 'Learner')}</b>${m.username ? `<span class="post-handle">@${esc(m.username)}</span>` : ''}</div></div>
-    <div class="mc-stats"><span>${tlevel(lv.idx)} · Lv ${lv.idx + 1}</span><span>${m.xp || 0} XP</span><span>🔥 ${m.streak || 0}</span></div>
+    <div class="mc-stats"><span>${tlevel(lv.idx)} · Lv ${lv.idx + 1}</span><span>${m.xp || 0} XP</span><span>${svgIcon('fire')} ${m.streak || 0}</span></div>
     ${m.joinedAt ? `<div class="mc-since">${t('comm_member_since')} ${new Date(tsMillis(m.joinedAt)).toLocaleDateString(_lang() === 'pt' ? 'pt-PT' : 'en-GB', { month: 'long', year: 'numeric' })}</div>` : ''}
     ${isOnline(m) ? `<div class="mc-on">● ${t('comm_online')}</div>` : ''}`;
   document.body.appendChild(card);
@@ -4679,12 +4723,12 @@ function renderProfile() {
         <label>${t('prof_username')}<div class="ob-handle"><span>@</span><input class="ob-input" id="pfUser" maxlength="20" value="${esc(userHandle())}" placeholder="${suggestHandle()}"></div></label>
         <label>${t('prof_role')}<select class="auth-input" id="pfRole"><option value="">—</option>${roleOpts}</select></label>
         <label>${t('dept_label')}<select class="auth-input" id="pfDept"><option value="">${t('dept_none')}</option>${DEPTS.map(d => `<option value="${d.key}" ${(S.profile && S.profile.dept) === d.key ? 'selected' : ''}>${tdept(d.key)}</option>`).join('')}</select></label>
-        <label>${t('prof_nif')}<input class="auth-input" id="pfNif" inputmode="numeric" maxlength="9" value="${esc((S.profile && S.profile.nif) || '')}" placeholder="123456789"></label>
+        ${BRAND.leanProfile ? '' : `<label>${t('prof_nif')}<input class="auth-input" id="pfNif" inputmode="numeric" maxlength="9" value="${esc((S.profile && S.profile.nif) || '')}" placeholder="123456789"></label>
         <label>${t('prof_empno')}<input class="auth-input" id="pfEmpNo" value="${esc((S.profile && S.profile.employeeNo) || '')}"></label>
         <label>${t('prof_contract')}<select class="auth-input" id="pfContract">${[['permanent','contract_permanent'],['fixed_term','contract_fixed'],['part_time','contract_part']].map(([v,k])=>`<option value="${v}" ${(S.profile && S.profile.contractType)===v?'selected':''}>${t(k)}</option>`).join('')}</select></label>
         <label>${t('prof_fte')}<select class="auth-input" id="pfFte">${[['1',t('fte_full')],['0.5',t('fte_half')]].map(([v,l])=>`<option value="${v}" ${String((S.profile && S.profile.fte)!=null?S.profile.fte:1)===v?'selected':''}>${l}</option>`).join('')}</select></label>
         <label>${t('prof_hire')}<input class="auth-input" id="pfHire" type="date" value="${esc((S.profile && S.profile.hireDate) || '')}"></label>
-        <label>${t('prof_goal')}<select class="auth-input" id="pfGoal">${goalOpts}</select></label>
+        <label>${t('prof_goal')}<select class="auth-input" id="pfGoal">${goalOpts}</select></label>`}
       </div>
       <button class="btn btn-primary" data-action="save-profile" style="margin-top:16px;">${t('prof_save')}</button>
     </div>
@@ -4697,16 +4741,16 @@ function renderProfile() {
       ${notify.whatsapp ? `<input class="auth-input" id="pfPhone" placeholder="${t('notif_phone_ph')}" value="${esc(p.phone || '')}" style="margin-top:12px;max-width:300px;">` : ''}
     </div>
     <div class="admin-section">
-      <h2>🔒 ${t('trust_title')}</h2>
+      <h2>${t('trust_title')}</h2>
       <p class="sect-sub sub-auto">${t('trust_sub')}</p>
       <ul class="trust-list">
-        <li>👁 ${t('trust_sees')}</li>
-        <li>📚 ${t('trust_grounded')}</li>
+        <li>${t('trust_sees')}</li>
+        <li>${t('trust_grounded')}</li>
         <li> ${t('trust_visible')}</li>
         <li> ${t('trust_thinking')}</li>
       </ul>
       <details class="trust-peek">
-        <summary>👁 ${t('trust_peek')}</summary>
+        <summary>${t('trust_peek')}</summary>
         <ul class="trust-list">${aiKnowsLines().map(l => `<li>${l}</li>`).join('')}</ul>
         <p class="sect-sub" style="margin-top:8px;">${t('trust_peek_note')}</p>
       </details>
@@ -4731,7 +4775,7 @@ function aiKnowsLines() {
   if (pathBits.length) lines.push(`${t('knows_path')}: ${pathBits.join(' · ')}`);
   const id = currentCourseId(); const c = id && courseById(id);
   if (c) lines.push(`${t('knows_open')}: ${esc(ctitle(c))}`);
-  lines.push(`${t('knows_stats')}: ${S.streak || 0}🔥 · ${S.xp || 0} XP · ${S.quizzesPassed || 0} ${t('knows_quizzes')}`);
+  lines.push(`${t('knows_stats')}: ${S.streak || 0}d · ${S.xp || 0} XP · ${S.quizzesPassed || 0} ${t('knows_quizzes')}`);
   return lines;
 }
 function exportMyData() {
@@ -4762,14 +4806,14 @@ function saveProfile() {
   const name = ($('#pfName').value || '').trim();
   const user = slugHandle($('#pfUser').value);
   const role = $('#pfRole').value;
-  const goal = $('#pfGoal').value;
+  const goal = $('#pfGoal') ? $('#pfGoal').value : S.goal;
   const phone = $('#pfPhone') ? $('#pfPhone').value.trim() : ((S.profile && S.profile.phone) || '');
   const dept = $('#pfDept') ? $('#pfDept').value : ((S.profile && S.profile.dept) || '');
   const legal = {
-    nif: ($('#pfNif') && $('#pfNif').value || '').replace(/\D/g, '').slice(0, 9),
-    employeeNo: ($('#pfEmpNo') && $('#pfEmpNo').value || '').trim(),
-    contractType: ($('#pfContract') && $('#pfContract').value) || 'permanent',
-    fte: $('#pfFte') ? +$('#pfFte').value : 1,
+    nif: $('#pfNif') ? ($('#pfNif').value || '').replace(/\D/g, '').slice(0, 9) : ((S.profile && S.profile.nif) || ''),
+    employeeNo: $('#pfEmpNo') ? ($('#pfEmpNo').value || '').trim() : ((S.profile && S.profile.employeeNo) || ''),
+    contractType: ($('#pfContract') && $('#pfContract').value) || ((S.profile && S.profile.contractType) || 'permanent'),
+    fte: $('#pfFte') ? +$('#pfFte').value : ((S.profile && S.profile.fte != null) ? S.profile.fte : 1),
     hireDate: ($('#pfHire') && $('#pfHire').value) || ''
   };
   S.profile = Object.assign({}, S.profile, { name: name || displayName(), username: user, role, phone, dept }, legal);
@@ -4796,6 +4840,12 @@ function makeFocusable(root) {
    filmed. Runs on every render so a stale path (a removed course, an old re-plan) heals itself. */
 function normalizePath() {
   try {
+    if (typeof GOAL_ALIASES === 'object' && S.goal && GOAL_ALIASES[S.goal]) { S.goal = GOAL_ALIASES[S.goal]; if (S.profile) S.profile.goal = S.goal; save(); }
+    if (typeof ROLE_ALIASES === 'object') {
+      if (S.role && ROLE_ALIASES[S.role]) { S.role = ROLE_ALIASES[S.role]; save(); }
+      if (S.profile && S.profile.role && ROLE_ALIASES[S.profile.role]) { S.profile.role = ROLE_ALIASES[S.profile.role]; save(); }
+      if (S.profile && S.profile.dept && ROLE_ALIASES[S.profile.dept]) { S.profile.dept = ROLE_ALIASES[S.profile.dept]; save(); }
+    }
     const known = (S.path || []).filter(id => courseById(id));
     const preset = (S.goal && typeof GOAL_PRESETS === 'object' && GOAL_PRESETS[S.goal]) || [];
     const merged = [...known]; preset.forEach(id => { if (courseById(id) && !merged.includes(id)) merged.push(id); });
@@ -5093,6 +5143,7 @@ function syncChrome() {
   const hi = $('#aiHello'); if (hi) hi.textContent = t('ai_hello');
   $$('.quick-row .quick[data-tk]').forEach(b => { b.textContent = t(b.dataset.tk); });
   const inp = $('#aiInput'); if (inp) inp.placeholder = t('ask_anything');
+  const pal = $('#palInput'); if (pal) pal.placeholder = t('pal_ph');
   const stEl = $('#tutorStatus'); if (stEl && !aiKey()) stEl.textContent = t('tutor_demo');
   const tsTitle = $('#tutorSettings .ts-title'); if (tsTitle) tsTitle.textContent = t('connect_ai');
   const tsNote = $('#tutorSettings .ts-note'); if (tsNote) tsNote.textContent = t('api_note');
@@ -5723,7 +5774,7 @@ videoEl.addEventListener('ended', () => {
    Both players now feed the same recorder. Nothing here decides what is legally
    sufficient — that is Part 6 Q4, unanswered. This captures the record so the
    answer can be applied to real data rather than to nothing. */
-const WATCH_MIN_COVERAGE = 0.75;   /* completion gate; NOT a legal threshold */
+const WATCH_MIN_COVERAGE = BRAND.watchGate === false ? 0 : 0.75;   /* completion gate; NOT a legal threshold. brand.js watchGate:false switches it off (Belong, while testing) */
 let watchEv = null;
 function watchStart(key, method) {
   watchEv = { key, method, segs: [], last: null, startedAt: Date.now(), dur: 0 };
@@ -7532,11 +7583,10 @@ function drawQuiz() {
 
 /* ---------- command palette ---------- */
 const PALETTE_ACTIONS = [
-  { t: 'Go to Library', icon: '📚', run: () => location.hash = '#/library' },
+  { t: 'Go to Library', icon: '', run: () => location.hash = '#/library' },
   { t: 'Go to Paths', icon: '', run: () => location.hash = '#/paths' },
-  { t: 'Go to Live sessions', icon: '🔴', run: () => location.hash = '#/live' },
+  { t: 'Go to Live sessions', icon: '', run: () => location.hash = '#/live' },
   { t: 'Go to Analytics', icon: '', run: () => location.hash = '#/analytics' },
-  { t: 'Quiz me on my current course', icon: '', run: () => openQuiz(currentCourseId() || 'leading-data') },
   { t: 'Ask the AI tutor', icon: '✦', run: () => setTutorOpen(true) },
   { t: 'Regenerate my AI path', icon: '↺', run: () => regenPath() }
 ];
@@ -7573,8 +7623,13 @@ function startVoiceSearch() {
     /* A spoken sentence is a question for the lessons, not a title lookup —
        it goes to Recall and comes back as moments and a spoken answer. A
        single word stays in the palette, where a course title is one tap away. */
+    /* João, 16 Oct 2026: the mic fired a question mid-sentence and read the answer
+       aloud in a computer voice. Now the words land in the search field and wait
+       for Enter, so the learner approves what gets asked. */
     const said = (finalTxt || ($('#palInput') || {}).value || '').trim();
-    if (said.split(/\s+/).length >= 2) { closePalette(); openAsk(said, 'voice'); }
+    const pi = $('#palInput');
+    if (pi) { pi.value = said; pi.placeholder = t('pal_ph'); drawPalette(said); pi.focus(); }
+    if (said) { const st = $('#palVoiceState'); if (st) { st.textContent = t('voice_check'); st.classList.add('on'); } }
   };
   r.onerror = () => { voiceRec = null; setVoiceUI(false); };
   try { r.start(); } catch (e) { voiceRec = null; setVoiceUI(false); }
@@ -7631,6 +7686,11 @@ function drawPalette(q) {
         .sort((x, y) => y.s - x.s).map(x => x.a)).slice(0, 6);
   palIdx = 0;
   let html = '';
+  /* A question goes to the lessons first. Three words or a question mark is a
+     question, not a title; it leads the list so Enter asks it, and it needs no
+     AI key because the moments come from the transcripts. */
+  const isQuestion = q && (q.split(/\s+/).length >= 3 || /\?$/.test(q));
+  if (isQuestion) html += `<div class="palette-group">${t('ask_h')}</div><div class="palette-item" data-pal="ask:${esc(q)}"><span class="pi-icon" style="background:var(--surface-2)">✦</span><div><div>“${esc(q)}”</div><div class="pi-meta">${t('pal_ask_hint')}</div></div></div>`;
   if (courses.length) html += `<div class="palette-group">${q ? t('pal_courses') : t('pal_recent')}</div>` + courses.map(c =>
     `<div class="palette-item" data-pal="course:${c.id}"><span class="pi-icon t-grad-${c.grad}">${svgIcon(c.icon)}</span><div><div>${esc(c.title)}</div><div class="pi-meta">${esc(c.cat)} · ${fmtMins(courseMins(c))}${c.rating ? ` · ★ ${c.rating}` : ''}</div></div></div>`).join('');
   if (acts.length) html += `<div class="palette-group">Actions</div>` + acts.map((a, i) =>
@@ -7641,9 +7701,9 @@ function drawPalette(q) {
   if (q.length >= 4 && _searchIdx) {
     const mm = searchMoments(q, 3);
     if (mm.length) html += `<div class="palette-group">${t('pal_moments')}</div>` + mm.map(m =>
-      `<div class="palette-item" data-pal="moment:${m.course}:${m.mod}:${Math.max(0, m.t0 - 4)}"><span class="pi-icon" style="background:rgba(166,195,165,.12)">⏱</span><div><div>${esc(m.title)} · <span style="color:var(--text-faint)">${fmtTc(m.t0)}</span></div><div class="pi-sub">“${esc(m.text.slice(0, 70))}…”</div></div></div>`).join('');
+      `<div class="palette-item" data-pal="moment:${m.course}:${m.mod}:${Math.max(0, m.t0 - 4)}"><span class="pi-icon" style="background:var(--surface-2)">▶</span><div><div>${esc(m.title)} · <span style="color:var(--text-faint)">${fmtTc(m.t0)}</span></div><div class="pi-sub">“${esc(m.text.slice(0, 70))}…”</div></div></div>`).join('');
   }
-  if (q && aiKey()) html += `<div class="palette-group">✦</div><div class="palette-item" data-pal="ask:${esc(q)}"><span class="pi-icon" style="background:var(--surface-2)">✦</span><div>${t('ask_more')}“${esc(q)}”</div></div>`;
+  if (q && !isQuestion) html += `<div class="palette-group">✦</div><div class="palette-item" data-pal="ask:${esc(q)}"><span class="pi-icon" style="background:var(--surface-2)">✦</span><div>${t('ask_more')}“${esc(q)}”</div></div>`;
   $('#palResults').innerHTML = html || `<div class="palette-empty">No matches for “${esc(q)}” — try the AI tutor.</div>`;
   highlightPal();
 }
@@ -8057,6 +8117,9 @@ document.addEventListener('click', e => {
     case 'take-go': resolveTakeaways(); break;
     case 'take-quiz': resolveTakeaways(true); break;
     case 'daily-answer': answerDaily(el); break;
+    case 'daily-open': { const bp = $('#bellPanel'); if (bp) bp.classList.remove('open'); openDailyModal(); break; }
+    case 'daily-close': closeDailyModal(); break;
+    case 'cal-prev': case 'cal-next': { const now = new Date(); const c = calCursor || new Date(now.getFullYear(), now.getMonth(), 1); calCursor = new Date(c.getFullYear(), c.getMonth() + (el.dataset.action === 'cal-next' ? 1 : -1), 1); render(); break; }
     case 'orgkey-save': {
       const k = ($('#orgKeyInput').value || '').trim();
       const mdl = ($('#orgModelInput') && $('#orgModelInput').value || '').trim();
@@ -8142,7 +8205,7 @@ document.addEventListener('click', e => {
     case 'ask-close': $('#askModal').classList.remove('open'); try { speechSynthesis.cancel(); } catch (e) {} break;
     case 'ask-again': openAsk(el.dataset.q, 'again'); break;
     case 'copy-link': copyLink(el.dataset.href); break;
-    case 'ask-speak': { S.speak = S.speak === false; save(); if (S.speak === false) { try { speechSynthesis.cancel(); } catch (e) {} } el.textContent = S.speak === false ? '🔇' : '🔊'; break; }
+    case 'ask-speak': { S.speak = S.speak !== true; save(); if (S.speak === false) { try { speechSynthesis.cancel(); } catch (e) {} } el.textContent = S.speak === false ? '🔇' : '🔊'; break; }
     case 'ask-reel': {
       const am = $('#askModal'); if (am) am.classList.remove('open'); setTutorOpen(false);
       const rid = el.dataset.id;
@@ -8903,7 +8966,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
     let _swReloaded = false;
     /* a new version waits until the learner is not inside a lesson, a check, a quiz or
        onboarding (every deploy was reloading mid-video and dropping people on the home page) */
-    window._swBusy = () => !!document.querySelector('#player.open, .player.open, #quizModal.open, .ck-ov.on, .take-overlay.open, #onboard.open, #askModal.open');
+    window._swBusy = () => !!document.querySelector('#player.open, .player.open, #quizModal.open, .ck-ov.on, .take-overlay.open, #onboard.open, #askModal.open, #dailyModal.open');
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       if (_swReloaded) return;
       if (window._swBusy()) { window._swPending = true; return; }
