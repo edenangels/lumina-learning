@@ -304,8 +304,9 @@ const userHandle = () => (S.profile && S.profile.username) || '';
 const userInitials = () => displayName().trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase() || '';
 const slugHandle = s => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '').slice(0, 20);
 const suggestHandle = () => { const p = S.profile || {}; return slugHandle(p.username) || slugHandle(p.name) || slugHandle((p.email || '').split('@')[0]) || 'learner'; };
-/* admin access — only these accounts see Analytics + Admin */
-const ADMIN_EMAILS = ['admin@edenrise.com', 'info@edenrise.com', 'john@edenrise.com'];
+/* admin access — the tenant's own superadmins (brand.js) see Analytics + Admin. Was a hard-coded
+   EdenRise list, which gave EdenRise staff the admin console on every tenant (fixed 20 Oct 2026). */
+const ADMIN_EMAILS = ((typeof BRAND !== 'undefined' && BRAND.superadmins) || []).map(e => String(e || '').trim().toLowerCase());
 const myEmail = () => ((S.profile && S.profile.email) || '').trim().toLowerCase();
 const isSuperAdmin = () => ADMIN_EMAILS.includes(myEmail());
 /* tenant admin: superadmin OR listed on the company doc */
