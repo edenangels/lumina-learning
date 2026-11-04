@@ -4806,3 +4806,19 @@ body:has(.take-overlay.open, .ck-ov.on, #onboard.open, #quizModal.open, .daily-o
   .path-row { overflow: visible; grid-auto-columns: minmax(0, 1fr); }
 }
 @media (max-width: 699px) { .path-row { padding-left: 18px; padding-right: 18px; scroll-padding-inline: 18px; } }   /* same phone gutter as the headings */
+
+/* course page: the intro box sits in the same column as the header and the module list (João, 5 Nov 2026) */
+.course-intro { margin-left: var(--edge); margin-right: var(--edge); }
+/* one edge per screen size on the course page: tablet 40px, phone 18px — header, intro, Modules, rows */
+@media (max-width: 1024px) {
+  .course-hero { padding-left: 40px; padding-right: 40px; }
+  .course-intro { margin-left: 40px; margin-right: 40px; }
+  .module-list { margin-left: 0; padding-left: 40px; padding-right: 40px; max-width: none; }
+}
+@media (max-width: 699px) {
+  .course-hero { padding-left: 18px; padding-right: 18px; }
+  .course-intro { margin-left: 18px; margin-right: 18px; }
+  .module-list { padding-left: 18px; padding-right: 18px; }
+}
+
+.ai-fab.dodge { opacity: 0; pointer-events: none; transform: scale(.85); }   /* something clickable is under it */

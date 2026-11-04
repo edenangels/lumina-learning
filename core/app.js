@@ -934,6 +934,8 @@ function courseIntroHTML(c) {
   const oc = (_lang() === 'pt' && c.outcomes_pt) || c.outcomes;
   if (!oc || !oc.length) return '';
   const steps = t('how_steps').split('|');
+  /* no final quiz where the lesson checks are the assessment (Belong) */
+  if (BRAND.certOnCompletion && steps.length > 2) steps[2] = t('how_step3_checks');
   return `<section class="course-intro">
     <div class="ci-col"><h2>${t('outcomes_h')}</h2><ul class="ci-list">${oc.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>
     <div class="ci-col"><h2>${t('how_h')}</h2><ol class="ci-steps">${steps.map(x => `<li>${esc(x)}</li>`).join('')}</ol>
@@ -1018,9 +1020,9 @@ function renderCourse(id) {
               <button class="link-quiet" data-action="ai-overview" data-id="${id}">${t('ai_overview')}</button>
             </div>
           </div>
-          ${certOf(id) ? `<p class="cert-status ok">✓ ${t('certified_lbl')} · ${certOf(id).score}% · ${fmtCertDate(new Date(certOf(id).at))}</p>` : ''}
+          ${certOf(id) ? `<p class="cert-status ok">✓ ${t('certified_lbl')}${certOf(id).score != null ? ' · ' + certOf(id).score + '%' : ''} · ${fmtCertDate(new Date(certOf(id).at))}</p>` : ''}
           ${coursePct(id) > 0 && !isDone(id) ? `<div class="hero-progress"><div class="track"><div class="fill" style="width:${coursePct(id)}%"></div></div><span>${coursePct(id)}% ${t('complete')}</span></div>` : ''}
-          ${isDone(id) ? (() => { const rs = recertState(c); return `<div class="hero-progress"><span class="due ${rs && rs.st !== 'ok' ? '' : 'ok'}" style="margin:0;">${rs && rs.st === 'expired' ? ' ' + t('comp_expired') + ' — ' + t('comp_renew').toLowerCase() : rs && rs.st === 'expiring' ? ' ' + t('comp_expiring') + ' (' + rs.days + 'd)' : '✓ ' + t('completed') + (p.score ? ' · ' + t('scored') + ' ' + p.score + '%' : '')}</span></div>`; })() : ''}
+          ${isDone(id) ? (() => { const rs = recertState(c); if (certOf(id) && !(rs && rs.st !== 'ok')) return ''; /* "Completed" repeated "Certified" right above it */ return `<div class="hero-progress"><span class="due ${rs && rs.st !== 'ok' ? '' : 'ok'}" style="margin:0;">${rs && rs.st === 'expired' ? ' ' + t('comp_expired') + ' — ' + t('comp_renew').toLowerCase() : rs && rs.st === 'expiring' ? ' ' + t('comp_expiring') + ' (' + rs.days + 'd)' : '✓ ' + t('completed') + (p.score ? ' · ' + t('scored') + ' ' + p.score + '%' : '')}</span></div>`; })() : ''}
         </div>
       </div>
     </div>
@@ -8626,6 +8628,32 @@ $('#playerComplete').addEventListener('click', () => {
   completeModule(playing.courseId, playing.mod);
 });
 $('#aiFab').addEventListener('click', () => setTutorOpen(!tutorPanel.classList.contains('open')));
+/* The ✦ never sits on a button (João, 5 Nov 2026). Overlays already hide it; on the page
+   itself it checks what is underneath as you scroll, and steps aside while a button,
+   link, field or lesson row is under it. Cheap: one check per ~60ms of scrolling, five point probes. */
+(function fabDodge() {
+  const fab = $('#aiFab'); if (!fab || !document.elementsFromPoint) return;
+  const HIT = 'button, a, input, textarea, select, [data-action], .btn, .module-row, .card, .pstep, .q-opt';
+  let queued = false;
+  const check = () => {
+    queued = false;
+    if (tutorPanel.classList.contains('open')) { fab.classList.remove('dodge'); return; }
+    const r = fab.getBoundingClientRect(); if (!r.width) return;
+    const m = 6;   /* a little air around the circle */
+    const app = document.getElementById('app');
+    const under = [...app.querySelectorAll(HIT)].some(el => {
+      if (el.offsetParent === null) return false;
+      const b = el.getBoundingClientRect();
+      return b.width && b.height && b.right > r.left - m && b.left < r.right + m && b.bottom > r.top - m && b.top < r.bottom + m;
+    });
+    fab.classList.toggle('dodge', under);
+  };
+  const queue = () => { if (!queued) { queued = true; setTimeout(check, 60); } };   /* a timer, not rAF: rAF pauses in hidden tabs */
+  addEventListener('scroll', queue, { passive: true });
+  addEventListener('resize', queue);
+  new MutationObserver(queue).observe(document.getElementById('app'), { childList: true, subtree: true });
+  setTimeout(check, 600);
+})();
 const _tutorClose = $('#tutorCloseBtn'); if (_tutorClose) _tutorClose.addEventListener('click', () => setTutorOpen(false));
 $('#aiSend').addEventListener('click', sendTutor);
 $('#aiInput').addEventListener('keydown', e => { if (e.key === 'Enter') sendTutor(); });
