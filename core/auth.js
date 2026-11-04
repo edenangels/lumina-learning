@@ -99,6 +99,8 @@ function mergeStates(cloud, local) {
   Object.entries(local.progress || {}).forEach(([id, lp]) => {
     const cp = m.progress[id];
     if (depth(lp) > depth(cp)) m.progress[id] = lp;
+    /* same lesson on two devices: the most recent playback position wins, whichever copy is "deeper" */
+    if (m.progress[id] && lp && cp && lp.pos && cp.pos) m.progress[id] = Object.assign({}, m.progress[id], { pos: (lp.pos.at || 0) >= (cp.pos.at || 0) ? lp.pos : cp.pos });
     const da = [lp && lp.doneAt, cp && cp.doneAt].filter(Boolean);
     if (da.length && m.progress[id]) m.progress[id].doneAt = Math.min(...da);
   });

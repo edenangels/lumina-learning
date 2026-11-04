@@ -4162,6 +4162,7 @@ function renderMe() {
   return `<div class="page"><div class="page-pad">
     <h1 class="page-title">${t('me_h')}</h1>
     <p class="page-sub">${esc(displayName())}${S.profile && S.profile.dept ? ' · ' + esc(tdept(S.profile.dept)) : ''}</p>
+    ${(() => { const live = CATALOG.filter(cc => !isComingSoon(cc)); const done = live.filter(cc => isDone(cc.id)).length; return `<p class="me-sum"><b>${done}</b> ${t('of')} ${live.length} ${t('courses_done_lc')} · <b>${(S.xp || 0).toLocaleString()}</b> ${t('xp')}</p>`; })()}
     </div>${bar}${body}${footerHTML()}</div>`;
 }
 function renderProgress(embedded) {
@@ -5131,6 +5132,9 @@ function syncChrome() {
      mic that now live inside it. */
   const sph = document.querySelector('#navSearch .search-ph'); if (sph) sph.textContent = t('search_ph');
   const mlab = document.querySelector('.searchbar-mic .mic-label'); if (mlab) mlab.textContent = t('voice_label');
+  /* account menu in the learner's language; "Reset demo data" is gone — a learner could wipe their own progress (4 Nov 2026) */
+  { const am = $('#avatarMenu'); if (am) { const L = { profile: t('nav_settings'), onboard: t('menu_goal'), signout: t('prof_signout') };
+    am.querySelectorAll('[data-m]').forEach(b => { if (L[b.dataset.m]) b.textContent = L[b.dataset.m]; }); const r = am.querySelector('[data-m="reset"]'); if (r) r.remove(); } }
   const org = $('#orgChip'); if (org) org.innerHTML = `<span class="org-dot"></span>${brandName()} · ${BRAND.wordSub || 'Academy'}`;
   const tn = $('#aiTitle'); if (tn) tn.textContent = t('tutor_name');
   /* AI Act Art. 50: people must know they are talking to AI — said plainly,
@@ -5651,7 +5655,7 @@ function armVimeo(c, mod) {
       const p = prog(c.id); if (p && d.percent) p.pct = Math.max(p.pct || 0, Math.round(d.percent * 100));
       /* where you are, to the second, so reopening (any device, after any break) lands here */
       if (p && d.seconds && d.duration && d.seconds < d.duration - 15) {
-        p.pos = { mod, t: Math.round(d.seconds) };
+        p.pos = { mod, t: Math.round(d.seconds), at: Date.now() };
         if (!armVimeo._posAt || Date.now() - armVimeo._posAt > 15000) { armVimeo._posAt = Date.now(); clearTimeout(saveTimer); saveTimer = setTimeout(save, 400); }
       }
     });
@@ -6050,6 +6054,24 @@ function resolveTakeaways(toQuiz) {
   }
   resolveTakeawaysNext(n, toQuiz);
 }
+function showCertEarned(courseId) {
+  const c = courseById(courseId), cert = certOf(courseId); if (!c || !cert) return;
+  const next = S.path.map(courseById).find(x => x && x.id !== courseId && !isDone(x.id) && !isComingSoon(x));
+  let ov = $('#certEarned');
+  if (!ov) { ov = document.createElement('div'); ov.id = 'certEarned'; ov.className = 'ck-ov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); document.body.appendChild(ov); }
+  ov.innerHTML = `<div class="ck-card cert-earned">
+    <div class="ce-seal" aria-hidden="true">${svgIcon('flower')}</div>
+    <div class="ob-eyebrow">${t('ce_eyebrow')}</div>
+    <h2 class="ce-title">${esc(ctitle(c))}</h2>
+    <p class="ce-meta">${fmtMins(courseMins(c))}${cert.score != null ? ` · ${t('ce_checks')} ${cert.score}%` : ''}</p>
+    <div class="ce-actions">
+      <button class="btn btn-primary" data-action="cert-dl" data-id="${courseId}">⤓ ${t('cert_dl')}</button>
+      ${next ? `<button class="btn btn-glass" data-action="ce-next" data-id="${next.id}">${t('ce_next')} · ${esc(ctitle(next))}</button>` : `<button class="btn btn-glass" data-action="ce-close">${t('close')}</button>`}
+    </div>
+  </div>`;
+  ov.classList.add('on');
+  try { makeFocusable(ov); } catch (e) {}
+}
 function resolveTakeawaysNext(n, toQuiz) {
   if (toQuiz && n.courseId) { closePlayer(); setTimeout(() => openQuiz(n.courseId), 250); return; }   /* watch → assess loop */
   if (n.kind === 'next') { _openPaused = true; openPlayer(n.courseId, n.mod); }   /* the learner presses play; nothing starts on its own after a check */
@@ -6057,7 +6079,8 @@ function resolveTakeawaysNext(n, toQuiz) {
   else if (n.kind === 'soon') { closePlayer(); setTimeout(() => toast(_lang() === 'pt' ? 'É tudo por agora — o resto da jornada está a caminho' : 'That’s every lesson available so far — the rest of the journey is coming soon', ''), 400); }
   else if (n.kind === 'course-done') {
     closePlayer();
-    /* the takeaways card already leads with the quiz — no tutor nag with a dead link */
+    /* certificate on completion: the finish is the moment it is earned, so show it */
+    if (BRAND.certOnCompletion && certOf(n.courseId)) setTimeout(() => showCertEarned(n.courseId), 300);
   }
 }
 /* ===== REQ-L-020 · JOB RELEVANCE ===========================================
@@ -8185,6 +8208,8 @@ document.addEventListener('click', e => {
     case 'lv-del': readLiveRows(); liveDraft.splice(+el.dataset.idx, 1); render(); break;
     case 'lv-save': lvSave(); break;
     case 'cert-dl': premiumCourseCert(id); break;
+    case 'ce-close': { const o = $('#certEarned'); if (o) o.classList.remove('on'); break; }
+    case 'ce-next': { const o = $('#certEarned'); if (o) o.classList.remove('on'); location.hash = '#/course/' + el.dataset.id; break; }
     case 'mis-submit': submitMission(id); break;
     case 'mis-claim': claimMission(id, el.dataset.course); break;
     case 'mis-review': EdenMissions.review(id, el.dataset.ok === '1').then(() => { toast(el.dataset.ok === '1' ? ' Approved' : 'Declined', el.dataset.ok === '1' ? '✓' : '－'); initAdmin(); }); break;
@@ -8762,7 +8787,7 @@ function drawOnboard() {
       <p class="ob-sub">${t('ob_q2_sub')}</p>
       <div class="ob-grid">${goals.map(g => `
         <div class="ob-option ${ob.goal === g ? 'sel' : ''}" data-goal="${g}">
-          <span class="oi">${svgIcon((courseById(GOAL_PRESETS[g][0]) || {}).icon || 'leaf')}</span><div>${tgoal(g)}<div class="od">${(() => { const ids = GOAL_PRESETS[g], live = ids.filter(x => { const cc = courseById(x); return cc && !isComingSoon(cc); }).length, soon = ids.length - live; return `${live} ${live === 1 ? t('course_ready_one') : t('courses_ready')}${soon ? ` · ${soon} ${t('coming_soon').toLowerCase()}` : ''}`; })()}</div></div>
+          <span class="oi">${svgIcon((courseById(GOAL_PRESETS[g][0]) || {}).icon || 'leaf')}</span><div>${tgoal(g)}<div class="od">${(() => { const cs = GOAL_PRESETS[g].map(courseById).filter(cc => cc && !isComingSoon(cc)); const mins = cs.reduce((a, cc) => a + courseMins(cc), 0); const lessons = cs.reduce((a, cc) => a + coreN(cc), 0); return mins ? `${t('about')} ${fmtMins(mins)} · ${lessons} ${t('lessons_lc')}` : t('coming_soon'); })()}</div></div>
         </div>`).join('')}
       </div>
       <div class="ob-foot">

@@ -4768,3 +4768,13 @@ body.reels-open { overflow: hidden; }
   .intent-box .ask-row { flex-wrap: wrap; }
   .intent-box .ask-row input { flex: 1 1 100%; min-width: 0; }
 }
+
+/* certificate earned — the stamp at the end of a course (4 Nov 2026) */
+.cert-earned { text-align: center; max-width: 460px; }
+.cert-earned .ce-seal { width: 64px; height: 64px; margin: 4px auto 14px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--accent) 16%, transparent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent), 0 0 32px var(--glow); }
+.cert-earned .ce-seal svg { width: 30px; height: 30px; color: var(--accent); }
+.cert-earned .ce-title { font-family: var(--font-display); font-size: 30px; line-height: 1.15; margin: 6px 0 8px; }
+.cert-earned .ce-meta { color: var(--text-dim); font-size: 15px; margin-bottom: 22px; }
+.cert-earned .ce-actions { display: flex; flex-direction: column; gap: 10px; }
+.me-sum { margin-top: 6px; color: var(--text-dim); font-size: 15px; }
+.me-sum b { color: var(--text); }
