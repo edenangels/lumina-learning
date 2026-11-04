@@ -7594,7 +7594,7 @@ function drawQuiz() {
 const PALETTE_ACTIONS = [
   { t: 'Go to Library', icon: '', run: () => location.hash = '#/library' },
   { t: 'Go to Live sessions', icon: '', run: () => location.hash = '#/live' },
-  { t: 'Go to Analytics', icon: '', run: () => location.hash = '#/analytics' },
+  { t: 'Go to Analytics', icon: '', admin: true, run: () => location.hash = '#/analytics' },
   { t: 'Ask the AI tutor', icon: '✦', run: () => setTutorOpen(true) }
 ];
 let palIdx = 0;
@@ -7688,9 +7688,11 @@ function drawPalette(q) {
     : CATALOG.map(c => ({ c, s: Math.max(fuzzyScore(hay(c), q), ...words.map(w => fuzzyScore(hay(c), w)), -1) }))
         .filter(x => x.s >= 0).sort((a, b) => b.s - a.s).map(x => x.c)
   ).slice(0, 6);
-  const acts = (!q ? PALETTE_ACTIONS
-    : PALETTE_ACTIONS.map(a => ({ a, s: fuzzyScore(a.t, q) })).filter(x => x.s >= 0)
-        .sort((x, y) => y.s - x.s).map(x => x.a)).slice(0, 6);
+  /* the empty search shows questions, not a menu of pages (João + John, 4 Nov 2026: "these options are not making sense").
+     A typed word can still match an action; Analytics only for admins. */
+  const acts = (!q ? []
+    : PALETTE_ACTIONS.filter(a => !a.admin || isAdmin()).map(a => ({ a, s: fuzzyScore(a.t, q) })).filter(x => x.s >= 0)
+        .sort((x, y) => y.s - x.s).map(x => x.a)).slice(0, 4);
   palIdx = 0;
   let html = '';
   /* empty search: a few real questions first, so a new learner sees it answers questions, not just titles (4 Nov 2026) */
