@@ -4794,3 +4794,15 @@ body:has(.take-overlay.open, .ck-ov.on, #onboard.open, #quizModal.open, .daily-o
 #app { padding-bottom: 96px; }
 @media (max-width: 700px) { #app { padding-bottom: 104px; } footer .links { padding-right: 76px; } }
 .auth-gate { z-index: 600; }   /* above the ✦ tutor button (519), so it never floats over the sign-in card */
+
+/* "Your path" as one balanced row (João, 5 Nov 2026). The row is capped at the content column,
+   so its padding must be the plain gutter: --edge resolved against the full screen and pushed
+   the cards ~430px right on wide screens. On desktop the steps share the column equally (no
+   scrolling, nothing cut off); phones keep the swipeable row. */
+/* the row's own box is at most the column, so the gutter it needs is --edge minus the centering
+   offset: on phones that is the phone gutter, on wide screens the plain --gutter */
+.path-row { padding-left: min(var(--edge), var(--gutter)); padding-right: min(var(--edge), var(--gutter)); scroll-padding-inline: min(var(--edge), var(--gutter)); }
+@media (min-width: 900px) {
+  .path-row { overflow: visible; grid-auto-columns: minmax(0, 1fr); }
+}
+@media (max-width: 699px) { .path-row { padding-left: 18px; padding-right: 18px; scroll-padding-inline: 18px; } }   /* same phone gutter as the headings */
