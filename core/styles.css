@@ -4746,3 +4746,25 @@ body.reels-open { overflow: hidden; }
 .cal-cell.cal-has { color: var(--text); background: rgba(var(--accent-2-rgb), .12); font-weight: 700; }
 .cal-cell.cal-has i { position: absolute; left: 50%; bottom: 3px; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; background: var(--accent); }
 .cal-none { margin: 12px 2px 2px; font-size: 13px; color: var(--text-faint); }
+
+/* rails sit inside the content column on wide screens; the row used to bleed to the right edge while everything else stopped at the column (João, 4 Nov 2026) */
+.rail-wrap, .path-row { max-width: var(--content-w); margin-inline: auto; }
+@media (min-width: 1281px) { .rail-wrap .rail { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent); } }
+.pstep.locked { cursor: default; }
+.seg.locked { cursor: default; }
+
+/* the takeaways card's lesson line was the smallest type on the screen (John, 4 Nov 2026) */
+#takeModal #takeMod { font-size: 13px; letter-spacing: .08em; line-height: 1.5; }
+#takeModal .take-item p { font-size: 15px; line-height: 1.55; }
+.intent-skip { margin-left: 6px; font-size: 13px; }
+
+/* THE "g" (João + John, three rounds): a gradient word is painted with background-clip:text,
+   which only paints inside the element's own box. The line box is shorter than the font
+   (92px type on a 90px line), so the descender of "g" hung below the box and rendered
+   transparent. Extend the box downward, and cancel it with a negative margin so nothing moves. */
+.grad-text { padding-bottom: .24em; margin-bottom: -.24em; }
+.hero-h1 .hw.grad-text { padding-bottom: .26em; margin-bottom: -.26em; }
+@media (max-width: 520px) {
+  .intent-box .ask-row { flex-wrap: wrap; }
+  .intent-box .ask-row input { flex: 1 1 100%; min-width: 0; }
+}

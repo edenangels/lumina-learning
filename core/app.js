@@ -78,7 +78,21 @@ function certsInit() {
     S.certs[e.courseId] = { passed: true, score: Math.max(p.score || 0, e.score || 0), at: p.at || Date.parse(e.at) || Date.now(), attempts: (p.attempts || 0) + 1 };
   });
 }
-const certOf = id => { certsInit(); const r = S.certs[id]; return r && r.passed ? r : null; };
+/* certOnCompletion (brand.js): the lesson checks are the assessment, so a finished course is a
+   certified course and no recap quiz is offered (Belong, 4 Nov 2026: "don't make them repeat").
+   The score printed is the share of lesson-check questions answered right. */
+function checksScore(id) {
+  const ck = e => e && e.ev && e.ev.check;
+  const L = (S.trainingLog || []).filter(e => e && e.courseId === id && ck(e) && ck(e).kind === 'assessment' && ck(e).total);
+  if (!L.length) return null;
+  const right = L.reduce((a, e) => a + (ck(e).score || 0), 0), total = L.reduce((a, e) => a + (ck(e).total || 0), 0);
+  return total ? Math.round(right / total * 100) : null;
+}
+const certOf = id => {
+  certsInit(); const r = S.certs[id]; if (r && r.passed) return r;
+  if (BRAND.certOnCompletion && isDone(id)) { const p = prog(id) || {}; return { passed: true, score: checksScore(id), at: p.doneAt || Date.now(), viaChecks: true }; }
+  return null;
+};
 const inPath = id => S.path.includes(id);
 /* A course may end with optional "go deeper" lessons (c.coreModules = how many are required).
    Completion, the course length and the certificate's hours count the required ones only. */
@@ -505,7 +519,7 @@ function pathStepperHTML() {
     const node = st === 'done' ? '✓' : st === 'current' ? '▶' : svgIcon(c.icon);
     const sub = (isComingSoon(c) && st !== 'done') ? t('coming_soon') : st === 'done' ? `${t('completed')}${p && p.score ? ' · ' + p.score + '%' : ''}` : st === 'current' ? `${t('in_progress')} · ${coursePct(id)}%` : (S.path.indexOf(id) === S.path.findIndex(x => !isDone(x)) + 1 ? t('next_up') : t('locked'));
     if (isComingSoon(c) && st !== 'done') return `<div class="seg soon" aria-disabled="true"><div class="snode">·</div><div class="sl">${t('coming_soon')}</div><div class="sd"></div></div>`;
-    return `<div class="seg ${st}" data-action="open-course" data-id="${id}"><div class="snode">${node}</div><div class="sl">${ctitle(c)}</div><div class="sd">${sub}</div></div>`;
+    return `<div class="seg ${st}"${st === 'locked' ? ' aria-disabled="true"' : ` data-action="open-course" data-id="${id}"`}><div class="snode">${node}</div><div class="sl">${ctitle(c)}</div><div class="sd">${sub}</div></div>`;
   }).join('')}</div>`;
 }
 
@@ -605,13 +619,15 @@ function pathRowHTML() {
     /* unfilmed step: a nameless placeholder — the name on a card nobody can open reads as a broken promise (João, 14 Oct) */
     if (isComingSoon(c) && st !== 'done') return `<div class="pstep soon" aria-disabled="true"><span class="pstep-n">${n}</span><span class="pstep-t">${t('coming_soon')}</span></div>`;
     const art = c.poster ? ` style="background-image:url('${c.poster}')"` : '';
-    /* a locked step still opens its course page — John could not even read what was coming */
-    return `<button class="pstep ${st}${c.poster ? ' has-art' : ''}" data-action="open-course" data-id="${id}"${art}>
+    /* steps ahead are shown, not opened: progress unlocks them in order (João + John, 4 Nov 2026).
+       The library still lets anyone browse a course page. */
+    const tag = st === 'locked' ? 'div' : 'button';
+    return `<${tag} class="pstep ${st}${c.poster ? ' has-art' : ''}"${st === 'locked' ? ' aria-disabled="true"' : ` data-action="open-course" data-id="${id}"`}${art}>
       <span class="pstep-n">${st === 'done' ? '✓' : n}</span>
       <span class="pstep-t">${esc(ctitle(c))}</span>
       <span class="pstep-s">${sub}</span>
       ${st === 'current' ? `<span class="pstep-bar"><i style="width:${pct}%"></i></span>` : ''}
-    </button>`;
+    </${tag}>`;
   }).filter(Boolean).join('');
   if (!steps) return '';
   return `<section class="rail-section path-row-section">
@@ -722,21 +738,7 @@ function renderHome() {
   ${pathRowHTML()}
   ${railHTML(t('assigned_you'), t('from_stewardship'), assigned.filter(notHero).map(c => cardHTML(c)))}
   ${railHTML(t('featured_h'), t('featured_sub'), featuredCourses.filter(notHero).map(c => cardHTML(c)))}
-  <section class="path-banner">
-    <div class="shimmer"></div>
-    <div class="path-banner-head">
-      <div class="left">
-        <span class="ai-tag">${t('generated_by_ai')}</span>
-        <h2>${t('your_path_to')} ${tgoal(S.goal)}</h2>
-        <p class="sub">${t('path_intro')}</p>
-      </div>
-      ${S.path.filter(id => !isComingSoon(courseById(id))).length >= 3 ? `<button class="btn btn-glass" data-action="regen-path" id="regenBtn">${t('regenerate_path')}</button>` : ''}
-    </div>
-    ${pathStepperHTML()}
-    <div class="path-banner-foot">
-      ${(S.quizScores || []).length ? `<div class="why"> <span><b>${t('why_order')}</b>&nbsp; ${PATH_RATIONALES[S.rationaleIdx % PATH_RATIONALES.length]}</span></div>` : `<div class="why"><span>${t('path_intro')}</span></div>`}
-    </div>
-  </section>
+  ${/* the full path lives in My learning; home keeps the small row above (4 Nov 2026) */''}
   <section class="stats">
     <div class="stat"><div class="num">${S.streak || 0}d</div><div class="lbl">${t('learning_streak')}</div><div class="delta">${(S.streak || 0) > 0 && S.streak >= (S.bestStreak || 0) ? t('personal_best') : (S.bestStreak ? `${t('stats_best')} ${S.bestStreak}d` : t('no_data'))}</div></div>
     <div class="stat"><div class="num">${fmtMins(weekMinutes())}</div><div class="lbl">${t('this_week')}</div><div class="delta">${minutesLast7()[6].v ? `▲ ${minutesLast7()[6].v}m ${t('stats_today')}` : t('no_data')}</div></div>
@@ -800,12 +802,12 @@ function renderLibrary() {
   </div>${footerHTML()}</div>`;
 }
 
-function renderPaths() {
+/* Paths and My learning were two pages showing the same path (João, 4 Nov 2026).
+   #/paths now opens My learning on its Path tab; pathBodyHTML is that tab. */
+function renderPaths() { meTab = 'path'; return renderMe(); }
+function pathBodyHTML() {
   const doneCount = S.path.filter(isDone).length;
-  return `<div class="page"><div class="page-pad">
-    <h1 class="page-title">${t('paths_h')}</h1>
-    <p class="page-sub">${t('paths_sub')}</p>
-  </div>
+  return `
   <section class="path-banner">
     <div class="shimmer"></div>
     <div class="path-banner-head">
@@ -814,7 +816,6 @@ function renderPaths() {
         <h2>${t('your_path_to')} ${tgoal(S.goal)}</h2>
         <p class="sub">${(S.quizScores || []).length ? PATH_RATIONALES[S.rationaleIdx % PATH_RATIONALES.length] : t('path_intro')}</p>
       </div>
-      ${S.path.filter(id => !isComingSoon(courseById(id))).length >= 3 ? `<button class="btn btn-glass" data-action="regen-path" id="regenBtn">${t('regenerate_path')}</button>` : ''}
     </div>
     ${pathStepperHTML()}
   </section>
@@ -823,8 +824,7 @@ function renderPaths() {
   ${/* "Where to go next" = whatever is filmed and not already on your path.
         This was four hard-coded ids, all of which are now deleted, so the rail
         rendered empty; derived, it stays correct as the library grows. */''}
-  ${railHTML(t('next_paths'), t('next_paths_sub'), CATALOG.filter(c => !S.path.includes(c.id) && hasRealContent(c)).map(c => cardHTML(c)))}
-  ${footerHTML()}</div>`;
+  ${railHTML(t('next_paths'), t('next_paths_sub'), CATALOG.filter(c => !S.path.includes(c.id) && hasRealContent(c)).map(c => cardHTML(c)))}`;
 }
 
 /* João, 16 Oct 2026: "need a calendar for this section, so we know when the
@@ -1002,7 +1002,7 @@ function renderCourse(id) {
             ${isComingSoon(c)
               ? `<button class="btn btn-glass" disabled>${t('coming_soon')}</button>`
               : isDone(id) && !certOf(id)
-              ? `<button class="btn btn-primary" data-action="quiz" data-id="${id}">🎯&nbsp; ${t('take_cert_quiz')}</button>`
+              ? `<button class="btn btn-primary" data-action="quiz" data-id="${id}">${t('take_cert_quiz')}</button>`
               : `<button class="btn btn-primary" data-action="play" data-id="${id}">▶&nbsp; ${isDone(id) ? t('rewatch') : p ? `${t('resume_module')} ${(p.mod || 0) + 1}` : t('start_course')}</button>`}
             ${isDone(id)
               ? (certOf(id) ? `<button class="btn btn-glass" data-action="cert-dl" data-id="${id}">⤓ ${t('cert_dl')}</button>` : `<button class="btn btn-glass" data-action="play" data-id="${id}">▶ ${t('rewatch')}</button>`)
@@ -2798,7 +2798,7 @@ function premiumCourseCert(courseId) {
     /* REQ-L-003 names the trainer, not only the supplying organisation — the
        educator object is where that name now comes from */
     trainer: (() => { const e = educatorFor(c); return e ? e.name + (e.external ? (pt ? ' (externo)' : ' (external)') : '') : ''; })(),
-    meta: `${h}h · ${pt ? 'Avaliação' : 'Assessed'} ${cert.score}% · <b>${fmtCertDate(certDate(c.id))}</b>`,
+    meta: `${h}h · ${cert.score != null ? `${pt ? 'Avaliação' : 'Assessed'} ${cert.score}% · ` : ''}<b>${fmtCertDate(certDate(c.id))}</b>`,
   }));
   ledgerAppend('cert_issued', { courseId, kind: 'course', score: cert.score });
 }
@@ -4147,9 +4147,10 @@ function renderAdmin() {
    page. They're hard to find, and harder to celebrate."
    Progress = the game. Record = the legal artefact. Activity = the places this
    used to have top-level nav slots for. */
-let meTab = 'progress';
+let meTab = 'path';
 function renderMe() {
-  const tabs = [['progress', t('me_progress')], ['record', t('me_record')], ['activity', t('me_activity')]];
+  if (!['path', 'progress', 'record'].includes(meTab)) meTab = 'path';
+  const tabs = [['path', t('your_path')], ['progress', t('me_progress')], ['record', t('me_record')]];
   const bar = `<div class="me-tabs" role="tablist">${tabs.map(([k, label]) =>
     `<button class="me-tab ${meTab === k ? 'on' : ''}" role="tab" aria-selected="${meTab === k}" data-action="me-tab" data-v="${k}">${label}</button>`).join('')}</div>`;
   let body = '';
@@ -4157,14 +4158,7 @@ function renderMe() {
   /* the learner's own legal record — complianceHTML() is the MANAGER's view of
      the whole team and renders nothing for a learner */
   else if (meTab === 'record') body = `${compliancePanelHTML()}${verifiedPanelHTML()}${certsSectionHTML()}`;
-  else body = `<div class="page-pad"><h2 class="sect-h">${t('your_path')}</h2></div>${pathRowHTML()}
-    <div class="page-pad" style="padding-top:8px;">
-      <div class="me-links">
-        <button class="me-link" data-action="goto" data-route="#/paths"><b>${t('nav_paths')}</b><span>${t('me_paths_sub')}</span></button>
-        <button class="me-link" data-action="goto" data-route="#/community"><b>${t('nav_community')}</b><span>${t('me_comm_sub')}</span></button>
-        <button class="me-link" data-action="goto" data-route="#/live"><b>${t('nav_live')}</b><span>${t('me_live_sub')}</span></button>
-      </div>
-    </div>${digestsSectionHTML()}`;
+  else body = `${pathBodyHTML()}${digestsSectionHTML()}`;
   return `<div class="page"><div class="page-pad">
     <h1 class="page-title">${t('me_h')}</h1>
     <p class="page-sub">${esc(displayName())}${S.profile && S.profile.dept ? ' · ' + esc(tdept(S.profile.dept)) : ''}</p>
@@ -5157,7 +5151,8 @@ function syncChrome() {
   const cl = $('#apiKeyClear'); if (cl) cl.textContent = t('use_demo');
   const askBtn = document.querySelector('.player-top .btn[data-action="ai-open"]'); if (askBtn) askBtn.textContent = t('ask_tutor');
   const nt = $('#notesToggle'); if (nt) { nt.title = t('notes_transcript'); nt.setAttribute('aria-label', t('notes_transcript')); }
-  const pc = $('#playerComplete'); if (pc) pc.innerHTML = `<span class="lbl-long">${esc(t('mark_complete'))}</span><span class="lbl-short">${esc(t('mark_complete_short'))}</span>`;
+  const pc = $('#playerComplete'); if (pc && BRAND.markComplete === false) pc.style.display = 'none';
+  if (pc) pc.innerHTML = `<span class="lbl-long">${esc(t('mark_complete'))}</span><span class="lbl-short">${esc(t('mark_complete_short'))}</span>`;
   $$('.lang-btn').forEach(b => { const on = b.dataset.lang === _lang(); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
   document.documentElement.classList.toggle('is-admin', isAdmin());
   updateBell();
@@ -5443,6 +5438,7 @@ function openPlayer(courseId, mod, startAt) {
   try { history.pushState({ overlay: 'player' }, ''); _playerPushed = true; } catch (e) {}
   if (mod == null) mod = (prog(courseId) && !isDone(courseId)) ? (prog(courseId).mod || 0) : 0;
   mod = Math.min(mod, c.modules.length - 1);
+  { const pp = prog(courseId); if (_seekTo == null && pp && pp.pos && pp.pos.mod === mod && pp.pos.t > 8) _seekTo = Math.max(0, pp.pos.t - 3); }
   const media = modMedia(c, mod);
   clearCheckpoint();
   watchedSeconds = 0;
@@ -5653,8 +5649,14 @@ function armVimeo(c, mod) {
       if (document.visibilityState === 'visible') watchMark(d.seconds, d.duration);
       /* live progress, so a half-watched lesson is not lost on close */
       const p = prog(c.id); if (p && d.percent) p.pct = Math.max(p.pct || 0, Math.round(d.percent * 100));
+      /* where you are, to the second, so reopening (any device, after any break) lands here */
+      if (p && d.seconds && d.duration && d.seconds < d.duration - 15) {
+        p.pos = { mod, t: Math.round(d.seconds) };
+        if (!armVimeo._posAt || Date.now() - armVimeo._posAt > 15000) { armVimeo._posAt = Date.now(); clearTimeout(saveTimer); saveTimer = setTimeout(save, 400); }
+      }
     });
     vimeoPlayer.on('ended', () => {
+      { const p = prog(c.id); if (p && p.pos && p.pos.mod === mod) delete p.pos; }
       vimeoWrap.classList.add('ended');   /* our curtain over Vimeo's "more from" screen, with a replay control */
       const vn = vimeoWrap.querySelector('.veil-note'); if (vn) vn.textContent = '';
       if (done || !playing || playing.courseId !== c.id || playing.mod !== mod) return;
@@ -5862,20 +5864,21 @@ function showTakeaways(c, mod, next) {
   $('#takeTitle').textContent = t('take_title');
   $('#takeSub').textContent = t('take_sub');
   const _cd = !!(next && next.kind === 'course-done');
-  const _go = $('#takeGo'); _go.textContent = _cd ? t('take_quiz') : t('take_continue'); _go.dataset.action = _cd ? 'take-quiz' : 'take-go';
+  const _noQuiz = _cd && BRAND.certOnCompletion;
+  const _go = $('#takeGo'); _go.textContent = _noQuiz ? t('take_done') : _cd ? t('take_quiz') : t('take_continue'); _go.dataset.action = _noQuiz ? 'take-go' : _cd ? 'take-quiz' : 'take-go';
   if (next && next.kind === 'course-done') {
+    /* no star rating: stars told Pedro nothing (John, 4 Nov 2026) */
     $('#takeList').innerHTML += `<div class="take-extra">
-      ${ratingStarsHTML(next.courseId)}
-      ${certOf(next.courseId) ? `<button class="btn btn-glass btn-sm" data-action="cert-dl" data-id="${next.courseId}">⤓ ${t('cert_dl')}</button>` : `<p class="cert-hint">🎯 ${t('cert_needs_quiz')}</p>`}
+      ${BRAND.certOnCompletion ? '' : certOf(next.courseId) ? `<button class="btn btn-glass btn-sm" data-action="cert-dl" data-id="${next.courseId}">⤓ ${t('cert_dl')}</button>` : `<p class="cert-hint">${t('cert_needs_quiz')}</p>`}
     </div>
     ${(S.intentions || {})[next.courseId] ? '' : `<div class="intent-box">
       <div class="ob-eyebrow"> ${t('intent_h')}</div>
       <p class="pre-sub">${t('intent_sub')}</p>
-      <div class="ask-row"><input class="auth-input" id="intentText" maxlength="140" placeholder="${t('intent_ph')}"><button class="btn btn-primary btn-sm" data-action="intent-save" data-id="${next.courseId}">${t('intent_save')}</button></div>
+      <div class="ask-row"><input class="auth-input" id="intentText" maxlength="140" placeholder="${t('intent_ph')}"><button class="btn btn-primary btn-sm" data-action="intent-save" data-id="${next.courseId}">${t('intent_save')}</button><button class="link-quiet intent-skip" data-action="intent-skip">${t('intent_skip')}</button></div>
     </div>`}`;
   }
   const tq = $('#takeQuiz');
-  if (tq) { tq.style.display = _cd ? '' : 'none'; tq.textContent = t('take_done'); tq.dataset.action = 'take-go'; }
+  if (tq) { tq.style.display = _cd && !_noQuiz ? '' : 'none'; tq.textContent = t('take_done'); tq.dataset.action = 'take-go'; }
   $('#takeModal').classList.add('open');
   armUpNext(next);
 }
@@ -7590,11 +7593,9 @@ function drawQuiz() {
 /* ---------- command palette ---------- */
 const PALETTE_ACTIONS = [
   { t: 'Go to Library', icon: '', run: () => location.hash = '#/library' },
-  { t: 'Go to Paths', icon: '', run: () => location.hash = '#/paths' },
   { t: 'Go to Live sessions', icon: '', run: () => location.hash = '#/live' },
   { t: 'Go to Analytics', icon: '', run: () => location.hash = '#/analytics' },
-  { t: 'Ask the AI tutor', icon: '✦', run: () => setTutorOpen(true) },
-  { t: 'Regenerate my AI path', icon: '↺', run: () => regenPath() }
+  { t: 'Ask the AI tutor', icon: '✦', run: () => setTutorOpen(true) }
 ];
 let palIdx = 0;
 function openPalette() {
@@ -7692,6 +7693,9 @@ function drawPalette(q) {
         .sort((x, y) => y.s - x.s).map(x => x.a)).slice(0, 6);
   palIdx = 0;
   let html = '';
+  /* empty search: a few real questions first, so a new learner sees it answers questions, not just titles (4 Nov 2026) */
+  const ex = (!q && BRAND.askExamples && (BRAND.askExamples[_lang()] || BRAND.askExamples.en)) || [];
+  if (ex.length) html += `<div class="palette-group">${t('pal_try')}</div>` + ex.map(x => `<div class="palette-item" data-pal="ask:${esc(x)}"><span class="pi-icon" style="background:var(--surface-2)">✦</span><div>${esc(x)}</div></div>`).join('');
   /* A question goes to the lessons first. Three words or a question mark is a
      question, not a title; it leads the list so Enter asks it, and it needs no
      AI key because the moments come from the transcripts. */
@@ -8244,6 +8248,7 @@ document.addEventListener('click', e => {
     case 'ev-export': downloadEvidenceExport(); break;
     case 'app-confirm': confirmApplication(id, 'confirmed'); break;
     case 'app-deny': confirmApplication(id, 'not_seen'); break;
+    case 'intent-skip': { const b = el.closest('.intent-box'); if (b) b.remove(); break; }
     case 'intent-save': {
       const txt = ($('#intentText') && $('#intentText').value || '').trim();
       if (!txt) { toast(t('intent_ph'), ''); break; }
@@ -8494,7 +8499,7 @@ document.addEventListener('click', e => {
       saveAssignments(assignments, 'Assignment removed');
       break;
     }
-    case 'me-tab': meTab = el.dataset.v; render(); break;
+    case 'me-tab': meTab = el.dataset.v; if (location.hash.startsWith('#/paths')) { location.hash = '#/me'; } else render(); break;
     case 'cockpit-retry': initAdmin(); break;
     case 'reset-demo': { try { Object.keys(localStorage).filter(k => k.startsWith(BRAND_SLUG)).forEach(k => localStorage.removeItem(k)); } catch (e) {} localStorage.removeItem(STATE_KEY); location.hash = '#/home'; location.reload(); break; }
   }
