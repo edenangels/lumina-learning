@@ -4782,3 +4782,15 @@ body.reels-open { overflow: hidden; }
 /* goal step: three goals stacked, one line of meaning each (4 Nov 2026) */
 .ob-grid.ob-goals { grid-template-columns: 1fr; }
 .ob-goals .ob-option .od { font-size: 13px; line-height: 1.45; margin-top: 3px; }
+
+/* the ✦ tutor button never sits on a button (João, 5 Nov 2026):
+   hidden while any card, sheet, player or menu is open, and pages end with room for it */
+body:has(.take-overlay.open, .ck-ov.on, #onboard.open, #quizModal.open, .daily-ov.open, .palette-backdrop.open,
+  #player.open, .player.open, #askModal.open, .modal-backdrop.open, .mobile-drawer.open, .notes-drawer.open,
+  #tourOv, .ai-panel.open) .ai-fab {
+  opacity: 0; pointer-events: none; transform: scale(.85);
+}
+.ai-fab { transition: opacity .2s, transform .2s; }
+#app { padding-bottom: 96px; }
+@media (max-width: 700px) { #app { padding-bottom: 104px; } footer .links { padding-right: 76px; } }
+.auth-gate { z-index: 600; }   /* above the ✦ tutor button (519), so it never floats over the sign-in card */

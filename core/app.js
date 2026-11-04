@@ -325,7 +325,13 @@ const myEmail = () => ((S.profile && S.profile.email) || '').trim().toLowerCase(
 const isSuperAdmin = () => ADMIN_EMAILS.includes(myEmail());
 /* tenant admin: superadmin OR listed on the company doc */
 const isAdmin = () => isSuperAdmin() || ((window.EdenCompany && EdenCompany.adminEmails) || []).map(e => (e || '').toLowerCase()).includes(myEmail());
-const companyName = () => (window.EdenCompany && EdenCompany.name) || 'EdenRise';
+/* the company on every document: the tenant's company record, else the brand's own name.
+   The fallback was 'EdenRise', which put EdenRise on Belong's certificates (5 Nov 2026). */
+const companyName = () => {
+  const B = window.BRAND || {}, n = window.EdenCompany && EdenCompany.name;
+  const own = B.company || B.name || 'Academy';
+  return n && !(n === 'EdenRise' && B.id && B.id !== 'edenrise') ? n : own;
+};
 const companyNif = () => (window.EdenCompany && EdenCompany.nif) || '';
 
 function toast(msg, icon = '') {
@@ -1716,6 +1722,21 @@ async function recallHybrid(q, topN) {
     return m;
   });
 }
+/* The search fills the grounding only with moments that MATCH the words. "Summarize" or
+   "explain this" match nothing, so the model got no lesson at all and refused (5 Nov 2026).
+   When the search finds little, send the lesson open in the player, or the course page's lessons. */
+function lessonGrounding(moments) {
+  if (moments && moments.length >= 2) return '';
+  if (!Array.isArray(_searchIdx) || !_searchIdx.length) { try { loadSearchIdx(); } catch (e) {} return ''; }
+  const inPlayer = (typeof playing !== 'undefined' && playing && $('#player') && $('#player').classList.contains('open')) ? playing : null;
+  const cid = (inPlayer && inPlayer.courseId) || currentCourseId();
+  if (!cid) return '';
+  const lessons = _searchIdx.filter(l => l.c === cid && (!inPlayer || l.m === inPlayer.mod));
+  if (!lessons.length) return '';
+  const per = Math.floor(2200 / lessons.length);
+  const body = lessons.map(l => { const txt = (l.s || []).map(x => x[1]).join(' '); return `[${l.t}] ${txt.length > per ? txt.slice(0, per) + '…' : txt}`; }).join('\n');
+  return `\n\nWHAT THE LEARNER HAS OPEN (${inPlayer ? 'the lesson playing' : 'the course page'} — "${lessons[0].ct}"). Use it to summarise, explain or answer when the question is about this:\n${body}`;
+}
 function groundingText(moments) {
   return moments.slice(0, 5).map(m => `${m.title} (${m.kind === 'reel' ? 'short' : m.courseTitle}) · ${fmtTc(m.t0)}: "${m.text.slice(0, 320)}"`).join('\n');
 }
@@ -1824,7 +1845,7 @@ async function openAsk(q, via) {
       /* the answer streams into place under the moments; links are resolved once it is complete */
       $('#askBody').insertAdjacentHTML('beforeend', `<p class="ask-answer streaming" id="askLive"></p>`);
       const live = $('#askLive');
-      const g = await gatewayStream({ messages: [{ role: 'user', content: askStyle() + q }], grounding: groundingText(moments) + learnerContext(), maxTokens: 350 }, live);
+      const g = await gatewayStream({ messages: [{ role: 'user', content: askStyle() + q }], grounding: groundingText(moments) + lessonGrounding(moments) + learnerContext(), maxTokens: 350 }, live);
       if (g && g.reply && $('#askQ') && $('#askQ').textContent === q) {
         live.classList.remove('streaming'); live.removeAttribute('id');
         live.innerHTML = linkifyAnswer(g.reply, moments);
@@ -2714,60 +2735,90 @@ function buildRecordHTML(o) {
 }
 
 function buildCertHTML(o) {
+  /* Redesigned 5 Nov 2026 (João: "more beautiful"): the academy's own fonts, logo and accent,
+     a fine double frame with corner marks, the facts in labelled columns, a seal, and the
+     signature in the academy's own name ("Trained by"). Legal wording unchanged. */
   const accent = brandVar('--accent', '#c8a45d');
   const pt = _lang() === 'pt';
-  return `<!doctype html><html lang="${pt ? 'pt' : 'en'}"><head><meta charset="utf-8"><title>${esc(o.docTitle)}</title>
+  const B = window.BRAND || {};
+  const abs = u => { try { return new URL(u, location.href).href; } catch (e) { return u; } };
+  const fontLink = B.fonts && B.fonts.link ? `<link rel="stylesheet" href="${abs(B.fonts.link)}">` : '';
+  const disp = (B.fonts && B.fonts.display) || "Georgia, 'Times New Roman', serif";
+  const body = (B.fonts && B.fonts.body) || "Helvetica, Arial, sans-serif";
+  const logo = (B.logoSvg) || ((document.querySelector('.logo-mark svg') || {}).outerHTML || '');
+  const facts = Array.isArray(o.facts) && o.facts.length
+    ? `<div class="facts">${o.facts.map(f => `<div class="fact"><span>${esc(f.k)}</span><b>${esc(f.v)}</b></div>`).join('')}</div>`
+    : `<div class="meta">${o.meta || ''}</div>`;
+  return `<!doctype html><html lang="${pt ? 'pt' : 'en'}"><head><meta charset="utf-8"><title>${esc(o.docTitle)}</title>${fontLink}
 <style>
   @page { size: A4 landscape; margin: 0; }
   * { margin:0; padding:0; box-sizing:border-box; print-color-adjust:exact; -webkit-print-color-adjust:exact; }
-  body { font-family: Georgia, 'Times New Roman', serif; background:#efece4; display:grid; place-items:center; min-height:100vh; }
-  .sheet { width:297mm; height:210mm; background:#faf8f2; position:relative; padding:16mm 20mm; display:flex; flex-direction:column; align-items:center; text-align:center; }
-  .frame { position:absolute; inset:7mm; border:2.5px solid ${accent}; }
-  .frame::after { content:''; position:absolute; inset:2.5mm; border:.6px solid #1c242033; }
-  .logo { height:15mm; margin:8mm 0 4mm; display:flex; align-items:center; gap:4mm; justify-content:center; }
-  .logo svg { height:15mm; width:auto; }
-  .brand { font-family:Helvetica,Arial,sans-serif; letter-spacing:.34em; font-size:10.5px; color:#4c554e; text-transform:uppercase; }
-  .eyebrow { font-family:Helvetica,Arial,sans-serif; letter-spacing:.42em; font-size:12px; color:${accent}; text-transform:uppercase; margin-top:7mm; }
-  ${o.tier ? `.tier { margin-top:3mm; font-family:Helvetica,Arial,sans-serif; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:#faf8f2; background:${accent}; padding:1.6mm 6mm; border-radius:99px; }` : ''}
-  .who { font-size:40px; margin-top:6mm; color:#161d18; font-weight:600; }
-  .did { font-size:14.5px; color:#57605a; margin-top:3.5mm; font-family:Helvetica,Arial,sans-serif; }
-  .what { font-size:27px; color:#161d18; margin-top:2.5mm; max-width:210mm; line-height:1.25; }
-  .meta { font-family:Helvetica,Arial,sans-serif; font-size:12.5px; color:#57605a; margin-top:5mm; letter-spacing:.05em; }
-  .meta b { color:#161d18; }
-  ${o.evidence ? `.ev { margin-top:4mm; font-family:'Courier New',monospace; font-size:10px; color:#6a736c; line-height:1.7; } .ev b { color:#3c453e; font-family:Helvetica,Arial,sans-serif; }` : ''}
-  .sig { margin-top:auto; margin-bottom:6mm; display:flex; width:100%; justify-content:space-between; align-items:flex-end; font-family:Helvetica,Arial,sans-serif; font-size:11px; color:#57605a; }
-  .sig .line { border-top:1px solid #1c2420; padding-top:2mm; width:62mm; text-align:center; }
-  .sig .line .role { font-size:8.5px; color:#8b938c; letter-spacing:.04em; margin-top:1mm; }
-  .prov { font-family:Helvetica,Arial,sans-serif; font-size:9.5px; color:#6a736c; margin-bottom:2mm; letter-spacing:.03em; }
-  .prov b { color:#3c453e; }
-  .note { position:absolute; bottom:9.5mm; left:20mm; right:20mm; font-family:Helvetica,Arial,sans-serif; font-size:8px; color:#8b938c; line-height:1.45; }
-  .print { position:fixed; top:12px; left:12px; font-family:Helvetica,Arial,sans-serif; background:#161d18; color:#fff; border:0; border-radius:8px; padding:9px 16px; cursor:pointer; font-size:13px; }
-  @media screen { body { padding-top:56px; } }
-  @media print { .print { display:none; } body { background:#faf8f2; display:block; min-height:0; padding:0; } .sheet { margin:0; page-break-after:avoid; } }
+  :root { --acc:${accent}; --ink:#1f1916; --dim:#6b5f58; --faint:#9a8f88; --paper:#fbf8f3; }
+  body { font-family:${body}; background:#ece6dd; display:grid; place-items:center; min-height:100vh; color:var(--ink); }
+  .sheet { width:297mm; height:210mm; position:relative; overflow:hidden; padding:20mm 26mm 16mm; display:flex; flex-direction:column; align-items:center; text-align:center;
+    background: radial-gradient(ellipse 70% 60% at 50% 0%, color-mix(in srgb, var(--acc) 7%, transparent), transparent 70%), var(--paper); }
+  .frame { position:absolute; inset:8mm; border:1.2px solid color-mix(in srgb, var(--acc) 70%, transparent); }
+  .frame::after { content:''; position:absolute; inset:2.2mm; border:.5px solid color-mix(in srgb, var(--ink) 18%, transparent); }
+  .corner { position:absolute; width:12mm; height:12mm; border-color:var(--acc); border-style:solid; border-width:0; }
+  .c1 { top:12mm; left:12mm; border-top-width:2.4px; border-left-width:2.4px; } .c2 { top:12mm; right:12mm; border-top-width:2.4px; border-right-width:2.4px; }
+  .c3 { bottom:12mm; left:12mm; border-bottom-width:2.4px; border-left-width:2.4px; } .c4 { bottom:12mm; right:12mm; border-bottom-width:2.4px; border-right-width:2.4px; }
+  .logo { height:13mm; margin-top:2mm; } .logo svg { height:13mm; width:auto; }
+  .brand { letter-spacing:.38em; font-size:10px; color:var(--dim); text-transform:uppercase; margin-top:3.5mm; }
+  .eyebrow { letter-spacing:.3em; font-size:11px; color:var(--acc); text-transform:uppercase; margin-top:9mm; font-weight:600; }
+  ${o.tier ? `.tier { margin-top:3mm; font-size:10.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--paper); background:var(--acc); padding:1.4mm 5mm; border-radius:99px; }` : ''}
+  .lead { font-size:13px; color:var(--dim); margin-top:7mm; }
+  .who { font-family:${disp}; font-size:50px; line-height:1.1; margin-top:2.5mm; font-weight:600; letter-spacing:-.01em; }
+  .orn { display:flex; align-items:center; gap:4mm; margin:5mm 0 4mm; color:var(--acc); }
+  .orn i { width:28mm; height:1px; background:linear-gradient(90deg, transparent, var(--acc)); } .orn i:last-child { transform:scaleX(-1); }
+  .orn b { width:2.2mm; height:2.2mm; transform:rotate(45deg); background:var(--acc); display:block; }
+  .did { font-size:13.5px; color:var(--dim); }
+  .what { font-family:${disp}; font-style:italic; font-size:30px; line-height:1.2; margin-top:2.5mm; max-width:200mm; }
+  .facts { display:flex; gap:0; margin-top:8mm; border-top:.6px solid color-mix(in srgb, var(--ink) 16%, transparent); border-bottom:.6px solid color-mix(in srgb, var(--ink) 16%, transparent); }
+  .fact { padding:3mm 9mm; display:flex; flex-direction:column; gap:1.2mm; } .fact + .fact { border-left:.6px solid color-mix(in srgb, var(--ink) 16%, transparent); }
+  .fact span { font-size:8.5px; letter-spacing:.22em; text-transform:uppercase; color:var(--faint); } .fact b { font-size:14px; font-weight:600; color:var(--ink); }
+  .meta { font-size:12.5px; color:var(--dim); margin-top:6mm; letter-spacing:.04em; } .meta b { color:var(--ink); }
+  ${o.evidence ? `.ev { margin-top:4mm; font-family:'Courier New',monospace; font-size:9.5px; color:var(--faint); line-height:1.7; } .ev b { color:var(--dim); font-family:${body}; }` : ''}
+  .foot { margin-top:auto; width:100%; display:flex; justify-content:space-between; align-items:flex-end; }
+  .seal { width:25mm; height:25mm; border-radius:50%; border:1.2px solid var(--acc); display:grid; place-items:center; position:relative;
+    background: radial-gradient(circle, color-mix(in srgb, var(--acc) 10%, transparent), transparent 70%); }
+  .seal::before { content:''; position:absolute; inset:1.6mm; border-radius:50%; border:.5px dashed color-mix(in srgb, var(--acc) 60%, transparent); }
+  .seal svg { width:10mm; height:auto; } .seal small { position:absolute; bottom:3.2mm; font-size:6px; letter-spacing:.2em; color:var(--acc); text-transform:uppercase; }
+  .code { font-size:9px; color:var(--faint); letter-spacing:.06em; margin-top:2mm; text-align:left; }
+  .sig { text-align:center; min-width:70mm; } .sig .cap { font-size:9px; letter-spacing:.24em; text-transform:uppercase; color:var(--faint); }
+  .sig .name { font-family:${disp}; font-size:22px; margin-top:1mm; padding-bottom:2mm; border-bottom:1px solid var(--ink); }
+  .sig .role { font-size:8.5px; color:var(--faint); margin-top:1.4mm; }
+  .prov { font-size:9.5px; color:var(--dim); margin-top:1.5mm; } .prov b { color:var(--ink); }
+  .note { position:absolute; bottom:11mm; left:30mm; right:30mm; font-size:7.5px; color:var(--faint); line-height:1.45; }
+  .foot { margin-bottom:9mm; }
+  .print { position:fixed; top:12px; left:12px; font-family:${body}; background:var(--ink); color:#fff; border:0; border-radius:8px; padding:9px 16px; cursor:pointer; font-size:13px; }
+  @media screen { body { padding:56px 0 24px; } .sheet { box-shadow:0 24px 60px rgba(40,25,15,.18); } }
+  @media print { .print { display:none; } body { background:var(--paper); display:block; min-height:0; padding:0; } .sheet { margin:0; box-shadow:none; page-break-after:avoid; } }
 </style></head><body>
 <button class="print" onclick="print()">⤓ ${pt ? 'Imprimir / Guardar PDF' : 'Print / Save as PDF'}</button>
 <div class="sheet">
-  <div class="frame"></div>
-  <div class="logo">${(window.BRAND && BRAND.logoSvg) || ((document.querySelector('.logo-mark svg') || {}).outerHTML || '')}</div>
+  <div class="frame"></div><i class="corner c1"></i><i class="corner c2"></i><i class="corner c3"></i><i class="corner c4"></i>
+  <div class="logo">${logo}</div>
   <div class="brand">${esc(brandAcademy())}</div>
   <div class="eyebrow">${esc(o.eyebrow)}</div>
   ${o.tier ? `<div class="tier">★ ${esc(o.tier)}</div>` : ''}
+  <div class="lead">${pt ? 'Atesta-se que' : 'This is to record that'}</div>
   <div class="who">${esc(o.who)}</div>
+  <div class="orn"><i></i><b></b><i></i></div>
   <div class="did">${esc(o.did)}</div>
   <div class="what">${esc(o.what)}</div>
-  <div class="meta">${o.meta}</div>
+  ${facts}
   ${o.evidence ? `<div class="ev">${o.evidence}</div>` : ''}
-  ${/* REQ-L-003: the document is issued in the EMPLOYER's name — that is the
-        signature line — and must NAME any external trainer or content provider.
-        The whole content-supply model (Part 1.2) rests on the employer being the
-        legal deliverer while we are visibly the supplier; leaving the supplier
-        unnamed is what would make it look like a certificate from us. */''}
-  <div class="sig">
-    <div>${esc(o.code || '')}</div>
-    <div class="line">${esc(companyName())}<div class="role">${pt ? 'Entidade empregadora · formação organizada por' : 'Employer · training organised by'}</div></div>
+  ${/* REQ-L-003: issued in the EMPLOYER's name (the signature line), naming any external trainer or content provider. */''}
+  <div class="foot">
+    <div><div class="seal">${logo}<small>${pt ? 'Registado' : 'Recorded'}</small></div>${o.code ? `<div class="code">${esc(o.code)}</div>` : ''}</div>
+    <div class="sig">
+      <div class="cap">${pt ? 'Formação por' : 'Trained by'}</div>
+      <div class="name">${esc(companyName())}</div>
+      <div class="role">${pt ? 'Entidade empregadora · formação organizada por' : 'Employer · training organised by'}</div>
+      ${o.trainer ? `<div class="prov">${pt ? 'Formador' : 'Trainer'} <b>${esc(o.trainer)}</b></div>` : ''}
+      ${contentProvider() ? `<div class="prov">${pt ? 'Conteúdo fornecido por' : 'Content supplied by'} <b>${esc(contentProvider())}</b></div>` : ''}
+    </div>
   </div>
-  ${o.trainer ? `<div class="prov">${pt ? 'Formador' : 'Trainer'} <b>${esc(o.trainer)}</b></div>` : ''}
-  ${contentProvider() ? `<div class="prov">${pt ? 'Conteúdo fornecido por' : 'Content supplied by'} <b>${esc(contentProvider())}</b></div>` : ''}
   <div class="note">${certFooterNote()}${o.extraNote ? ' · ' + o.extraNote : ''}</div>
 </div></body></html>`;
 }
@@ -2799,6 +2850,12 @@ function premiumCourseCert(courseId) {
        educator object is where that name now comes from */
     trainer: (() => { const e = educatorFor(c); return e ? e.name + (e.external ? (pt ? ' (externo)' : ' (external)') : '') : ''; })(),
     meta: `${h}h · ${cert.score != null ? `${pt ? 'Avaliação' : 'Assessed'} ${cert.score}% · ` : ''}<b>${fmtCertDate(certDate(c.id))}</b>`,
+    facts: [
+      { k: pt ? 'Duração' : 'Duration', v: fmtMins(courseMins(c)) },
+      { k: pt ? 'Lições' : 'Lessons', v: String(coreN(c)) },
+      ...(cert.score != null ? [{ k: pt ? 'Verificações' : 'Lesson checks', v: cert.score + '%' }] : []),
+      { k: pt ? 'Concluído a' : 'Completed', v: fmtCertDate(certDate(c.id)) }
+    ],
   }));
   ledgerAppend('cert_issued', { courseId, kind: 'course', score: cert.score });
 }
@@ -5928,10 +5985,7 @@ function showModuleCheck(c, mod, after) {
         ${qs.map((q, qi) => `<div class="mc-q">
           <div class="ck-q">${qi + 1}. ${esc(q.q)}</div>
           ${q.opts.map((o, oi) => `<div class="q-opt${answers[qi] === oi ? ' sel' : ''}" data-q="${qi}" data-o="${oi}" role="button" tabindex="0"><span class="radio"></span><span>${esc(o)}</span></div>`).join('')}
-          <div class="mc-conf">${t('mc_conf')}
-            <button type="button" class="conf-b${conf[qi] === true ? ' on' : ''}" data-cq="${qi}" data-cv="1">${t('mc_conf_sure')}</button>
-            <button type="button" class="conf-b${conf[qi] === false ? ' on' : ''}" data-cq="${qi}" data-cv="0">${t('mc_conf_guess')}</button>
-          </div>
+          ${/* no "How sure are you?" row: João + John, 5 Nov 2026, redundant */''}
         </div>`).join('')}
         <div class="ck-foot"><span class="ck-note">${t('mc_note')}</span>
           <button class="btn btn-primary btn-sm" id="mcGo"${answers.some(a => a === null) ? ' disabled' : ''}>${t('mc_submit')}</button></div>
@@ -7860,19 +7914,19 @@ function buildTutorSystem() {
   return `You are the ${brandName()} Tutor, the in-app AI learning companion inside ${brandAcademy()} — the learning platform of ${brandEthos()}
 You are talking to ${displayName()}${S.role ? ' (' + S.role + ')' : ''}, whose learning goal is "${S.goal}".
 
-Courses he has NOT started (recommend only from here):
+Courses they have NOT started (recommend only from here):
 ${CATALOG.filter(x => !isDone(x.id) && coursePct(x.id) === 0).slice(0, 14).map(x => `- ${x.title} (${x.cat}, ${fmtMins(courseMins(x))})`).join('\n')}
 
-His learning path right now:
+Their learning path right now:
 ${pathLines}
 
-${c ? `He currently has "${c.title}" open${p && !p.done ? ` — module ${(p.mod || 0) + 1} of ${c.modules.length}, "${c.modules[p.mod || 0]}", ${coursePct(c.id)}% complete` : ''}. Course description: ${c.desc}` : 'No course is currently open.'}
+${c ? `They currently have "${c.title}" open${p && !p.done ? ` — module ${(p.mod || 0) + 1} of ${c.modules.length}, "${c.modules[p.mod || 0]}", ${coursePct(c.id)}% complete` : ''}. Course description: ${c.desc}` : 'No course is currently open.'}
 
 Deadlines: "Fire Safety on the Land" is required and due in 3 days (it's fire season in the Alentejo); the team series "Living by the Seasons" is due June 30.
 
-WHEN HE BRINGS A PROBLEM, NOT A QUESTION — a bad day, a manager who has gone quiet, friction in the team, feeling behind — do this and nothing else: acknowledge it in ONE short sentence without platitudes, then recommend at most TWO courses he has NOT started, say in a half-line what each would give him for THAT problem, and tell him which to start first. Never recommend something he has already completed. If the library genuinely has nothing for it, say so and suggest who he might talk to instead — a course is not a substitute for a person.
+WHEN THEY BRING A PROBLEM, NOT A QUESTION — a bad day, a manager who has gone quiet, friction in the team, feeling behind — do this and nothing else: acknowledge it in ONE short sentence without platitudes, then recommend at most TWO courses they have NOT started, say in a half-line what each would give them for THAT problem, and tell them which to start first. Never recommend something they have already completed. If the library genuinely has nothing for it, say so and suggest who they might talk to instead — a course is not a substitute for a person.
 
-Style: warm, encouraging, concise (2-4 sentences unless asked for depth). Refer to his actual progress and path when relevant. You can offer to quiz him — if he agrees, tell him to press the "Quiz me now" button. Never invent courses that aren't in his path or the descriptions above.
+Style: warm, encouraging, concise (2-4 sentences unless asked for depth). Refer to their actual progress and path when relevant. You can offer to quiz them — if they agree, tell them to press the "Quiz me now" button. Never invent courses that aren't in their path or the descriptions above.
 HONESTY: Be honest before being helpful. If you are not sure of something, or the courses don't cover it, say so plainly ("I'm not certain" / "our courses don't cover this yet — check with the land team") instead of guessing. Never invent facts, names, numbers or regulations. When the learner shares their own reasoning, respond to their ACTUAL thinking — name what's right in it before correcting what's off.
 ${_lang() === 'pt' ? 'IMPORTANT: Respond in European Portuguese (português de Portugal).' : ''}\n\n${TUTOR_MODES[S.tutorMode || 'coach']}${aiGuardrails()}`;
 }
@@ -7950,7 +8004,7 @@ async function askGateway(text, moments) {
   typing.className = 'msg bot typing'; typing.innerHTML = '<span></span><span></span><span></span>';
   $('#aiMsgs').appendChild(typing); $('#aiMsgs').scrollTop = $('#aiMsgs').scrollHeight;
   try {
-    const g = await gatewayStream({ messages: tutorHistory.slice(-12), grounding: groundingText(moments) + learnerContext(), maxTokens: 500 }, (typing.classList.remove('typing'), typing));
+    const g = await gatewayStream({ messages: tutorHistory.slice(-12), grounding: groundingText(moments) + lessonGrounding(moments) + learnerContext(), maxTokens: 500 }, (typing.classList.remove('typing'), typing));
     if (!g || !g.reply) throw new Error('empty');
     tutorHistory.push({ role: 'assistant', content: g.reply });
     typing.innerHTML = tutorFmt(g.reply, moments) + momentsHTML(moments, { compact: true });

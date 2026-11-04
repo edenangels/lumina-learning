@@ -484,8 +484,8 @@ window.EdenCloud = {
     try {
       const snap = await getDoc(doc(db, 'companies', cid()));
       window.EdenCompany = snap.exists() ? Object.assign({ id: cid() }, snap.data())
-        : { id: cid(), name: cid() === 'edenrise' ? 'EdenRise' : cid(), status: 'active', adminEmails: [] };
-    } catch (e) { window.EdenCompany = { id: cid(), name: 'EdenRise', status: 'active', adminEmails: [] }; }
+        : { id: cid(), name: cid() === 'edenrise' ? 'EdenRise' : ((window.BRAND && (BRAND.company || BRAND.name)) || cid()), status: 'active', adminEmails: [] };
+    } catch (e) { window.EdenCompany = { id: cid(), name: cid() === 'edenrise' ? 'EdenRise' : ((window.BRAND && (BRAND.company || BRAND.name)) || cid()), status: 'active', adminEmails: [] }; }
     if (window.EdenApp && window.EdenApp.applyCompany) window.EdenApp.applyCompany(window.EdenCompany);
     return window.EdenCompany;
   },
