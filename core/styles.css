@@ -4778,3 +4778,7 @@ body.reels-open { overflow: hidden; }
 .cert-earned .ce-actions { display: flex; flex-direction: column; gap: 10px; }
 .me-sum { margin-top: 6px; color: var(--text-dim); font-size: 15px; }
 .me-sum b { color: var(--text); }
+
+/* goal step: three goals stacked, one line of meaning each (4 Nov 2026) */
+.ob-grid.ob-goals { grid-template-columns: 1fr; }
+.ob-goals .ob-option .od { font-size: 13px; line-height: 1.45; margin-top: 3px; }

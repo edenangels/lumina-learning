@@ -8778,17 +8778,18 @@ function drawOnboard() {
     body.querySelectorAll('.ob-option').forEach(o => o.addEventListener('click', () => { grabHandle(); ob.role = o.dataset.role; drawOnboard(); }));
   } else if (ob.step === 1) {
     const role = ROLE_OPTIONS.find(r => r.key === ob.role) || ROLE_OPTIONS[0];
-    const goals = [...new Set([...role.goals, ...Object.keys(GOAL_PRESETS)])].slice(0, 4);
+    /* three goals, the department's own first; less to read, nothing that looks like a duplicate (João, 4 Nov 2026) */
+    const goals = [...new Set([...role.goals, ...Object.keys(GOAL_PRESETS)])].filter(g => GOAL_PRESETS[g]).slice(0, 3);
     /* the role already implies a first goal — pre-select it so the step is one click, not two */
     if (!ob.goal || !GOAL_PRESETS[ob.goal]) ob.goal = goals[0];
     body.innerHTML = `
       <div class="ob-eyebrow">${t('ob_step')} 2 ${t('of')} 3 · ${t('ob_destination')}</div>
       <div class="ob-title">${t('ob_q2')}</div>
       <p class="ob-sub">${t('ob_q2_sub')}</p>
-      <div class="ob-grid">${goals.map(g => `
+      <div class="ob-grid ob-goals">${goals.map(g => { const gi = (typeof GOAL_INFO !== 'undefined' && GOAL_INFO[g]) || null; return `
         <div class="ob-option ${ob.goal === g ? 'sel' : ''}" data-goal="${g}">
-          <span class="oi">${svgIcon((courseById(GOAL_PRESETS[g][0]) || {}).icon || 'leaf')}</span><div>${tgoal(g)}<div class="od">${(() => { const cs = GOAL_PRESETS[g].map(courseById).filter(cc => cc && !isComingSoon(cc)); const mins = cs.reduce((a, cc) => a + courseMins(cc), 0); const lessons = cs.reduce((a, cc) => a + coreN(cc), 0); return mins ? `${t('about')} ${fmtMins(mins)} · ${lessons} ${t('lessons_lc')}` : t('coming_soon'); })()}</div></div>
-        </div>`).join('')}
+          <span class="oi">${svgIcon((gi && gi.icon) || (courseById(GOAL_PRESETS[g][0]) || {}).icon || 'leaf')}</span><div>${tgoal(g)}${gi ? `<div class="od">${esc(_lang() === 'pt' ? gi.pt : gi.en)}</div>` : ''}</div>
+        </div>`; }).join('')}
       </div>
       <div class="ob-foot">
         <button class="ob-skip" id="obBack">← ${_lang() === 'pt' ? 'Voltar' : 'Back'}</button>
