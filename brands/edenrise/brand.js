@@ -7,17 +7,22 @@
 ============================================================================ */
 (window.EdenBrands = window.EdenBrands || {}).edenrise = {
   id: 'edenrise',
-  name: 'EdenRise',
-  academy: 'EdenRise Academy',
+  /* 24 Nov 2026: the academy is renamed ADEN (official migration from EdenRise, same branding).
+     `company` stays the LEGAL employer: certificates and the 40-hour training record name it.
+     The id 'edenrise', storage keys, Firebase project, domain and sign-in emails are unchanged on
+     purpose, so no learner is signed out or loses progress. */
+  name: 'ADEN',
+  company: 'EdenRise',
+  academy: 'ADEN Academy',
   tagline: 'Regenerative Living, Learned',
-  title: 'EdenRise Academy — Regenerative Living, Learned',
+  title: 'ADEN Academy — Regenerative Living, Learned',
   ogDesc: 'Where nature leads, the land heals, and stewardship shapes everything we learn.',
   twDesc: 'Regenerative living, learned — with adaptive AI paths and an AI tutor.',
   domain: 'academy.edenrise.com',
   hostnames: ['academy.edenrise.com'],
   lang: 'en',
   /* the "school ethos" the AI tutor is grounded in (see buildTutorSystem) */
-  ethos: 'EdenRise, a regenerative-living farm and school in the Baixo Alentejo, Portugal. Its ethos: where nature leads, the land heals, and stewardship shapes everything. The courses teach regenerative living — soil, water, food forests, native flora, foraging, natural building, fire stewardship and nature connection.',
+  ethos: 'ADEN (formerly EdenRise; older videos still say EdenRise), a regenerative-living farm and school in the Baixo Alentejo, Portugal. Its ethos: where nature leads, the land heals, and stewardship shapes everything. The courses teach regenerative living — soil, water, food forests, native flora, foraging, natural building, fire stewardship and nature connection.',
   shortDesc: 'a regenerative-living school in the Baixo Alentejo, Portugal',   /* used inside AI prompts */
   realm: 'the Alentejo reality (heat, drought, fire season, cork-oak montado, clay soils, water scarcity, working as a team)',  /* AI quiz/scenario grounding */
   location: 'Baixo Alentejo, Portugal',   /* certificate / footer line */

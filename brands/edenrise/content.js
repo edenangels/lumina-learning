@@ -1,5 +1,5 @@
 /* ============================================================================
-   INSTANCE CONTENT · EdenRise  (the course catalog — pure data, swap per client)
+   INSTANCE CONTENT · ADEN  (the course catalog — pure data, swap per client)
    ----------------------------------------------------------------------------
    Loaded BEFORE the core framework (data.js). A new client ships its own
    brands/<id>/content.js with the same globals: CATALOG + course maps.
@@ -17,7 +17,7 @@ const CATALOG = [
     level: 'All levels', learners: 0, ai: true, featured: true, poster: 'media/above-below-line-cover.webp', heroArt: 'media/covers/land-team-journey-hero.webp', updated: '2026-07',
     hook: 'Choose how you show up — even on the hard days.',
     hookSub: 'Eight mindset habits that make you someone the team can rely on.',
-    desc: 'The course every EdenRise team member starts with. In eight short lessons from John you learn the one question that changes how you show up, how to treat mistakes as feedback, how to own outcomes, and the habits of people others trust: clarify instead of assuming, benchmark excellence, notice the details, keep learning, stay grateful. Finish it and you have a shared language with everyone on the land.',
+    desc: 'The course every ADEN team member starts with. In eight short lessons from John you learn the one question that changes how you show up, how to treat mistakes as feedback, how to own outcomes, and the habits of people others trust: clarify instead of assuming, benchmark excellence, notice the details, keep learning, stay grateful. Finish it and you have a shared language with everyone on the land.',
     /* 13 Oct 2026 (John): everything Above-the-Line / No-Failure lives HERE, nowhere else.
        The long-form lessons that used to sit in the Alignment Journey are appended as a
        "Go deeper" block — appended, not interleaved, so every hour already recorded
@@ -135,13 +135,13 @@ const CATALOG = [
     ]
   },
   {
-    id: 'alignment-journey', title: 'The EdenRise Alignment Journey', cat: 'Leadership', grad: 1, icon: 'compass', featured: true, updated: '2026-07',
-    outcomes: ['Feel genuinely welcomed — and know how EdenRise works together', 'Use ESIP, our shared frame for how we think, decide and act', 'Move through fear instead of working around it', 'Look after body, soul and spirit so you bring your whole self to the work'],
-    outcomes_pt: ['Sentir-se verdadeiramente bem-vindo — e saber como a EdenRise trabalha em conjunto', 'Usar o ESIP, a nossa estrutura comum para pensar, decidir e agir', 'Atravessar o medo em vez de o contornar', 'Cuidar do corpo, da alma e do espírito para trazer a pessoa inteira para o trabalho'],
+    id: 'alignment-journey', title: 'The ADEN Alignment Journey', cat: 'Leadership', grad: 1, icon: 'compass', featured: true, updated: '2026-07',
+    outcomes: ['Feel genuinely welcomed — and know how ADEN works together', 'Use ESIP, our shared frame for how we think, decide and act', 'Move through fear instead of working around it', 'Look after body, soul and spirit so you bring your whole self to the work'],
+    outcomes_pt: ['Sentir-se verdadeiramente bem-vindo — e saber como a ADEN trabalha em conjunto', 'Usar o ESIP, a nossa estrutura comum para pensar, decidir e agir', 'Atravessar o medo em vez de o contornar', 'Cuidar do corpo, da alma e do espírito para trazer a pessoa inteira para o trabalho'],
     level: 'All levels', rating: 5.0, learners: 0, isNew: true, poster: 'media/covers/alignment-journey.webp', heroArt: 'media/covers/alignment-journey-hero.webp',
     hook: 'One team, one way of working — starting with a warm welcome.',
     hookSub: 'John\'s welcome, the ESIP framework, moving beyond fear, and caring for body, soul and spirit.',
-    desc: 'John welcomes you personally and lays out the frame everything else at EdenRise hangs on: ESIP, the framework for how we think and act together. Then two deeper journeys — moving beyond fear, and looking after body, soul and spirit — so you can bring your whole self to the work.',
+    desc: 'John welcomes you personally and lays out the frame everything else at ADEN hangs on: ESIP, the framework for how we think and act together. Then two deeper journeys — moving beyond fear, and looking after body, soul and spirit — so you can bring your whole self to the work.',
     /* 13 Oct 2026 (John): no duplication across courses. Above-the-Line / No-Failure moved
        to "Above the Line", Goal Setting moved to "Ultimate Purpose". What stays is what only
        this journey has: John's welcome, the ESIP framework, Beyond Fear, Body/Soul/Spirit. */
@@ -471,7 +471,7 @@ const TAKEAWAYS = {
 const COURSE_PT = {
   'ai-literacy': { title:'Trabalhar Bem com a IA', desc:'O Regulamento IA da UE (Artigo 4.º) pede a todas as organizações que usam IA que garantam a literacia de IA das suas pessoas. Esta é a nossa versão: o que a IA é e não é, como trabalhar com a IA da Academia com honestidade e segurança, o que ela faz com os seus dados, e o que a lei espera de nós.', modules:['O que a IA É (e Não É)','Trabalhar com o Nosso Tutor de IA','Quando a IA Está Errada','Os Seus Dados e Privacidade','O Regulamento IA da UE e Nós'] },
   'fire-truck-training': { title:'Formação — Camião de Incêndio', desc:'Operação prática do camião de combate a incêndios da propriedade — arrancar, conduzir, encher e pôr água exatamente onde é preciso. Quando chega a época de fogos, todos devem saber mover água.', modules:['Arrancar e Conduzir o Camião','Encher o Depósito de Água','Todo-o-Terreno, Bomba e Jato','Potência, Segurança e o Exercício'] },
-  'alignment-journey': { title:'A Jornada de Alinhamento EdenRise', desc:'John dá-lhe as boas-vindas pessoalmente e apresenta a estrutura em que tudo o resto na EdenRise assenta: o ESIP, a forma como pensamos e agimos em conjunto. Depois, duas jornadas mais profundas — para além do medo, e cuidar do corpo, da alma e do espírito — para trazer a pessoa inteira para o trabalho.', hook:'Uma equipa, uma forma de trabalhar — a começar por boas-vindas calorosas.', hookSub:'As boas-vindas do John, o ESIP, ir para além do medo, e cuidar do corpo, alma e espírito.', modules:[
+  'alignment-journey': { title:'A Jornada de Alinhamento ADEN', desc:'John dá-lhe as boas-vindas pessoalmente e apresenta a estrutura em que tudo o resto na ADEN assenta: o ESIP, a forma como pensamos e agimos em conjunto. Depois, duas jornadas mais profundas — para além do medo, e cuidar do corpo, da alma e do espírito — para trazer a pessoa inteira para o trabalho.', hook:'Uma equipa, uma forma de trabalhar — a começar por boas-vindas calorosas.', hookSub:'As boas-vindas do John, o ESIP, ir para além do medo, e cuidar do corpo, alma e espírito.', modules:[
     'Boas-vindas',
     'ESIP · A Estrutura',
     'Para Além do Medo · Introdução', 'Para Além do Medo · Animação', 'Para Além do Medo · Desmontar e Sintetizar',
@@ -481,10 +481,10 @@ const COURSE_PT = {
   'land-team-journey': { title:'Acima da Linha', desc:'A jornada de crescimento da Equipa da Terra — a mentalidade e os hábitos que moldam como trabalhamos a terra, e uns aos outros. Começa com uma pergunta que muda a forma como aparecemos.', modules:['Acima da Linha, Abaixo da Linha','Não Há Fracasso, Só Feedback','Responsabilidade Total','Comunicação — Esclareça','Benchmark de Excelência','Atenção ao Detalhe','Seja Aprendiz','A Ciência da Gratidão','Acima da Linha: Pensamento Simples e Poderoso','Acima da Linha: Análise Profunda','Acima da Linha: Síntese','Sem Fracasso: a Animação','Sem Fracasso: Síntese'], hook:'Escolha como aparece — mesmo nos dias difíceis.', hookSub:'Oito hábitos de mentalidade que fazem de si alguém em quem a equipa pode confiar.' },
   'land-literacy': { title:'Ler a Terra', desc:'Antes de mudar uma paisagem, aprenda a lê-la. Declive, água, solo, sol e sucessão — a literacia com que começa todo o ato de zeladoria.', modules:['Ficar quieto: como observar','Ler o declive e a água','O solo ao toque e à vista','Sol, sombra e exposição','Sucessão e o que a terra quer','Mapear o seu terreno'] },
   'living-soil': { title:'Solo Vivo', desc:'O solo não é terra morta — é uma comunidade viva. Conheça o microbioma sob os seus pés e as práticas que o alimentam em vez de o esgotar.', modules:['A teia alimentar do solo','Porque deixámos de lavrar','Compostagem como inoculante','Culturas de cobertura e raízes vivas','Cobertura morta e solo nu','Ler uma análise de solo'] },
-  'water-cycles': { title:'A Água e a Paisagem Viva', desc:'Domine o pequeno ciclo da água de que a sua terra depende. Este programa adapta-se ao seu terreno — a IA da EdenRise reordena cada módulo conforme o que já sabe.', modules:['O pequeno ciclo da água','Para onde vai a sua água','Abrandar, espalhar, infiltrar','Valas de infiltração em curva de nível','Charcos e represas','Reidratar terra seca','Águas cinzentas, com cuidado','Proteger uma horta da seca','Ler uma bacia','Nascentes e olheiros','Medir a infiltração','Avaliação final'] },
+  'water-cycles': { title:'A Água e a Paisagem Viva', desc:'Domine o pequeno ciclo da água de que a sua terra depende. Este programa adapta-se ao seu terreno — a IA da ADEN reordena cada módulo conforme o que já sabe.', modules:['O pequeno ciclo da água','Para onde vai a sua água','Abrandar, espalhar, infiltrar','Valas de infiltração em curva de nível','Charcos e represas','Reidratar terra seca','Águas cinzentas, com cuidado','Proteger uma horta da seca','Ler uma bacia','Nascentes e olheiros','Medir a infiltração','Avaliação final'] },
   'agroforestry': { title:'Agrofloresta e a Floresta Comestível', desc:'Construa uma floresta que o alimenta. Sete camadas, fixadores de azoto e a arte paciente de desenhar um sistema cada vez mais abundante.', modules:['As sete camadas','Escolher o dossel','Fixadores de azoto e espécies de apoio','Consórcios que funcionam','Plantar para a sucessão','Cuidar da floresta jovem'] },
   'regen-design': { title:'Desenhar com a Natureza', desc:'Desenho de permacultura da observação ao plano: zonas, setores e como colocar cada elemento para que a terra faça o trabalho.', modules:['Observar antes de agir','Zonas e setores','Colocar elementos por relação','Dos padrões aos detalhes','O plano do sítio inteiro'] },
-  'capstone-land': { title:'Projeto Final: O Seu Plano de Terra', desc:'O final avaliado: produza e apresente um plano de regeneração de um ano para uma terra real. A IA da EdenRise avalia água, solo e sequência.', modules:['Apresentar o seu sítio','Desenho a começar pela água','Sequenciar o primeiro ano','Ensaio com feedback da IA','Revisão avaliada por IA'] },
+  'capstone-land': { title:'Projeto Final: O Seu Plano de Terra', desc:'O final avaliado: produza e apresente um plano de regeneração de um ano para uma terra real. A IA da ADEN avalia água, solo e sequência.', modules:['Apresentar o seu sítio','Desenho a começar pela água','Sequenciar o primeiro ano','Ensaio com feedback da IA','Revisão avaliada por IA'] },
   'composting': { title:'A Arte da Compostagem', desc:'Transforme resíduos em ouro negro. Pilhas quentes, frias, minhocas e as proporções simples que fazem composto de forma fiável, sem cheiro.', modules:['Verdes e castanhos','Fazer uma pilha quente','Minhocas e vermicomposto','Chá de composto e extratos','Resolver maus cheiros','Usar o composto pronto'] },
   'seed-saving': { title:'Guardar Sementes e Variedades Antigas', desc:'Mantenha a linhagem viva. Guarde, seque e armazene semente da sua horta — e as variedades de polinização aberta a proteger no Alentejo.', modules:['Porque importa a polinização aberta','Isolamento e pureza','Processar semente húmida e seca','Secar e armazenar','Uma biblioteca de sementes'] },
   'foraging': { title:'Colher no Alentejo', desc:'Saia e volte alimentado. Ervas silvestres, cogumelos, plantas e a regra de ouro — identifique com certeza, colha com cuidado.', modules:['A mentalidade do colhedor','Identificar com certeza','Verduras silvestres do prado','Cogumelos: respeito e cautela','Ervas e chás silvestres','Ética da colheita','Calendário sazonal','Conservar a colheita silvestre','Sósias a nunca confundir','Um primeiro passeio de colheita'] },
@@ -521,7 +521,7 @@ const COURSE_SKILLS = {
    of course a client would assume covers their safety obligation. */
 /* ===== EDUCATORS — the people who teach ====================================
    A premium academy names its teacher. Here that is not decoration: at
-   EdenRise (and at every tenant) the educator is a COLLEAGUE, and putting
+   ADEN (and at every tenant) the educator is a COLLEAGUE, and putting
    their face and their "why" on the module is how passing knowledge down
    becomes a form of dignity rather than a chore. It also does legal work —
    REQ-L-003 requires the training record to name the trainer, not only the

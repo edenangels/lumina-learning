@@ -1,7 +1,7 @@
 {
-  "name": "EdenRise Academy",
-  "short_name": "EdenRise",
-  "description": "Regenerative living, learned — EdenRise's learning platform with AI paths, community and a personal tutor.",
+  "name": "ADEN Academy",
+  "short_name": "ADEN",
+  "description": "Regenerative living, learned — ADEN's learning platform with AI paths, community and a personal tutor.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
