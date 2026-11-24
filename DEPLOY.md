@@ -1,4 +1,4 @@
-# Deploy instruction — EdenRise Academy
+# Deploy instruction — ADEN Academy (formerly EdenRise Academy)
 > **Since 2026-10-07 the Academy has two hosts.** GitHub Pages is back, now under **edenangels/lumina-learning** (public): a push to `main` runs `.github/workflows/pages.yml` and serves https://edenangels.github.io/lumina-learning/. Cloudflare Pages (`scripts/deploy-pages.sh` → edenrise-academy.pages.dev) stays as the second host. Release = push to main AND run the script. The custom domain academy.edenrise.com is attached to whichever host João frees it for at GoDaddy (see ClickUp B0).
 >
 > **History:** 2026-09-16 the site was served by Cloudflare Pages only, not GitHub Pages. The GitHub account that
@@ -15,7 +15,7 @@ When the build work is done, deploy like this:
 
 2. **Bump the cache version — read it fresh first.** Run `grep -o "v=edr[0-9]*" index.html | sort -u` to see the CURRENT number — do not assume it from memory; parallel sessions move it. Then bump every `?v=edrN` in index.html to N+1, and set the matching `const VERSION = 'edenrise-vN+1'` in sw.js. **Both must move together** or returning browsers serve stale files.
 
-3. **Check for foreign commits, then commit and push:** `git log --oneline -3` and `git status` first — another session may have committed since you last looked; re-read any file right before editing it. Commit with a descriptive message and push to `main`. If the push 403s, run `gh auth switch --hostname github.com --user meridante-dev` (the Angel-Team7 account sometimes grabs the credential) and push again.
+3. **Check for foreign commits, then commit and push:** `git log --oneline -3` and `git status` first — another session may have committed since you last looked; re-read any file right before editing it. Commit with a descriptive message and push to `main`. If the push 403s or says "repository not found", the wrong GitHub account holds the credential: `gh auth status`, then `gh auth switch --hostname github.com --user <the account with write access to edenangels/lumina-learning>` and push again. (The old meridante-dev account is closed.)
 
 4. **Verify the deploy by curling the live site, not the workflow status.** The push triggers `.github/workflows/pages.yml` (checkout → esbuild minify → upload-pages-artifact → deploy-pages; local source stays unminified). Content often goes live before the run reports completed, so poll:
    ```
@@ -25,8 +25,8 @@ When the build work is done, deploy like this:
 
 5. **If deploy-pages fails instantly with "Deployment failed, try again later"** (site-level Pages status "errored", GitHub status all green — this repo's Pages backend has gotten stuck twice), reset the Pages site:
    ```
-   gh api -X DELETE repos/meridante-dev/lumina-learning/pages
-   gh api -X POST repos/meridante-dev/lumina-learning/pages -f build_type=workflow
+   gh api -X DELETE repos/edenangels/lumina-learning/pages
+   gh api -X POST repos/edenangels/lumina-learning/pages -f build_type=workflow
    gh workflow run pages.yml
    ```
 
