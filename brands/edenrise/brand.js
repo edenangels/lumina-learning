@@ -55,7 +55,16 @@
      most-filmed course, which is a sensible default and a poor storefront: the
      tenant, not a ranking function, decides what a visitor sees first. The
      learner's own place is never lost — it stays one row down in "Continue". */
-  heroCourse: 'alignment-journey',   /* John's welcome leads (13 Oct 2026) */
+  heroCourse: 'alignment-journey',
+  /* 25 Nov 2026: ADEN runs the shared engine Belong was approved on. The engine's loader needs the backend
+     named: 'firebase' keeps everyone's real accounts. (Missing = no-login mode.) */
+  backend: 'firebase',
+  /* Belong-approved choices, mirrored: the video ending opens the questions (no Mark complete button),
+     no "knowledge verified" counter, no second reels shelf. NOT mirrored on purpose: watchGate stays ON
+     (Belong turned it off only for testing) and the full profile stays (NIF/contract for the 40-h record). */
+  markComplete: false,
+  hideVerifiedStat: true,
+  quickWinsShelf: false,   /* John's welcome leads (13 Oct 2026) */
   logoSvg: null,          /* founding brand keeps the inline SVG in index.html; a client ships its own here */
   favicon: null,          /* keep index.html's versioned favicon for the founding brand */
   ogImage: 'https://academy.edenrise.com/og-image.png',

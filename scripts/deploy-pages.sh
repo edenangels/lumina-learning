@@ -25,7 +25,7 @@ fi
 rm -rf "$DIST"; mkdir -p "$DIST"
 rsync -a --exclude .git --exclude node_modules --exclude .stale --exclude media/reels --exclude exports --exclude .tmp-audio --exclude test --exclude scripts --exclude '*.md' --exclude .github --exclude docs --exclude .claude --exclude .wrangler --exclude dist ./ "$DIST/"
 ( cd "$DIST"
-  for f in brands/edenrise/brand.js brands/_example/brand.js core/brandkit.js core/app.js brands/edenrise/content.js data.js sw.js; do npx --yes esbuild@0.24.2 "$f" --minify --charset=utf8 --outfile="$f" --allow-overwrite --log-level=error; done
+  for f in brands/edenrise/brand.js brands/_example/brand.js core/brandkit.js core/app.js core/curriculum.js core/team.js core/localdb.js core/compat.js brands/edenrise/content.js data.js sw.js; do npx --yes esbuild@0.24.2 "$f" --minify --charset=utf8 --outfile="$f" --allow-overwrite --log-level=error; done
   npx --yes esbuild@0.24.2 core/auth.js --minify --charset=utf8 --format=esm --outfile=core/auth.js --allow-overwrite --log-level=error
   npx --yes esbuild@0.24.2 core/styles.css --minify --outfile=core/styles.css --allow-overwrite --log-level=error
   printf '/*\n  X-Content-Type-Options: nosniff\n/knowledge/*\n  Cache-Control: public, max-age=600\n/fonts/*\n  Cache-Control: public, max-age=31536000, immutable\n' > _headers

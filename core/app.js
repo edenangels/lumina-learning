@@ -16,6 +16,13 @@ const STATE_KEY = BRAND_SLUG + '-state-v2';
    it in core would have shown every returning learner the sign-in gate — a
    silent mass logout dressed as a cleanup. Default is <id>-auth-mode. */
 const MODE_KEY  = (window.BRAND && window.BRAND.authModeKey) || (BRAND_SLUG + '-auth-mode');
+/* BRAND.backend 'open': no sign-in anywhere — the link opens straight into the academy */
+const OPEN_MODE = !!(window.BRAND && window.BRAND.backend === 'open');
+/* Small-tile artwork. Path-row tiles and course cards draw a poster at about
+   300 css px, but the posters are 960-1280 px wide; media/covers/sm/ holds the
+   same pictures at 640 px (2x for a phone), built by scripts/build-thumbs.py.
+   Full-size posters stay for the course page and the hero. */
+const thumbOf = window.thumbOf = p => (typeof p === 'string' && /^media\/covers\/[^/]+\.webp$/.test(p) && !/-hero\.webp$/.test(p)) ? p.replace('media/covers/', 'media/covers/sm/') : p;
 let S;
 try { S = Object.assign({}, structuredClone(DEFAULT_STATE), JSON.parse(localStorage.getItem(STATE_KEY) || '{}')); }
 catch { S = structuredClone(DEFAULT_STATE); }
@@ -28,8 +35,13 @@ function migrateState() {
   const before = JSON.stringify([S.goal, S.path, S.assignments]);
   const goals = (typeof GOAL_PRESETS === 'object' && GOAL_PRESETS) || {};
   const names = Object.keys(goals);
+  /* a renamed goal maps to its successor before anything is called "retired" */
+  if (typeof GOAL_ALIASES === 'object' && S.goal && GOAL_ALIASES[S.goal] && goals[GOAL_ALIASES[S.goal]]) {
+    S.goal = GOAL_ALIASES[S.goal]; if (typeof GOAL_MODS === 'object' && GOAL_MODS[S.goal]) S.pathMods = [...GOAL_MODS[S.goal]];
+    S.path = [...goals[S.goal]];   /* the old goal's items would otherwise ride along outside the new goal */
+  }
   const goalRetired = names.length && !goals[S.goal];
-  if (goalRetired) S.goal = names[0];
+  if (goalRetired) { S.goal = names[0]; if (typeof GOAL_MODS === 'object') S.pathMods = [...(GOAL_MODS[S.goal] || [])]; }
   const known = new Set((typeof CATALOG !== 'undefined' ? CATALOG : []).map(c => c.id));
   if (Array.isArray(S.path)) {
     const kept = S.path.filter(id => known.has(id));
@@ -150,6 +162,8 @@ function ledgerAppend(type, data = {}) {
       /* idempotent event kinds — never double-record the same fact */
       if (type === 'module_complete' && L.some(e => e.type === type && e.courseId === data.courseId && e.mod === data.mod)) return;
       if (type === 'course_complete' && L.some(e => e.type === type && e.courseId === data.courseId)) return;
+      /* a course result card and a certificate download are facts once, not once per view (they fed the Team feed) */
+      if ((type === 'program_complete' || type === 'cert_issued') && data.programId && L.some(e => e.type === type && e.programId === data.programId)) return;
       if (type === 'consent_given' && L.some(e => e.type === type)) return;
       if (type === 'pretest' && L.some(e => e.type === type && e.courseId === data.courseId)) return;
       const core = Object.assign({
@@ -201,9 +215,12 @@ function ledgerAppend(type, data = {}) {
     try { _origLogErr(kind, msg, src); } catch (e) {}
     try {
       const sig = kind + '|' + String(msg).slice(0, 80);
+      /* BRAND.errorBeacon: the endpoint that receives error reports; null switches reporting off */
+      const BEACON = (window.BRAND && 'errorBeacon' in window.BRAND) ? window.BRAND.errorBeacon : 'https://academy-watch.edenrise.workers.dev/beacon';
+      if (!BEACON) return;
       if (_sentSig.size >= 5 || _sentSig.has(sig)) return; _sentSig.add(sig);
       const body = JSON.stringify({ kind, msg: String(msg).slice(0, 300), src: String(src || '').slice(0, 120), v: (document.querySelector('script[src*="core/app.js"]') || {}).src, ua: navigator.userAgent.slice(0, 80), url: location.hash, brand: (window.BRAND && BRAND.id) || '' });
-      (navigator.sendBeacon && navigator.sendBeacon('https://academy-watch.edenrise.workers.dev/beacon', new Blob([body], { type: 'application/json' }))) || fetch('https://academy-watch.edenrise.workers.dev/beacon', { method: 'POST', body, keepalive: true }).catch(() => {});
+      (navigator.sendBeacon && navigator.sendBeacon(BEACON, new Blob([body], { type: 'application/json' }))) || fetch(BEACON, { method: 'POST', body, keepalive: true }).catch(() => {});
     } catch (e) {}
   };
   window.EdenBeacon = logErr;
@@ -457,6 +474,12 @@ function updateXpChip() {
   const lv = levelFor(S.xp);
   const html = `${svgIcon('sprout')}<span>${lv.name} · ${S.xp} XP</span>`;
   [$('#xpChip'), $('#xpChipMobile')].forEach(c => { if (c) c.innerHTML = html; });
+  /* streak, Duolingo-style: a small flame in the header, always in sight, never a block in the page */
+  const sc = $('#streakChip');
+  if (sc) { const n = S.streak || 0; sc.classList.toggle('on', n > 0);
+    sc.innerHTML = `${svgIcon('fire')}<b>${n}</b>`;
+    const lbl = _lang() === 'pt' ? `Sequência: ${n} ${n === 1 ? 'dia' : 'dias'} seguidos a aprender` : `Streak: ${n} ${n === 1 ? 'day' : 'days'} in a row`;
+    sc.setAttribute('aria-label', lbl); sc.title = lbl; }
 }
 
 /* ---------- card builder ---------- */
@@ -486,7 +509,7 @@ function cardHTML(c, opts = {}) {
       <button class="icon-btn" data-action="play" data-id="${c.id}" aria-label="Play ${ctitle(c)}" title="Play">▶</button>
       <button class="icon-btn ${inPath(c.id) ? 'in-path' : ''}" data-action="toggle-path" data-id="${c.id}" aria-label="${inPath(c.id) ? 'Remove from your path' : 'Add to your path'}" title="${inPath(c.id) ? 'In your path' : 'Add to path'}">${inPath(c.id) ? '✓' : '＋'}</button>
     </div>
-    <div class="thumb t-grad-${c.grad} ${c.poster ? 'has-poster' : ''}"${c.poster ? ` data-bg="${c.poster}"` : ''}>${c.poster ? '' : `<span class="big-icon">${svgIcon(c.icon)}</span>`}<div class="chip-row">${chips.join('')}</div>${bar}</div>
+    <div class="thumb t-grad-${c.grad} ${c.poster ? 'has-poster' : ''}"${c.poster ? ` data-bg="${thumbOf(c.poster)}"` : ''}>${c.poster ? '' : `<span class="big-icon">${svgIcon(c.icon)}</span>`}<div class="chip-row">${chips.join('')}</div>${bar}</div>
     <div class="card-body">
       <h3>${ctitle(c)}</h3>
       <p class="card-hook">${chook(c)}</p>
@@ -624,7 +647,7 @@ function pathRowHTML() {
        bullet — and this row is what a buyer sees before anything else. */
     /* unfilmed step: a nameless placeholder — the name on a card nobody can open reads as a broken promise (João, 14 Oct) */
     if (isComingSoon(c) && st !== 'done') return `<div class="pstep soon" aria-disabled="true"><span class="pstep-n">${n}</span><span class="pstep-t">${t('coming_soon')}</span></div>`;
-    const art = c.poster ? ` style="background-image:url('${c.poster}')"` : '';
+    const art = c.poster ? ` style="background-image:url('${thumbOf(c.poster)}')"` : '';
     /* steps ahead are shown, not opened: progress unlocks them in order (João + John, 4 Nov 2026).
        The library still lets anyone browse a course page. */
     const tag = st === 'locked' ? 'div' : 'button';
@@ -660,7 +683,7 @@ function renderHome() {
   const _last = lastPlayed && courseById(lastPlayed[0]);
   const _inProgress = _last && !isDone(_last.id) && coursePct(_last.id) > 0;
   const brandHero = _pin && !isDone(_pin.id) && !_inProgress ? _pin : null;   /* the pin leads for a fresh learner; a course in progress leads for everyone else */
-  const featured = brandHero
+  let featured = brandHero
     || (_last && !isDone(_last.id) ? _last : null)
     || realOnes.find(c => !isDone(c.id)) || realOnes[0]
     || S.path.map(courseById).filter(Boolean).find(c => !isDone(c.id))
@@ -698,33 +721,37 @@ function renderHome() {
       <div class="step-node ${nodeCls}">${node}</div>
       <div class="step-info"><div class="t">${ctitle(c)}</div><div class="s">${sub}</div></div></div>`;
   }).join('');
-  const words = ctitle(featured).split(' ');
+  /* curriculum: the hero features the module holding the learner's next lesson, named with its course */
+  const _H = window.curHero ? window.curHero(featured) : null;
+  if (_H) { featured = courseById(_H.source) || featured; }
+  const words = (_H ? _H.title : ctitle(featured)).split(' ');
   const lastWord = words.pop();
 
   return `<div class="page">
   <header class="hero">
     <div class="hero-bg"></div><div class="hero-grid"></div>
-    ${(featured.heroArt || featured.poster) ? `<div class="hero-art${featured.heroFit ? ' fit-' + featured.heroFit : ''}" style="background-image:url('${featured.heroArt || featured.poster}')"></div>` : ''}
+    ${(featured.heroArt || featured.poster) ? `<div class="hero-art${featured.heroFit ? ' fit-' + featured.heroFit : ''}" style="background-image:url('${featured.heroArt || featured.poster}')${!featured.heroFit && /-hero\.webp$/.test(featured.heroArt || '') ? `;--hero-phone:url('${new URL(featured.heroArt.replace(/\.webp$/, '-phone.webp'), location.href).href}')` : ''}"></div>` : ''}
     <div class="orb orb-1"></div><div class="orb orb-2"></div><div class="hero-fade"></div><div class="hero-rim" aria-hidden="true"></div>
     <div class="hero-content">
+      ${_H ? _H.eyebrow : ''}
       <h1 class="hero-h1">${words.map((wd, i) => `<span class="hw" style="--i:${i}">${esc(wd)}</span>`).join(' ')} <span class="hw grad-text" style="--i:${words.length}">${esc(lastWord)}</span></h1>
       <!-- THREE facts, like a Netflix billboard. Was five plus a boxed chip:
            goal-match, modules, duration, level, CERTIFIED. Level and the
            certified badge are on the course page where they matter. -->
       <div class="hero-meta">
-        <span>${featured.modules.length} ${t('modules')}</span><span class="sep"></span>
-        <span>${fmtMins(courseMins(featured))}</span><span class="sep"></span>
+        <span>${_H ? _H.count : featured.modules.length + ' ' + t('modules')}</span><span class="sep"></span>
+        <span>${_H ? _H.time : fmtMins(courseMins(featured))}</span><span class="sep"></span>
         <span class="match">${t('match_goal')} · ${tgoal(S.goal)}</span>
       </div>
       <!-- ONE line, not two. The hook sells; the sub-hook repeated it. -->
-      <p class="desc"><span class="hook-line">${chook(featured)}</span></p>
+      <p class="desc"><span class="hook-line">${_H ? esc(_H.hook) : chook(featured)}</span></p>
       <div class="hero-actions">
-        <button class="btn btn-primary" data-action="play" data-id="${featured.id}">▶&nbsp; ${isDone(featured.id) ? t('rewatch') : fp && fp.mod != null ? `${t('resume_module')} ${fp.mod + 1}` : t('start_learning')}</button>
-        <button class="btn btn-glass" data-action="open-course" data-id="${featured.id}">${t('course_details') || 'Details'}</button>
+        ${_H ? _H.play + _H.details : `<button class="btn btn-primary" data-action="play" data-id="${featured.id}">▶&nbsp; ${isDone(featured.id) ? t('rewatch') : fp && fp.mod != null ? `${t('resume_module')} ${fp.mod + 1}` : t('start_learning')}</button>
+        <button class="btn btn-glass" data-action="open-course" data-id="${featured.id}">${t('course_details') || 'Details'}</button>`}
       </div>
       <div class="hero-progress">
-        <div class="track"><div class="fill" style="width:${coursePct(featured.id)}%"></div></div>
-        <span>${coursePct(featured.id)}% ${t('complete')} · ${t('est')} ${fmtMins(Math.round(courseMins(featured) * (100 - coursePct(featured.id)) / 100))} ${t('left')}</span>
+        <div class="track"><div class="fill" style="width:${_H ? _H.pct : coursePct(featured.id)}%"></div></div>
+        <span>${_H ? _H.progress : `${coursePct(featured.id)}% ${t('complete')} · ${t('est')} ${fmtMins(Math.round(courseMins(featured) * (100 - coursePct(featured.id)) / 100))} ${t('left')}`}</span>
       </div>
     </div>
   </header>
@@ -745,17 +772,19 @@ function renderHome() {
   ${railHTML(t('assigned_you'), t('from_stewardship'), assigned.filter(notHero).map(c => cardHTML(c)))}
   ${railHTML(t('featured_h'), t('featured_sub'), featuredCourses.filter(notHero).map(c => cardHTML(c)))}
   ${/* the full path lives in My learning; home keeps the small row above (4 Nov 2026) */''}
-  <section class="stats">
-    <div class="stat"><div class="num">${S.streak || 0}d</div><div class="lbl">${t('learning_streak')}</div><div class="delta">${(S.streak || 0) > 0 && S.streak >= (S.bestStreak || 0) ? t('personal_best') : (S.bestStreak ? `${t('stats_best')} ${S.bestStreak}d` : t('no_data'))}</div></div>
-    <div class="stat"><div class="num">${fmtMins(weekMinutes())}</div><div class="lbl">${t('this_week')}</div><div class="delta">${minutesLast7()[6].v ? `▲ ${minutesLast7()[6].v}m ${t('stats_today')}` : t('no_data')}</div></div>
-    <div class="stat"><div class="num">${Object.values(S.progress).filter(p => p.done).length + S.quizzesPassed}</div><div class="lbl">${t('skills_verified')}</div><div class="delta">${S.quizzesPassed ? `▲ ${S.quizzesPassed} ${t('from_quizzes')}` : t('no_data')}</div></div>
-    <div class="stat"><div class="num">${avgQuizScore() != null ? avgQuizScore() + '%' : t('no_data')}</div><div class="lbl">${t('avg_score')}</div><div class="delta">${(S.quizScores || []).length ? (S.quizScores.length + ' ' + t('stats_quizzes')) : t('earn_first')}</div></div>
-  </section>
+  ${/* the stats row left Home (feedback 3, 6 Nov 2026): the streak lives in the header chip, the rest in My learning */''}
   ${reelsAll().length ? `<section class="rail-section reel-tease">
     <div class="rail-head"><h2>${t('reel_h')}</h2>
       <button class="see-all" data-action="goto" data-route="#/reels">${t('reel_open')}</button></div>
-    <div class="rail-wrap"><div class="rail">${reelsAll().slice(0, 8).map((r, i) => `
-      <button class="reel-chip" data-action="goto" data-route="#/reels">
+    <div class="rail-wrap"><div class="rail">${reelsAll().slice(0, 12).map((r, i) => r.poster ? `
+      <button class="reel-thumb" data-action="goto" data-route="#/reels/${esc(r.id)}" aria-label="${esc(reelField(r.head) || reelField(r.title))} · ${reelLen(r)}">
+        <img data-src="${esc(r.poster)}" alt="" decoding="async">
+        <span class="rt-time">${reelLen(r)}</span>
+        ${reelPending(r) ? `<span class="rt-pend">${t('reel_pending')}</span>` : ''}
+        <span class="rt-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg></span>
+        <span class="rt-title">${esc(reelField(r.head) || reelField(r.title))}${reelField(r.why) ? `<small class="rt-why">${esc(reelField(r.why))}</small>` : ''}</span>
+      </button>` : `
+      <button class="reel-chip" data-action="goto" data-route="#/reels/${esc(r.id)}">
         <div class="reel-chip-art t${toneOf(r.theme || r.id)}">
           <span>${esc(reelField(r.title))}</span></div>
         <div class="reel-chip-meta">${reelPending(r) ? `<span class="pend">${t('reel_pending')}</span> &middot; ` : ''}${r.seconds || 30}s</div>
@@ -763,7 +792,7 @@ function renderHome() {
   </section>` : ''}
   ${quickWinsShelfHTML()}
   ${educatorsBandHTML()}
-  ${railHTML(t('trending'), t('community_learning'), trending.map((c, i) => cardHTML(c, { rank: c.trending })))}
+  ${window.curExploreHTML ? window.curExploreHTML() : railHTML(t('trending'), t('community_learning'), trending.map((c, i) => cardHTML(c, { rank: c.trending })))}
   ${railHTML(`${t('because_completed')} “${_lang() === 'pt' ? 'Solo Vivo' : 'Living Soil'}”`, t('ai_recommendations'), recs.map(c => cardHTML(c)))}
   ${footerHTML()}</div>`;
 }
@@ -811,26 +840,44 @@ function renderLibrary() {
 /* Paths and My learning were two pages showing the same path (João, 4 Nov 2026).
    #/paths now opens My learning on its Path tab; pathBodyHTML is that tab. */
 function renderPaths() { meTab = 'path'; return renderMe(); }
+/* Goals are a journey too (round 5): finish one and the next opens; or switch at any time.
+   Only the learner's own department goals, so the choice stays meaningful. */
+function goalSwitchHTML(done, len) {
+  const role = (typeof ROLE_OPTIONS !== 'undefined' && ROLE_OPTIONS.find(r => r.key === (S.role || (S.profile && S.profile.role)))) || null;
+  if (!role) return '';
+  const others = role.goals.filter(g => g !== S.goal && GOAL_PRESETS[g]);
+  if (!others.length) return '';
+  const finished = len > 0 && done >= len;
+  return `<div class="goal-switch${finished ? ' done' : ''}">
+    <span class="gs-h">${finished ? `✓ ${t('goal_reached')} · ${t('goal_next')}` : t('goal_other')}</span>
+    ${others.map(g => `<button class="${finished ? 'btn btn-primary btn-sm' : 'btn btn-glass btn-sm'}" data-action="goal-switch" data-g="${attr(g)}">${esc(tgoal(g))} →</button>`).join('')}
+  </div>`;
+}
 function pathBodyHTML() {
-  const doneCount = S.path.filter(isDone).length;
+  const _pm = window.CUR ? CUR.pathModules() : null;
+  const doneCount = _pm ? _pm.filter(m => CUR.moduleStats(m).complete).length : S.path.filter(isDone).length;
+  const pathLen = _pm ? _pm.length : S.path.length;
   return `
   <section class="path-banner">
     <div class="shimmer"></div>
     <div class="path-banner-head">
       <div class="left">
-        <span class="ai-tag">${t('active_path')} · ${doneCount}/${S.path.length}</span>
-        <h2>${t('your_path_to')} ${tgoal(S.goal)}</h2>
+        <span class="ai-tag">${t('active_path')} · ${doneCount}/${pathLen}</span>
+        <h2>${t('your_path_to')} ${qgoal(S.goal)}</h2>
         <p class="sub">${(S.quizScores || []).length ? PATH_RATIONALES[S.rationaleIdx % PATH_RATIONALES.length] : t('path_intro')}</p>
       </div>
     </div>
     ${pathStepperHTML()}
+    ${goalSwitchHTML(doneCount, pathLen)}
   </section>
-  <div class="page-pad" style="padding-top:26px;">${journeysSectionHTML()}</div>
-  ${railHTML(t('courses_in_path'), t('in_order'), S.path.map(id => courseById(id)).filter(Boolean).map(c => cardHTML(c)))}
+  ${/* Journeys left My learning (João + Pedro, 5 Nov 2026): one hierarchy only, courses → modules → lessons.
+        What sits here instead is the learner's own unfinished business: the questions to fix. */''}
+  ${/* the review list moved to its own tab (round 5) */''}
+  ${window.curPathRailsHTML ? curPathRailsHTML() : railHTML(t('courses_in_path'), t('in_order'), S.path.map(id => courseById(id)).filter(Boolean).map(c => cardHTML(c)))}
   ${/* "Where to go next" = whatever is filmed and not already on your path.
         This was four hard-coded ids, all of which are now deleted, so the rail
         rendered empty; derived, it stays correct as the library grows. */''}
-  ${railHTML(t('next_paths'), t('next_paths_sub'), CATALOG.filter(c => !S.path.includes(c.id) && hasRealContent(c)).map(c => cardHTML(c)))}`;
+  ${window.curPathRailsHTML ? '' : railHTML(t('next_paths'), t('next_paths_sub'), CATALOG.filter(c => !S.path.includes(c.id) && hasRealContent(c)).map(c => cardHTML(c)))}`;
 }
 
 /* João, 16 Oct 2026: "need a calendar for this section, so we know when the
@@ -889,7 +936,7 @@ function renderAnalytics() {
   const week = minutesLast7();
   const max = Math.max(...week.map(w => w.v), 1);
   /* real skill picture: completion per category the learner has touched */
-  const cats = [...new Set(CATALOG.map(c => c.cat))].map(cat => {
+  const cats = (window.CUR && CUR.categoryProgress) ? CUR.categoryProgress() : [...new Set(CATALOG.map(c => c.cat))].map(cat => {
     const all = CATALOG.filter(c => c.cat === cat);
     const touched = all.filter(c => coursePct(c.id) > 0);
     if (!touched.length) return null;
@@ -897,17 +944,17 @@ function renderAnalytics() {
   }).filter(Boolean).sort((a, b) => b[1] - a[1]);
   const certs = CATALOG.filter(c => isDone(c.id));
   return `<div class="page"><div class="page-pad">
-    <h1 class="page-title">Analytics</h1>
+    <h1 class="page-title">${_lang() === 'pt' ? 'Análise' : 'Analytics'}</h1>
     <p class="page-sub">${t('analytics_sub')}</p>
     <section class="stats" style="margin:28px 0 0;">
       <div class="stat"><div class="num">${S.streak || 0}d</div><div class="lbl">${t('learning_streak')}</div><div class="delta">${S.bestStreak ? t('stats_best') + ' ' + S.bestStreak + 'd' : t('no_data')}</div></div>
       <div class="stat"><div class="num">${fmtMins(weekMinutes())}</div><div class="lbl">${t('this_week')}</div><div class="delta">${week[6].v ? '▲ ' + week[6].v + 'm ' + t('stats_today') : t('no_data')}</div></div>
-      <div class="stat"><div class="num">${certs.length}</div><div class="lbl">Training records</div><div class="delta">${certs.length ? '▲' : t('no_data')}</div></div>
-      <div class="stat"><div class="num">${S.quizzesPassed}</div><div class="lbl">Quizzes passed</div><div class="delta">${avgQuizScore() != null ? 'avg ' + avgQuizScore() + '%' : t('no_data')}</div></div>
+      <div class="stat"><div class="num">${certs.length}</div><div class="lbl">${_lang() === 'pt' ? 'Registos de formação' : 'Training records'}</div><div class="delta">${certs.length ? '▲' : t('no_data')}</div></div>
+      <div class="stat"><div class="num">${S.quizzesPassed}</div><div class="lbl">${_lang() === 'pt' ? 'Questionários aprovados' : 'Quizzes passed'}</div><div class="delta">${avgQuizScore() != null ? (_lang() === 'pt' ? 'média ' : 'avg ') + avgQuizScore() + '%' : t('no_data')}</div></div>
     </section>
     <div class="two-col" style="margin-top:18px;">
       <div class="chart-card">
-        <h3>Minutes learned · last 7 days</h3>
+        <h3>${_lang() === 'pt' ? 'Minutos de estudo · últimos 7 dias' : 'Minutes learned · last 7 days'}</h3>
         <div class="bars">${week.map((w, i) => `
           <div class="bar-col">
             <span class="bv">${w.v || ''}</span>
@@ -917,13 +964,13 @@ function renderAnalytics() {
         </div>
       </div>
       <div class="chart-card">
-        <h3>Training records</h3>
+        <h3>${_lang() === 'pt' ? 'Registos de formação' : 'Training records'}</h3>
         ${certs.map(c => `<div class="cert-row"><span class="ci">${svgIcon(c.icon)}</span><span class="ct">${ctitle(c)}</span><span class="cd">★ verified</span></div>`).join('') || '<p class="empty-note">Complete a course to earn your first certificate.</p>'}
       </div>
     </div>
     <div class="chart-card">
-      <h3>Category progress · from your real activity</h3>
-      ${cats.map(([n, v]) => `<div class="skill-row"><span class="sn">${n}</span><div class="track"><div class="fill" style="width:${v}%"></div></div><span class="sv">${v}%</span></div>`).join('') || '<p class="empty-note">Start a course and your picture builds here.</p>'}
+      <h3>${_lang() === 'pt' ? 'Progresso por departamento · da sua atividade real' : (window.CUR && CUR.categoryProgress ? 'Progress by department · from your real activity' : 'Category progress · from your real activity')}</h3>
+      ${cats.map(([n, v]) => `<div class="skill-row"><span class="sn">${n}</span><div class="track"><div class="fill" style="width:${v}%"></div></div><span class="sv">${v}%</span></div>`).join('') || `<p class="empty-note">${_lang() === 'pt' ? 'Comece um curso e o seu quadro vai-se construindo aqui.' : 'Start a course and your picture builds here.'}</p>`}
     </div>
   </div>${footerHTML()}</div>`;
 }
@@ -1103,11 +1150,15 @@ async function emailNudgeMember(uid, btn) {
 
 /* ---------- Leader's Cockpit (real member data) ---------- */
 let adminMembers = null;
+/* initials from the letters of a name ("Admin (test)" → "AT"); the brand's first letter when there is no name.
+   The fallback used to be a hard-coded 'ER' (EdenRise) on every tenant. */
+const initialsOf = name => (String(name || '').replace(/[^\p{L}\s]/gu, ' ').trim().split(/\s+/).filter(Boolean).map(w => w[0]).join('').slice(0, 2).toUpperCase())
+  || String((typeof BRAND !== 'undefined' && (BRAND.company || BRAND.name)) || 'A').charAt(0).toUpperCase();
 function memberSummary(m) {
   const st = m.state || {}, pf = m.profile || {};
   const compHours = trainingHours(st.trainingLog || []), compTarget = complianceTarget(pf) || 40;
   const name = pf.name || (pf.email ? pf.email.split('@')[0] : 'Learner');
-  const initials = name.trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase() || 'ER';
+  const initials = initialsOf(name);
   const path = st.path || [], prg = st.progress || {};
   const doneInPath = path.filter(id => prg[id] && prg[id].done).length;
   const pathPct = path.length ? Math.round(doneInPath / path.length * 100) : 0;
@@ -1386,6 +1437,7 @@ function tourShow(i) {
   const ring = $('#tourRing'), card = $('#tourCard');
   const el = st.sel ? document.querySelector(st.sel.split(',').map(s => s.trim()).find(s => { const e = document.querySelector(s); return e && e.getBoundingClientRect().width > 0; }) || st.sel) : null;
   const last = tourIdx === tourList.length - 1;
+  { const ov = $('#tourOv'); if (ov) ov.setAttribute('aria-label', `${tourIdx + 1}/${tourList.length} · ${String(st.title).replace(/<[^>]+>/g, '')}`); }
   card.innerHTML = `
     <div class="tour-step">${tourIdx + 1} / ${tourList.length}</div>
     <b>${st.title}</b><p>${st.body}</p>
@@ -1481,7 +1533,7 @@ async function seedDemo() {
     await EdenForum.createPost({ channel: 'general', kind: 'discussion', title: 'Where should the next work party focus?', body: 'Vote below — we\u2019ll bring tools and lunch either way', poll: { options: ['The east swales', 'Food forest mulching', 'The nursery beds'], votes: {} } });
     const live = [
       { id: 'live-soil-clinic', title: 'Field Hours: Live Soil Clinic', host: 'Marta Oliveira · Head of Regeneration', when: fmtDay(next(4)), date: iso(next(4)), desc: 'Bring a photo or sample of your soil — read live, with the first three things to do.', live: false, viewers: 0, grad: 7, icon: 'sprout' },
-      { id: 'live-founder-ama', title: 'Founder AMA: Why Regeneration', host: 'João Amaral · Founder', when: fmtDay(next(8)), date: iso(next(8)), desc: 'Unfiltered Q&A on building ADEN and stewarding land in the Baixo Alentejo.', live: false, viewers: 0, grad: 1, icon: 'tree' }
+      { id: 'live-founder-ama', title: 'Founder AMA: Why Regeneration', host: 'João Amaral · Founder', when: fmtDay(next(8)), date: iso(next(8)), desc: 'Unfiltered Q&A on building EdenRise and stewarding land in the Baixo Alentejo.', live: false, viewers: 0, grad: 1, icon: 'tree' }
     ];
     const assignments = activeAssignments().concat([{ id: 'asg-fire-truck-land', courseId: 'fire-truck-training', team: 'land', due: new Date(Date.now() + 14 * day).toISOString().slice(0, 10) }]);
     await EdenCloud.saveMeta(Object.assign({}, studioMeta, { live, assignments }));
@@ -1520,7 +1572,7 @@ function logAsk(q, via) {
    the same moments for the same words */
 /* knowledge files ride the same ?v= marker as the bundle: a deploy that changes
    tags.json or search.json must not be served from the previous version's cache */
-function knowledgeV() { const v = ((document.querySelector('script[src*="core/app.js"]') || {}).src || '').match(/v=(edr\d+)/); return v ? v[1] : ''; }
+function knowledgeV() { const v = ((document.querySelector('script[src*="core/app.js"]') || {}).src || '').match(/v=([a-z]+\d+)/); return v ? v[1] : ''; }
 let _searchIdx = null;
 function loadSearchIdx() {
   if (_searchIdx !== undefined && _searchIdx !== null) return Promise.resolve(_searchIdx);
@@ -1743,7 +1795,7 @@ function groundingText(moments) {
   return moments.slice(0, 5).map(m => `${m.title} (${m.kind === 'reel' ? 'short' : m.courseTitle}) · ${fmtTc(m.t0)}: "${m.text.slice(0, 320)}"`).join('\n');
 }
 /* ---- the free gateway: no key in the browser, grounded in Recall's moments ---- */
-const AI_GATEWAY = (typeof window !== 'undefined' && window.ACADEMY_AI_GATEWAY) || 'https://academy-ai.edenrise.workers.dev/';
+const AI_GATEWAY = (typeof window !== 'undefined' && (window.ACADEMY_AI_GATEWAY || (window.BRAND && window.BRAND.aiGateway))) || 'https://academy-ai.edenrise.workers.dev/';
 async function gatewayComplete({ messages, grounding, maxTokens }) {
   const id = currentCourseId(); const c = id && courseById(id);
   const res = await fetch(AI_GATEWAY, { method: 'POST', headers: { 'content-type': 'application/json' },
@@ -2420,25 +2472,25 @@ function compliancePanelHTML() {
   const behind = done < pace - 1;
   const dateFmt = ts => new Date(ts).toLocaleDateString(_lang() === 'pt' ? 'pt-PT' : 'en-GB', { day: 'numeric', month: 'short' });
   return `<div class="admin-section comp-panel">
-    <h2> ${t('comp_h')} · ${complianceYear()}</h2>
+    <h2>${t('comp_h')} · ${complianceYear()}</h2>
     <p class="sect-sub sub-auto">${t('comp_sub')}</p>
-    <div class="ready-wrap">
-      <div class="jour-ring lg" style="background:conic-gradient(${behind ? 'var(--warn, #d9b38c)' : 'var(--accent-2)'} ${pct * 3.6}deg, rgba(231,237,227,.12) 0)"><span>${done}<small style="font-size:11px">/${target}h</small></span></div>
-      <div class="ready-rows" style="gap:6px;">
-        <div class="between"><span class="sk-name">${t('comp_done')}</span> <b>${done} ${t('comp_h_unit')}</b></div>
-        <div class="between"><span class="sk-name">${t('comp_target')}</span><b>${target} ${t('comp_h_unit')}</b></div>
-        <div class="between"><span class="sk-name">${t('comp_left')}</span><b>${Math.max(0, Math.round((target - done) * 10) / 10)} ${t('comp_h_unit')}</b></div>
-        <div class="comp-status ${behind ? 'behind' : 'ok'}">${behind ? `⚠ ${t('comp_behind')} · ${t('comp_pace_by')} ${pace}h` : `● ${t('comp_ontrack')}`}</div>
+    <div class="comp-grid">
+      <div class="comp-ring" style="--p:${pct * 3.6}deg;--c:${behind ? 'var(--warn, #d9b38c)' : 'var(--accent)'}"><span><b>${done}</b><small>/ ${target} ${t('comp_h_unit')}</small></span></div>
+      <div class="comp-figs">
+        <div><span>${t('comp_done')}</span><b>${done} ${t('comp_h_unit')}</b></div>
+        <div><span>${t('comp_target')}</span><b>${target} ${t('comp_h_unit')}</b></div>
+        <div><span>${t('comp_left')}</span><b>${Math.max(0, Math.round((target - done) * 10) / 10)} ${t('comp_h_unit')}</b></div>
       </div>
+      <div class="comp-status ${behind ? 'behind' : 'ok'}">${behind ? `${t('comp_behind')} · ${t('comp_pace_by')} ${pace}h` : t('comp_ontrack')}</div>
     </div>
-    ${!pf.nif ? `<div class="comp-note" data-action="goto" data-route="#/profile" role="button" tabindex="0">🪪 ${t('comp_nif_prompt')} →</div>` : ''}
+    ${!pf.nif && !BRAND.leanProfile ? `<div class="comp-note" data-action="goto" data-route="#/profile" role="button" tabindex="0">${t('comp_nif_prompt')} →</div>` : ''}
     <div class="ob-eyebrow" style="margin-top:16px;">${t('comp_log')}</div>
-    ${log.length ? `<div class="comp-log">${log.slice(0, 8).map(e => `<div class="comp-row"><span class="cl-t">${esc(e.title || '')}</span><span class="cl-meta">${dateFmt(e.at)} · ${e.hours}${t('comp_h_unit')} ${e.confirmed ? '· ✓' : ''}</span></div>`).join('')}</div>` : `<p class="empty-note" style="text-align:left;padding:6px 0;">${t('comp_none')}</p>`}
+    ${log.length ? `<div class="comp-log">${log.slice(0, 8).map(e => `<div class="comp-row"><span class="cl-t">${esc(e.title || (window.CUR && e.courseId && courseById(e.courseId) ? CUR.lTitle(e.courseId, e.mod) : ''))}</span><span class="cl-meta">${dateFmt(e.at)} · ${e.hours}${t('comp_h_unit')} ${e.confirmed ? '· ✓' : ''}</span></div>`).join('')}</div>` : `<p class="empty-note" style="text-align:left;padding:6px 0;">${t('comp_none')}</p>`}
     ${log.length ? `<div class="row wrapf gap-3" style="margin-top:16px;">
       <button class="btn btn-primary btn-sm" data-action="comp-cert"> ${t('comp_cert_btn')}</button>
       <button class="btn btn-glass btn-sm" data-action="hour-log"> ${t('hourlog_btn')}</button>
       <button class="btn btn-glass btn-sm" data-action="comp-register">⤓ ${t('comp_reg_btn')}</button>
-      <button class="btn btn-glass btn-sm" data-action="art4-self">🤖 ${t('art4_btn')}</button>
+      <button class="btn btn-glass btn-sm" data-action="art4-self">${t('art4_btn')}</button>
     </div>` : ''}
   </div>`;
 }
@@ -2751,7 +2803,7 @@ function buildCertHTML(o) {
   const facts = Array.isArray(o.facts) && o.facts.length
     ? `<div class="facts">${o.facts.map(f => `<div class="fact"><span>${esc(f.k)}</span><b>${esc(f.v)}</b></div>`).join('')}</div>`
     : `<div class="meta">${o.meta || ''}</div>`;
-  return `<!doctype html><html lang="${pt ? 'pt' : 'en'}"><head><meta charset="utf-8"><title>${esc(o.docTitle)}</title>${fontLink}
+  return `<!doctype html><html lang="${pt ? 'pt' : 'en'}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${esc(o.docTitle)}</title>${fontLink}
 <style>
   @page { size: A4 landscape; margin: 0; }
   * { margin:0; padding:0; box-sizing:border-box; print-color-adjust:exact; -webkit-print-color-adjust:exact; }
@@ -2794,7 +2846,7 @@ function buildCertHTML(o) {
   .foot { margin-bottom:9mm; }
   .print { position:fixed; top:12px; left:12px; font-family:${body}; background:var(--ink); color:#fff; border:0; border-radius:8px; padding:9px 16px; cursor:pointer; font-size:13px; }
   @media screen { body { padding:56px 0 24px; } .sheet { box-shadow:0 24px 60px rgba(40,25,15,.18); } }
-  @media print { .print { display:none; } body { background:var(--paper); display:block; min-height:0; padding:0; } .sheet { margin:0; box-shadow:none; page-break-after:avoid; } }
+  @media print { .print { display:none; } body { background:var(--paper); display:block; min-height:0; padding:0; } .sheet { margin:0; box-shadow:none; page-break-after:avoid; zoom:1 !important; } }
 </style></head><body>
 <button class="print" onclick="print()">⤓ ${pt ? 'Imprimir / Guardar PDF' : 'Print / Save as PDF'}</button>
 <div class="sheet">
@@ -2822,7 +2874,9 @@ function buildCertHTML(o) {
     </div>
   </div>
   <div class="note">${certFooterNote()}${o.extraNote ? ' · ' + o.extraNote : ''}</div>
-</div></body></html>`;
+</div>
+<script>/* on a narrow screen (a phone) the A4 sheet scales to fit; printing stays true size */
+(function(){var s=document.querySelector(".sheet");function f(){if(!s)return;s.style.zoom="";var k=Math.min(1,(innerWidth-24)/s.offsetWidth);s.style.zoom=k<1?k:"";}f();addEventListener("resize",f);})();</script></body></html>`;
 }
 /* Who supplied the content, if not the employer. Brand config so each tenant
    states the truth: a client running our library names us; a client that
@@ -3169,9 +3223,36 @@ function missionCardHTML(c) {
   return `<div class="admin-section mission-card">
     <h2> ${t('mis_h')} <span class="mis-xp">+${m.xp} XP</span></h2>
     <p class="sect-sub sub-auto">${t('mis_sub')}</p>
-    <div class="mis-brief"><b>${esc(m.title)}</b><p>${esc(m.brief)}</p></div>
+    <div class="mis-brief"><b>${esc(m.title)}</b>${m.brief ? `<p>${esc(m.brief)}</p>` : ''}${m.deliver ? `<p class="mis-deliver"><span>${t('mis_admin_deliver')}</span> ${esc(m.deliver)}</p>` : ''}</div>
     ${body}
   </div>`;
+}
+/* Admins set (or clear) a course's field mission: a real task with a real deliverable. Saved in
+   the org config, so every learner of the company sees the same one. */
+function missionAdminHTML(courseId) {
+  if (!isAdmin()) return '';
+  const m = ((window.EdenOrg && EdenOrg.missions) || {})[courseId] || {};
+  return `<details class="admin-section mis-admin"${m.title ? '' : ''}>
+    <summary><b>${t('mis_admin_h')}</b><span class="sect-sub" style="display:inline;margin-left:8px;">${m.title ? esc(m.title) : t('mis_admin_none')}</span></summary>
+    <p class="sect-sub sub-auto">${t('mis_admin_sub')}</p>
+    <label class="mis-lbl">${t('mis_admin_title')}<input class="auth-input" id="misT" maxlength="80" value="${attr(m.title || '')}"></label>
+    <label class="mis-lbl">${t('mis_admin_brief')}<textarea class="comm-input" id="misB" rows="3" maxlength="600">${esc(m.brief || '')}</textarea></label>
+    <label class="mis-lbl">${t('mis_admin_deliver')}<input class="auth-input" id="misD" maxlength="140" value="${attr(m.deliver || '')}"></label>
+    <label class="mis-lbl mis-xp-l">XP<input class="auth-input" id="misX" type="number" min="0" max="500" step="10" value="${+m.xp || 100}"></label>
+    <div class="mis-actions"><button class="btn btn-primary btn-sm" data-action="mis-set" data-id="${courseId}">${t('mis_admin_save')}</button>
+      ${m.title ? `<button class="btn btn-glass btn-sm" data-action="mis-clear" data-id="${courseId}">${t('mis_admin_clear')}</button>` : ''}</div>
+  </details>`;
+}
+window.missionAdminHTML = missionAdminHTML;
+function saveMissionDef(courseId, def) {
+  if (!(window.EdenCloud && EdenCloud.saveOrgConfig)) { toast(t('mail_failed'), '⚠️'); return; }
+  const all = Object.assign({}, (window.EdenOrg && EdenOrg.missions) || {});
+  if (def) all[courseId] = def; else delete all[courseId];
+  EdenCloud.saveOrgConfig({ missions: all }).then(() => {
+    window.EdenOrg = Object.assign({}, window.EdenOrg, { missions: all });
+    ledgerAppend('mission_set', { courseId, cleared: !def });
+    toast(def ? t('mis_admin_saved') : t('mis_admin_cleared'), '✓'); render();
+  }).catch(() => toast(t('mail_failed'), '⚠️'));
 }
 function compressPhoto(file, cb) {
   const img = new Image();
@@ -3225,7 +3306,7 @@ function submitMission(courseId) {
   }).catch(() => toast(_lang() === 'pt' ? 'Não foi possível submeter' : 'Could not submit', '⚠️'));
 }
 function claimMission(id, courseId) {
-  const m = MISSIONS[courseId];
+  const m = missionFor(courseId);
   EdenMissions.claim(id).then(() => {
     const mine = (myMissions || []).find(x => x.id === id); if (mine) mine.claimed = true;
     awardXp((m && m.xp) || 100, t('mis_h'));
@@ -3402,11 +3483,12 @@ function paintMissions(list) {
   const el = $('#missionQueue'); if (!el) return;
   el.innerHTML = list.length ? list.map(m => {
     const c = courseById(m.courseId);
-    const mis = MISSIONS[m.courseId];
+    const co = window.CUR && CUR.courses.find(x => x.id === m.courseId);
+    const mis = missionFor(m.courseId);
     return `<div class="mq-row">
       ${m.photo ? `<img class="mq-photo" src="${m.photo}" alt="proof">` : `<span class="ci t-grad-${c ? c.grad : 1}">${svgIcon(c ? c.icon : 'leaf')}</span>`}
-      <div class="ct"><b>${esc(m.authorName || 'Learner')} · ${c ? esc(c.title) : m.courseId}</b>
-        <span>${esc((mis && mis.en.title) || '')}${m.note ? ' — “' + esc(m.note.slice(0, 140)) + '”' : ''} · ${timeAgo(m.createdAt)}</span></div>
+      <div class="ct"><b>${esc(m.authorName || 'Learner')} · ${co ? esc(CUR.cTitle(co)) : c ? esc(c.title) : m.courseId}</b>
+        <span>${esc((mis && mis.title) || '')}${m.note ? ' — “' + esc(m.note.slice(0, 140)) + '”' : ''} · ${timeAgo(m.createdAt)}</span></div>
       <button class="btn btn-primary btn-sm" data-action="mis-review" data-id="${m.id}" data-ok="1">✓ Approve</button>
       <button class="btn btn-glass btn-sm" data-action="mis-review" data-id="${m.id}" data-ok="0">Decline</button>
     </div>`;
@@ -3643,7 +3725,7 @@ function openMemberDetail(uid) {
         ${issues.length ? `<div class="comp-status behind"> ${issues.map(i => `${esc(i.course)} ${i.state === 'expired' ? 'expired' : 'expires in ' + i.days + 'd'}`).join(' · ')}</div>` : ''}
       </div></div>
     <div class="ob-eyebrow" style="margin-top:16px;">Training log · ${complianceYear()}</div>
-    ${log.length ? `<div class="comp-log">${log.slice(0, 8).map(e => `<div class="comp-row"><span class="cl-t">${esc(e.title || '')}</span><span class="cl-meta">${new Date(e.at).toLocaleDateString('pt-PT')} · ${e.hours}h</span></div>`).join('')}</div>` : `<p class="empty-note" style="text-align:left;padding:6px 0;">No credited hours yet.</p>`}
+    ${log.length ? `<div class="comp-log">${log.slice(0, 8).map(e => `<div class="comp-row"><span class="cl-t">${esc(e.title || (window.CUR && e.courseId && courseById(e.courseId) ? CUR.lTitle(e.courseId, e.mod) : ''))}</span><span class="cl-meta">${new Date(e.at).toLocaleDateString('pt-PT')} · ${e.hours}h</span></div>`).join('')}</div>` : `<p class="empty-note" style="text-align:left;padding:6px 0;">No credited hours yet.</p>`}
     <div class="row wrapf gap-3" style="margin-top:16px;">
       <button class="btn btn-primary btn-sm" data-action="nudge" data-uid="${esc(s.uid)}" data-name="${esc(s.name)}">Nudge</button>
       <button class="btn btn-glass btn-sm" data-action="mdet-register" data-uid="${esc(s.uid)}">⤓ Registo CSV</button>
@@ -3754,7 +3836,7 @@ function adminCockpitHTML() {
       <div class="cockpit-head">
         <div><h2>Team</h2><p class="sect-sub">Your real members, sorted by who needs attention. “Nudge” pings their next lesson.</p></div>
         <div style="display:flex;gap:8px;align-items:center;">
-          <select id="ckDept" class="ck-dept"><option value="">All departments</option>${DEPTS.map(d => `<option value="${d.key}" ${cockpitDept === d.key ? 'selected' : ''}>${d.en}</option>`).join('')}</select>
+          <select id="ckDept" class="ck-dept" aria-label="Department"><option value="">All departments</option>${DEPTS.map(d => `<option value="${d.key}" ${cockpitDept === d.key ? 'selected' : ''}>${d.en}</option>`).join('')}</select>
           <button class="btn btn-glass btn-sm" data-action="export-members">⤓ Export CSV</button><button class="btn btn-glass btn-sm" data-action="ru-annex"> ${t('ru_annex_btn')}</button><button class="btn btn-glass btn-sm" data-action="art4-pack" title="EU AI Act Art. 4 — AI-literacy evidence">${t('art4_btn')}</button><button class="btn btn-glass btn-sm" data-action="gdpr-doc" data-kind="retention" title="${t('gdpr_retention')}">${t('gdpr_retention')}</button><button class="btn btn-glass btn-sm" data-action="gdpr-doc" data-kind="art30" title="${t('gdpr_art30')}">${t('gdpr_art30')}</button><button class="btn btn-glass btn-sm" data-action="gdpr-doc" data-kind="dpa" title="${t('gdpr_dpa')}">${t('gdpr_dpa')}</button>
         </div>
       </div>
@@ -3776,11 +3858,11 @@ function adminCockpitHTML() {
     <div class="admin-section">
       <h2>Assign learning</h2>
       <div class="composer">
-        <div class="field"><label>Course</label>
+        <div class="field"><label for="asgCourse">Course</label>
           <select id="asgCourse">${CATALOG.map(c => `<option value="${c.id}">${esc(c.title)}</option>`).join('')}</select></div>
-        <div class="field"><label>Team</label>
+        <div class="field"><label for="asgTeam">Team</label>
           <select id="asgTeam"><option value="everyone">Everyone</option>${DEPTS.map(d => `<option value="${d.key}">${d.en}</option>`).join('')}</select></div>
-        <div class="field"><label>Due date</label><input id="asgDue" type="date"></div>
+        <div class="field"><label for="asgDue">Due date</label><input id="asgDue" type="date"></div>
         <button class="btn btn-primary" data-action="assign">Assign →</button>
       </div>
       <div id="asgList">${assignments}</div>
@@ -4208,20 +4290,27 @@ function renderAdmin() {
    used to have top-level nav slots for. */
 let meTab = 'path';
 function renderMe() {
-  if (!['path', 'progress', 'record'].includes(meTab)) meTab = 'path';
-  const tabs = [['path', t('your_path')], ['progress', t('me_progress')], ['record', t('me_record')]];
+  if (!['path', 'review', 'saved', 'progress', 'record'].includes(meTab)) meTab = 'path';
+  /* Review is its own room, like Duolingo's practice: the badge says how many questions wait there (round 5) */
+  const rc = window.curReviewCount ? curReviewCount() : 0;
+  const tabs = [['path', t('your_path')], ['review', t('me_review')], ['saved', t('me_saved')], ['progress', t('me_progress')], ['record', t('me_record')]];
   const bar = `<div class="me-tabs" role="tablist">${tabs.map(([k, label]) =>
-    `<button class="me-tab ${meTab === k ? 'on' : ''}" role="tab" aria-selected="${meTab === k}" data-action="me-tab" data-v="${k}">${label}</button>`).join('')}</div>`;
+    `<button class="me-tab ${meTab === k ? 'on' : ''}" role="tab" aria-selected="${meTab === k}" data-action="me-tab" data-v="${k}">${label}${k === 'review' && rc ? `<span class="me-badge" aria-label="${rc}">${rc}</span>` : ''}</button>`).join('')}</div>`;
   let body = '';
   if (meTab === 'progress') body = renderProgress(true);
   /* the learner's own legal record — complianceHTML() is the MANAGER's view of
      the whole team and renders nothing for a learner */
-  else if (meTab === 'record') body = `${compliancePanelHTML()}${verifiedPanelHTML()}${certsSectionHTML()}`;
+  else if (meTab === 'record') body = `<div class="page-pad me-record">${compliancePanelHTML()}${verifiedPanelHTML()}${certsSectionHTML()}</div>`;   /* inside the page column (it ran off the left edge, 4 Nov 2026) */
+  else if (meTab === 'review') body = `<div class="page-pad me-record">${window.curFixHTML ? curFixHTML(true) : ''}</div>`;
+  else if (meTab === 'saved') body = `<div class="page-pad me-record">${savedReelsHTML()}</div>`;
   else body = `${pathBodyHTML()}${digestsSectionHTML()}`;
   return `<div class="page"><div class="page-pad">
     <h1 class="page-title">${t('me_h')}</h1>
     <p class="page-sub">${esc(displayName())}${S.profile && S.profile.dept ? ' · ' + esc(tdept(S.profile.dept)) : ''}</p>
-    ${(() => { const live = CATALOG.filter(cc => !isComingSoon(cc)); const done = live.filter(cc => isDone(cc.id)).length; return `<p class="me-sum"><b>${done}</b> ${t('of')} ${live.length} ${t('courses_done_lc')} · <b>${(S.xp || 0).toLocaleString()}</b> ${t('xp')}</p>`; })()}
+    ${(() => { if (window.CUR) { const n = CUR.courses.length, d = CUR.courses.filter(co => CUR.courseStats(co.id).complete).length; const mn = CUR.modules.length, md = CUR.modules.filter(m => CUR.moduleStats(m).complete).length;
+        /* modules first: finishing "Welcome to Belong" is a module, and a learner must see that progress (round 5) */
+        return `<p class="me-sum"><b>${md}</b> ${t('of')} ${mn} ${t('mods_done_lc')} · <b>${d}</b> ${t('of')} ${n} ${t('courses_done_lc')} · <b>${(S.xp || 0).toLocaleString()}</b> ${t('xp')}</p>`; }
+      const live = CATALOG.filter(cc => !isComingSoon(cc)); const done = live.filter(cc => isDone(cc.id)).length; return `<p class="me-sum"><b>${done}</b> ${t('of')} ${live.length} ${t('courses_done_lc')} · <b>${(S.xp || 0).toLocaleString()}</b> ${t('xp')}</p>`; })()}
     </div>${bar}${body}${footerHTML()}</div>`;
 }
 function renderProgress(embedded) {
@@ -4267,7 +4356,7 @@ function renderProgress(embedded) {
         <div class="stat"><div class="num">${S.streak}d</div><div class="lbl">${t('learning_streak')}</div></div>
         <div class="stat"><div class="num">#${rank.rank}</div><div class="lbl">${t('board_rank')}</div><div class="delta">${t('of')} ${rank.total} ${t('this_week').toLowerCase()}</div></div>
         <div class="stat"><div class="num">${S.badges.length}<span style="font-size:18px;color:var(--text-faint)">/${BADGES.length}</span></div><div class="lbl">${t('badges_earned')}</div></div>
-        <div class="stat"><div class="num">${doneCount}</div><div class="lbl">${t('courses_finished')}</div><div class="delta">${S.quizzesPassed} ${t('skills_verified').toLowerCase()}</div></div>
+        <div class="stat"><div class="num">${doneCount}</div><div class="lbl">${t('courses_finished')}</div>${BRAND.hideVerifiedStat ? '' : `<div class="delta">${S.quizzesPassed} ${t('skills_verified').toLowerCase()}</div>`}</div>
       </div>
     </div>
 
@@ -4322,7 +4411,7 @@ function renderProgress(embedded) {
     </div>
 
     <div class="admin-section">
-      <h2>${t('your_path_to')} ${tgoal(S.goal)}</h2>
+      <h2>${t('your_path_to')} ${qgoal(S.goal)}</h2>
       <p class="sect-sub sub-auto">${t('path_points')}</p>
       ${pathStepperHTML()}
     </div>
@@ -4535,7 +4624,7 @@ function channelPillsHTML() {
   </div>`;
 }
 const isOnline = m => Date.now() - tsMillis(m.lastSeen) < 150000;
-function memberDot(m) { return `<span class="m-ava ${isOnline(m) ? 'online' : ''}" data-action="member-card" data-uid="${m.uid}" title="${esc(m.name || '')}">${esc(m.initials || 'ER')}</span>`; }
+function memberDot(m) { return `<span class="m-ava ${isOnline(m) ? 'online' : ''}" data-action="member-card" data-uid="${m.uid}" title="${esc(m.name || '')}">${esc(m.initials || initialsOf(m.name))}</span>`; }
 function sidebarHTML() {
   const board = (boardCache || []).slice().sort((x, y) => (y.xp || 0) - (x.xp || 0));
   const online = (boardCache || []).filter(isOnline);
@@ -4603,7 +4692,7 @@ function postCardHTML(p) {
   const isDisc = p.kind === 'discussion' && p.title;
   const rc = p.replyCount || 0;
   return `<article class="post ${isDisc ? 'is-disc' : ''} ${p.pinned ? 'pinned' : ''}"${isDisc ? ` data-action="comm-open" data-id="${p.id}"` : ''}>
-    <div class="post-av" data-action="member-card" data-handle="${esc(p.authorHandle || '')}">${esc(p.authorInitials || 'ER')}</div>
+    <div class="post-av" data-action="member-card" data-handle="${esc(p.authorHandle || '')}">${esc(p.authorInitials || initialsOf(p.authorName))}</div>
     <div class="post-main">
       <div class="post-head">${p.official ? `<span class="off-badge">✦ ${brandName()} · ${t('comm_official')}</span>` : ''}${p.pinned ? `<span class="pin-badge">${t('comm_pinned')}</span>` : ''}<b>${esc(p.authorName || 'Learner')}</b>${p.authorHandle ? `<span class="post-handle" data-action="member-card" data-handle="${esc(p.authorHandle)}">@${esc(p.authorHandle)}</span>` : ''}<span class="post-time">\u00b7 ${timeAgo(p.createdAt)}</span></div>
       ${isDisc ? `<div class="post-title">${esc(p.title)}</div>` : ''}
@@ -4622,7 +4711,7 @@ function postCardHTML(p) {
 function replyHTML(r, postId) {
   const liked = r.likedBy && myUid() && r.likedBy.includes(myUid());
   return `<div class="reply">
-    <div class="post-av sm" data-action="member-card" data-handle="${esc(r.authorHandle || '')}">${esc(r.authorInitials || 'ER')}</div>
+    <div class="post-av sm" data-action="member-card" data-handle="${esc(r.authorHandle || '')}">${esc(r.authorInitials || initialsOf(r.authorName))}</div>
     <div class="post-main">
       <div class="post-head"><b>${esc(r.authorName || 'Learner')}</b>${r.authorHandle ? `<span class="post-handle" data-action="member-card" data-handle="${esc(r.authorHandle)}">@${esc(r.authorHandle)}</span>` : ''}<span class="post-time">\u00b7 ${timeAgo(r.createdAt)}</span></div>
       <div class="post-body">${richBody(r.body)}</div>
@@ -4695,7 +4784,7 @@ function showMemberCard(el) {
   const lv = levelFor(m.xp || 0);
   const card = document.createElement('div');
   card.className = 'member-card-pop';
-  card.innerHTML = `<div class="mc-head"><span class="m-ava lg ${isOnline(m) ? 'online' : ''}">${esc(m.initials || 'ER')}</span>
+  card.innerHTML = `<div class="mc-head"><span class="m-ava lg ${isOnline(m) ? 'online' : ''}">${esc(m.initials || initialsOf(m.name))}</span>
     <div><b>${esc(m.name || 'Learner')}</b>${m.username ? `<span class="post-handle">@${esc(m.username)}</span>` : ''}</div></div>
     <div class="mc-stats"><span>${tlevel(lv.idx)} · Lv ${lv.idx + 1}</span><span>${m.xp || 0} XP</span><span>${svgIcon('fire')} ${m.streak || 0}</span></div>
     ${m.joinedAt ? `<div class="mc-since">${t('comm_member_since')} ${new Date(tsMillis(m.joinedAt)).toLocaleDateString(_lang() === 'pt' ? 'pt-PT' : 'en-GB', { month: 'long', year: 'numeric' })}</div>` : ''}
@@ -4756,7 +4845,9 @@ function renderProfile() {
   const doneCount = CATALOG.filter(c => isDone(c.id)).length;
   const providerLabel = p.provider === 'google.com' ? 'Google' : p.provider === 'password' ? 'Email' : (p.provider || '');
   const roleOpts = ROLE_OPTIONS.map(r => `<option value="${r.key}" ${S.role === r.key ? 'selected' : ''}>${trole(r)}</option>`).join('');
-  const goalOpts = Object.keys(GOAL_PRESETS).map(g => `<option value="${g}" ${S.goal === g ? 'selected' : ''}>${tgoal(g)}</option>`).join('');
+  const myRole = ROLE_OPTIONS.find(r => r.key === S.role) || null;
+  const goalOpts = (myRole ? myRole.goals : []).concat(Object.keys(GOAL_PRESETS).filter(g => !myRole || !myRole.goals.includes(g)))
+    .map(g => `<option value="${attr(g)}" ${S.goal === g ? 'selected' : ''}>${esc(tgoal(g))}</option>`).join('');
   return `<div class="page"><div class="page-pad">
     <h1 class="page-title">${t('prof_title')}</h1>
     <p class="page-sub">${t('prof_sub')}</p>
@@ -4774,7 +4865,7 @@ function renderProfile() {
       <div class="stat"><div class="num">${doneCount}</div><div class="lbl">${t('courses_finished')}</div></div>
       <div class="stat"><div class="num">${S.badges.length}</div><div class="lbl">${t('badges_earned')}</div></div>
       <div class="stat"><div class="num">${S.streak}d</div><div class="lbl">${t('learning_streak')}</div></div>
-      <div class="stat"><div class="num">${S.quizzesPassed}</div><div class="lbl">${t('skills_verified')}</div></div>
+      ${BRAND.hideVerifiedStat ? '' : `<div class="stat"><div class="num">${S.quizzesPassed}</div><div class="lbl">${t('skills_verified')}</div></div>`}
     </div>
     <div class="admin-section">
       <h2>${t('prof_edit')}</h2>
@@ -4783,6 +4874,10 @@ function renderProfile() {
         <label>${t('prof_username')}<div class="ob-handle"><span>@</span><input class="ob-input" id="pfUser" maxlength="20" value="${esc(userHandle())}" placeholder="${suggestHandle()}"></div></label>
         <label>${t('prof_role')}<select class="auth-input" id="pfRole"><option value="">—</option>${roleOpts}</select></label>
         <label>${t('dept_label')}<select class="auth-input" id="pfDept"><option value="">${t('dept_none')}</option>${DEPTS.map(d => `<option value="${d.key}" ${(S.profile && S.profile.dept) === d.key ? 'selected' : ''}>${tdept(d.key)}</option>`).join('')}</select></label>
+        ${/* the annual training certificate (CT art. 131.º) must identify the worker: NIF + employee no. are always asked,
+              even on the lean profile, or the certificate button would send the learner to a field that is not there */''}
+        ${BRAND.leanProfile ? `<div class="pf-legal-h">${t('prof_legal_h')}</div><label>${t('prof_nif')}<input class="auth-input" id="pfNif" inputmode="numeric" maxlength="9" value="${esc((S.profile && S.profile.nif) || '')}" placeholder="123456789"></label>
+        <label>${t('prof_empno')}<input class="auth-input" id="pfEmpNo" value="${esc((S.profile && S.profile.employeeNo) || '')}"></label>` : ''}
         ${BRAND.leanProfile ? '' : `<label>${t('prof_nif')}<input class="auth-input" id="pfNif" inputmode="numeric" maxlength="9" value="${esc((S.profile && S.profile.nif) || '')}" placeholder="123456789"></label>
         <label>${t('prof_empno')}<input class="auth-input" id="pfEmpNo" value="${esc((S.profile && S.profile.employeeNo) || '')}"></label>
         <label>${t('prof_contract')}<select class="auth-input" id="pfContract">${[['permanent','contract_permanent'],['fixed_term','contract_fixed'],['part_time','contract_part']].map(([v,k])=>`<option value="${v}" ${(S.profile && S.profile.contractType)===v?'selected':''}>${t(k)}</option>`).join('')}</select></label>
@@ -4878,7 +4973,7 @@ function saveProfile() {
   };
   S.profile = Object.assign({}, S.profile, { name: name || displayName(), username: user, role, phone, dept }, legal);
   if (role) S.role = role;
-  if (goal && goal !== S.goal) { S.goal = goal; S.path = [...GOAL_PRESETS[goal]]; }
+  if (goal && goal !== S.goal) { S.goal = goal; S.path = [...GOAL_PRESETS[goal]]; S.pathMods = [...((typeof GOAL_MODS === 'object' && GOAL_MODS[goal]) || [])]; }
   save();
   if (window.EdenCloud && window.EdenCloud.updateName) window.EdenCloud.updateName(name);
   EdenApp.applyProfile(S.profile);
@@ -4900,7 +4995,8 @@ function makeFocusable(root) {
    filmed. Runs on every render so a stale path (a removed course, an old re-plan) heals itself. */
 function normalizePath() {
   try {
-    if (typeof GOAL_ALIASES === 'object' && S.goal && GOAL_ALIASES[S.goal]) { S.goal = GOAL_ALIASES[S.goal]; if (S.profile) S.profile.goal = S.goal; save(); }
+    if (typeof GOAL_ALIASES === 'object' && S.goal && GOAL_ALIASES[S.goal]) { S.goal = GOAL_ALIASES[S.goal]; if (S.profile) S.profile.goal = S.goal; if (typeof GOAL_MODS === 'object' && GOAL_MODS[S.goal]) { S.pathMods = [...GOAL_MODS[S.goal]]; if (GOAL_PRESETS[S.goal]) S.path = [...GOAL_PRESETS[S.goal]]; } save(); }
+    if (typeof GOAL_MODS === 'object' && S.goal && GOAL_MODS[S.goal] && !Array.isArray(S.pathMods)) { S.pathMods = [...GOAL_MODS[S.goal]]; save(); }
     if (typeof ROLE_ALIASES === 'object') {
       if (S.role && ROLE_ALIASES[S.role]) { S.role = ROLE_ALIASES[S.role]; save(); }
       if (S.profile && S.profile.role && ROLE_ALIASES[S.profile.role]) { S.profile.role = ROLE_ALIASES[S.profile.role]; save(); }
@@ -4914,8 +5010,15 @@ function normalizePath() {
     if (next.join() !== (S.path || []).join()) { S.path = next; save(); }
   } catch (e) {}
 }
+let _lastPage = null, _samePage = false;
 function render() {
   normalizePath();
+  try { updateXpChip(); } catch (e) {}
+  /* round 6 "too much blinking": a redraw of the SAME page (a tab, a filter, a toggle) is instant —
+     no cross-fade, no entrance animations, no jump to the top. Only a real page change fades. */
+  _samePage = (location.hash || '#/home') === _lastPage;
+  _lastPage = location.hash || '#/home';
+  if (_samePage) { document.body.classList.add('rerender'); renderNow(); setTimeout(() => document.body.classList.remove('rerender'), 450); return; }
   /* One line of cross-route continuity. renderNow() is fully synchronous, so
      the transition captures a clean before/after with no extra bookkeeping. */
   if (document.startViewTransition && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -4952,7 +5055,9 @@ function renderNow() {
   $$('.nav-links a, .mobile-drawer a').forEach(a => a.classList.toggle('active', a.getAttribute('href') === `#/${route}`));
   syncChrome();
   if (route !== 'community') teardownCommunity();
-  $('#app').innerHTML = route === 'course' ? renderCourse(param) : route === 'journey' ? renderJourney(param) : (routes[route] || renderHome)();
+  /* curriculum layer (core/curriculum.js): #/course/<course|module>, #/module/<id> */
+  const _cur = window.curRoute ? window.curRoute(route, param) : null;
+  $('#app').innerHTML = _cur || (route === 'course' ? renderCourse(param) : route === 'journey' ? renderJourney(param) : (routes[route] || renderHome)());
   makeFocusable($('#app'));
   lazyBackgrounds();
   if (route === 'community') initCommunity();
@@ -4961,24 +5066,8 @@ function renderNow() {
   if (route === 'progress' || route === 'me') paintLedgerCheck();
   maybeTour();
   if (route === 'community') initBoard();
-  window.scrollTo({ top: 0, behavior: 'instant' });
-  const libInput = $('#libSearch');
-  if (libInput) {
-    libInput.oninput = e => {
-      libQuery = e.target.value;
-      const tmp = document.createElement('div');
-      tmp.innerHTML = renderLibrary();
-      /* swap the whole results block, not just .grid: the "nothing matches"
-         note lives outside it, so typing a non-matching query used to leave a
-         blank page while clicking a category chip showed the message —
-         two behaviours for one state */
-      const newPad = tmp.querySelector('.page-pad') || tmp.querySelector('.grid');
-      const oldPad = $('#app .page-pad') || $('#app .grid');
-      if (newPad && oldPad) oldPad.innerHTML = newPad.innerHTML;
-      const sub = $('#app .page-sub'), newSub = tmp.querySelector('.page-sub');
-      if (sub && newSub) sub.textContent = newSub.textContent;
-    };
-  }
+  if (!_samePage) window.scrollTo({ top: 0, behavior: 'instant' });
+  bindLibSearch();
   initMotion();
   armRails($('#app'));
   armHeroDepth();
@@ -5012,7 +5101,10 @@ function renderNow() {
   animateCounters();
 }
 /* covers download only as their cards approach the viewport (~1.4MB saved on Library) */
-const loadBg = el => { el.style.backgroundImage = `url('${el.dataset.bg}')`; el.removeAttribute('data-bg'); };
+const loadBg = el => {
+  if (el.dataset.src) { el.src = el.dataset.src; el.removeAttribute('data-src'); return; }   /* reel-rail posters */
+  el.style.backgroundImage = `url('${el.dataset.bg}')`; el.removeAttribute('data-bg');
+};
 let ioEverFired = false;
 /* Scroll reveal (Dream Motion cadence). The hidden class is applied by THIS
    script, never in the markup — if JS fails or the observer is unavailable,
@@ -5082,15 +5174,77 @@ const bgObserver = ('IntersectionObserver' in window) ? new IntersectionObserver
   ioEverFired = true;
   entries.forEach(e => { if (e.isIntersecting) { loadBg(e.target); bgObserver.unobserve(e.target); } });
 }, { rootMargin: '400px' }) : null;
+/* horizontal rail: a small sideways margin, so a tile is fetched as the row starts to move toward it */
+const pathTileObserver = ('IntersectionObserver' in window) ? new IntersectionObserver(entries => {
+  ioEverFired = true;
+  entries.forEach(e => { if (e.isIntersecting) { loadBg(e.target); pathTileObserver.unobserve(e.target); } });
+}, { rootMargin: '400px 160px' }) : null;
+/* Library search (round 6): the box stays (it was replaced on every key, losing focus), the results keep
+   their pictures (they turned into green placeholders), and a short list of matches appears under it. */
+function libSuggestHTML(q) {
+  if (!q || q.trim().length < 2) return '';
+  const k = q.trim().toLowerCase(), out = [];
+  if (!window.CUR) {   /* academies without the course layer (ADEN): suggest courses and their lessons from the catalogue */
+    CATALOG.filter(c => !isComingSoon(c)).forEach(c => {
+      if (ctitle(c).toLowerCase().includes(k)) out.push({ type: t('lib_t_course'), label: ctitle(c), route: '#/course/' + c.id });
+      (cmods(c) || []).forEach(lt => { if (lt && String(lt).toLowerCase().includes(k)) out.push({ type: t('lib_t_lesson'), label: lt, sub: ctitle(c), route: '#/course/' + c.id }); });
+    });
+    if (!out.length) return `<div class="lib-suggest"><div class="ls-empty">${t('nothing_matches')}</div></div>`;
+  } else {
+  CUR.courses.forEach(co => { if (CUR.cTitle(co).toLowerCase().includes(k)) out.push({ type: t('lib_t_course'), label: CUR.cTitle(co), route: '#/course/' + co.id }); });
+  CUR.modules.forEach(m => {
+    if (CUR.mTitle(m).toLowerCase().includes(k)) out.push({ type: t('lib_t_module'), label: CUR.mTitle(m), route: '#/module/' + m.id });
+    m.lessons.forEach((i, n) => { const lt = CUR.lTitle(m.source, i); if (lt && lt.toLowerCase().includes(k)) out.push({ type: t('lib_t_lesson'), label: lt, sub: CUR.mTitle(m), route: '#/module/' + m.id }); });
+  });
+  if (!out.length) return `<div class="lib-suggest"><div class="ls-empty">${t('nothing_matches')}</div></div>`;
+  }
+  return `<div class="lib-suggest" role="listbox">${out.slice(0, 7).map(o => `<button class="ls-item" role="option" data-action="goto" data-route="${o.route}"><span class="ls-type">${esc(o.type)}</span><span class="ls-label">${esc(o.label)}${o.sub ? `<small>${esc(o.sub)}</small>` : ''}</span></button>`).join('')}</div>`;
+}
+function bindLibSearch() {
+  const libInput = $('#libSearch'); if (!libInput) return;
+  const box = libInput.closest('.lib-search');
+  if (box && !box.querySelector('.lib-suggest-slot')) box.insertAdjacentHTML('afterend', '<div class="lib-suggest-slot"></div>');
+  libInput.oninput = e => {
+    libQuery = e.target.value;
+    const slot = $('#app .lib-suggest-slot'); if (slot) slot.innerHTML = libSuggestHTML(libQuery);
+    const tmp = document.createElement('div');
+    tmp.innerHTML = renderLibrary();
+    /* swap every block AFTER the search box, never the box itself */
+    const oldPad = $('#app .page-pad'), newPad = tmp.querySelector('.page-pad');
+    if (oldPad && newPad) {
+      const keep = oldPad.querySelector('.lib-search'), keepSlot = oldPad.querySelector('.lib-suggest-slot');
+      const pageSub = oldPad.querySelector(':scope > .page-sub');
+      [...oldPad.children].forEach(ch => { if (ch !== keep && ch !== keepSlot && !ch.matches('h1') && ch !== pageSub) ch.remove(); });
+      let seenSub = false;
+      let afterSearch = false;
+      [...newPad.children].forEach(ch => { if (ch.classList.contains('lib-search')) { afterSearch = true; return; } if (afterSearch) oldPad.appendChild(ch); });
+      void seenSub;
+    }
+    const sub = $('#app .page-sub'), newSub = tmp.querySelector('.page-sub');
+    if (sub && newSub) sub.textContent = newSub.textContent;
+    makeFocusable($('#app')); lazyBackgrounds();
+  };
+  libInput.onkeydown = e => { if (e.key === 'Escape') { libInput.value = ''; libInput.oninput({ target: libInput }); } };
+}
 function lazyBackgrounds() {
   const els = [...document.querySelectorAll('.thumb[data-bg]')];
-  els.slice(0, 8).forEach(loadBg);                 /* above the fold: instant */
-  const rest = els.slice(8);
-  if (!bgObserver) { rest.forEach(loadBg); return; }
+  /* above the fold: instant. "Above the fold" was approximated as the first
+     eight cards — right for Library, but on Home the first cards sit two
+     screens down and were fetched with the hero; ask the layout instead. */
+  const vh = innerHeight || 800, above = el => el.getBoundingClientRect().top < vh;
+  els.filter(above).forEach(loadBg);
+  const rest = els.filter(el => el.dataset.bg);
+  if (!bgObserver) { rest.forEach(loadBg); document.querySelectorAll('.reel-thumb img[data-src], .ps-art[data-bg]').forEach(loadBg); return; }
   rest.forEach(el => bgObserver.observe(el));
+  /* Home reel-rail posters sit ~2 screens down. Native loading="lazy" fetches
+     anything within ~2500px on a slow link, so on a phone they downloaded with
+     the hero and slowed it; here they load 400px before they scroll in. */
+  document.querySelectorAll('.reel-thumb img[data-src]').forEach(el => bgObserver.observe(el));
+  /* Home path row: tiles past the second sit off-screen to the right */
+  document.querySelectorAll('.ps-art[data-bg]').forEach(el => pathTileObserver ? pathTileObserver.observe(el) : loadBg(el));
   clearTimeout(lazyBackgrounds._t);
   lazyBackgrounds._t = setTimeout(() => {          /* observer broken? load everything (old behavior) */
-    if (!ioEverFired) document.querySelectorAll('.thumb[data-bg]').forEach(loadBg);
+    if (!ioEverFired) document.querySelectorAll('.thumb[data-bg], .reel-thumb img[data-src], .ps-art[data-bg]').forEach(loadBg);
   }, 2500);
 }
 /* Deep link from outside the app — LandFlow's brain sends people here.
@@ -5114,12 +5268,10 @@ function handlePlayLink() {
   const closeOverlays = () => { const am = $('#askModal'); if (am) am.classList.remove('open'); try { setTutorOpen(false); } catch (e) {} try { speechSynthesis.cancel(); } catch (e) {} };
   /* #/reels/<id> — one short, by id. The feed renders and scrolls to it. */
   const r = h.match(/^#\/reels\/([a-z0-9-]+)/);
-  if (r) {
-    closeOverlays();
-    location.hash = '#/reels';
-    scrollToReel(r[1]);
-    return true;
-  }
+  /* The address stays #/reels/<id> and the normal route renders it (armReelFeed opens at that reel).
+     It used to be rewritten to #/reels as a NEW history entry, so Back returned to #/reels/<id>,
+     which rewrote itself again: Back looked dead. */
+  if (r) { closeOverlays(); return false; }
   const m = h.match(/^#\/play\/([a-z0-9-]+)\/(\d+)(?:\/(\d+))?/);
   if (!m) return false;
   const [, cid, mod, sec] = m;
@@ -5179,7 +5331,11 @@ async function copyLink(hash) {
     catch (e2) { prompt(t('link_copy'), url); }
   }
 }
-addEventListener('hashchange', () => { if (!handlePlayLink()) render(); });
+/* where the reels back arrow returns to */
+let lastNonReelHash = '';
+const noteHash = () => { const h = location.hash || '#/home'; if (!/^#\/reels\b/.test(h)) lastNonReelHash = h; };
+noteHash();
+addEventListener('hashchange', () => { noteHash(); if (!handlePlayLink()) render(); });
 if (handlePlayLink()) {} 
 
 /* ---------- language (EN / PT) ---------- */
@@ -5497,11 +5653,13 @@ let _openPaused = false;   /* set by 'resume-check': open the lesson silent, sho
 function openPlayer(courseId, mod, startAt) {
   const c = courseById(courseId);
   if (!c) return;
-  _seekTo = (typeof startAt === 'number' && startAt > 2) ? startAt : null;
+  const explicitStart = typeof startAt === 'number' && !isNaN(startAt);
+  _seekTo = (explicitStart && startAt > 2) ? startAt : null;
   try { history.pushState({ overlay: 'player' }, ''); _playerPushed = true; } catch (e) {}
   if (mod == null) mod = (prog(courseId) && !isDone(courseId)) ? (prog(courseId).mod || 0) : 0;
   mod = Math.min(mod, c.modules.length - 1);
-  { const pp = prog(courseId); if (_seekTo == null && pp && pp.pos && pp.pos.mod === mod && pp.pos.t > 8) _seekTo = Math.max(0, pp.pos.t - 3); }
+  /* a chapter at 0:00 is an explicit start: do not resume from the saved position */
+  { const pp = prog(courseId); if (_seekTo == null && !explicitStart && pp && pp.pos && pp.pos.mod === mod && pp.pos.t > 8) _seekTo = Math.max(0, pp.pos.t - 3); }
   const media = modMedia(c, mod);
   clearCheckpoint();
   watchedSeconds = 0;
@@ -5551,6 +5709,7 @@ function openPlayer(courseId, mod, startAt) {
     const done = isDone(courseId) || (p && !p.done && i < (p.mod || 0));
     return `<button class="mod-pill ${i === mod ? 'current' : done ? 'done' : ''} ${soon ? 'soon' : ''}" data-action="play" data-id="${courseId}" data-mod="${i}"><span class="mp-n">${done ? '✓ ' : soon ? '🔒 ' : ''}${i + 1}</span><span class="mp-t">${soon ? t('coming_soon') : cmods(c)[i]}</span></button>`;
   }).join('');
+  if (window.curPlayer) window.curPlayer(c, mod);   /* course › module › lesson context, the module's lessons, prev/next */
   /* hide "mark complete" for coming-soon lessons */
   /* keep the lesson you are on inside the strip — the fix that matters more
      than any affordance, because you always see where you are.
@@ -5567,8 +5726,10 @@ function openPlayer(courseId, mod, startAt) {
     const target = (prev ? prev.offsetLeft : cur.offsetLeft) - 12;
     scrollSurely(strip, Math.max(0, target));
   }, 260);
-  $('#playerComplete').style.display = (media && media.type === 'soon') ? 'none' : '';
   { const pp = prog(courseId); const dm = isDone(courseId) || (pp && !pp.done && (pp.mod || 0) > mod) || (S.trainingLog || []).some(e => e.courseId === courseId && e.mod === mod);
+    /* markComplete:false — no manual "Mark complete" (the video ending opens the questions); a lesson already
+       done keeps the button, because there it means "Next lesson" / "Back to course" */
+    $('#playerComplete').style.display = (media && media.type === 'soon') || (BRAND.markComplete === false && !dm) ? 'none' : '';
     $('#playerComplete').textContent = dm ? (mod + 1 < c.modules.length ? t('next_lesson_btn') : t('back_to_course')) : t('mark_complete'); }
   playerEl.classList.add('open');
   playerChrome.show(true);
@@ -5723,6 +5884,12 @@ function armVimeo(c, mod) {
       vimeoWrap.classList.add('ended');   /* our curtain over Vimeo's "more from" screen, with a replay control */
       const vn = vimeoWrap.querySelector('.veil-note'); if (vn) vn.textContent = '';
       if (done || !playing || playing.courseId !== c.id || playing.mod !== mod) return;
+      /* round 5: reviewing a moment (the result folded to the side) that runs on to the end is not finishing the
+         lesson again — it re-opened the takeaways and handed over to the NEXT module's lesson and its questions */
+      { const ck = $('#ckOv'); if (ck && ck.classList.contains('on')) return; }
+      /* and an end reached with almost nothing played (a seek, a glitch, an iframe event) never completes a lesson,
+         even with the watch rule off for testing */
+      if (!watchEv || watchEv.key !== c.id + ':' + mod || (watchEv.dur && watchCoverage() < 0.15)) return;
       /* the same discipline the <video> branch has always had: reaching the end
          of the timeline is not the same as having watched the lesson, and a
          scrubbed-through lesson must not mint a compliance hour */
@@ -5923,12 +6090,14 @@ function showTakeaways(c, mod, next) {
   pendingNext = next;
   $('#takeList').innerHTML = takeawaysFor(c, mod).map((x, i) =>
     `<div class="take-item" style="animation-delay:${.15 + i * .18}s"><span class="take-num">${i + 1}</span><p>${x}</p></div>`).join('');
-  $('#takeMod').textContent = `${cmods(c)[mod]} · ${ctitle(c)}`;
+  $('#takeMod').textContent = window.CUR
+    ? `${CUR.lTitle(c.id, mod)} · ${CUR.mTitle(CUR.moduleOfLesson(c.id, mod))}`
+    : `${cmods(c)[mod]} · ${ctitle(c)}`;
   $('#takeTitle').textContent = t('take_title');
   $('#takeSub').textContent = t('take_sub');
   const _cd = !!(next && next.kind === 'course-done');
-  const _noQuiz = _cd && BRAND.certOnCompletion;
-  const _go = $('#takeGo'); _go.textContent = _noQuiz ? t('take_done') : _cd ? t('take_quiz') : t('take_continue'); _go.dataset.action = _noQuiz ? 'take-go' : _cd ? 'take-quiz' : 'take-go';
+  const _noQuiz = (_cd && BRAND.certOnCompletion) || (_cd && !!window.CUR) || (next && next.kind === 'cur-course-end');
+  const _go = $('#takeGo'); _go.textContent = (next && next.goLabel) || (_noQuiz ? t('take_done') : _cd ? t('take_quiz') : t('take_continue')); _go.dataset.action = _noQuiz ? 'take-go' : _cd ? 'take-quiz' : 'take-go';
   if (next && next.kind === 'course-done') {
     /* no star rating: stars told Pedro nothing (John, 4 Nov 2026) */
     $('#takeList').innerHTML += `<div class="take-extra">
@@ -5950,7 +6119,9 @@ function showTakeaways(c, mod, next) {
    "answer this". Submission writes the art. 131.º record; skipping leaves the
    lesson in pendingChecks and credits nothing, which the learner is told
    plainly rather than discovering at audit time. */
-function showModuleCheck(c, mod, after) {
+function showModuleCheck(c, mod, after, opts) {
+  let fix = (opts && opts.fix) || null;              /* { base, wrong }: re-ask only the missed questions */
+  const retake = !!(opts && opts.retake) || !!fix;
   const ov = $('#ckOv'); if (!ov) { creditTraining(c.id, mod, null); if (after) after(); return; }
   const lang = _lang() === 'pt' ? 'pt' : 'en';
   const finish = res => { ov.classList.remove('on'); ov.innerHTML = ''; creditTraining(c.id, mod, res); updateXpChip(); if (after) after(); };
@@ -5958,7 +6129,18 @@ function showModuleCheck(c, mod, after) {
   loadQuizV2(c.id).then(() => {
     /* V2 (transcript-grounded, blind-verified) first; the hand-written bank is
        the fallback, and the acknowledgment is the floor — never a silent credit. */
-    let qs = v2CheckPair(c.id, mod, lang);
+    let qs = null;
+    if (fix) {
+      /* the same questions the learner got wrong (found in the bank by their text in either language),
+         options reshuffled; anything not found falls back to a normal retake */
+      const bank = (QUIZ_V2[c.id] && QUIZ_V2[c.id].modules && QUIZ_V2[c.id].modules[mod]) || [];
+      const found = fix.wrong.map(d => bank.find(q => (q.en && q.en.q === d.q) || (q.pt && q.pt.q === d.q))).filter(Boolean);
+      if (found.length === fix.wrong.length) qs = found.map(q => shuffledView(q, lang));
+      /* a missed question no longer in the bank (e.g. reworded): never pretend it was fixed —
+         fall back to an honest normal retake, scored on its own */
+      else fix = null;
+    }
+    if (!qs) qs = v2CheckPair(c.id, mod, lang, retake ? (((S.checkRetakes || {})[c.id + ':' + mod] || []).length + 1) : 0);
     if (!qs) {
       const legacy = moduleCheckQuestions(c, mod);
       qs = legacy ? legacy.map(q => ({ q: q.q, opts: q.opts, a: q.a, why: null, t0: null, type: 'recall', gen: false, audit: 'authored' })) : null;
@@ -5982,14 +6164,15 @@ function showModuleCheck(c, mod, after) {
     const conf = new Array(qs.length).fill(null);   /* true=sure, false=guessing, null=unsaid */
     const paint = () => {
       ov.innerHTML = `<div class="ck-card">
-        <div class="ob-eyebrow">${t('mc_eyebrow')} · ${esc(ctitle(c))}</div>
-        <p class="pre-sub">${t('mc_sub')}</p>
+        <div class="ob-eyebrow">${fix ? t('fix_eyebrow') : t('mc_eyebrow')} · ${esc(ctitle(c))}</div>
+        <p class="pre-sub">${fix ? t('fix_sub_ck') : t('mc_sub')}</p>
         ${qs.map((q, qi) => `<div class="mc-q">
           <div class="ck-q">${qi + 1}. ${esc(q.q)}</div>
+          ${fix && q.t0 != null ? `<button class="fix-moment" data-action="review-moment" data-id="${c.id}" data-mod="${mod}" data-t="${Math.max(0, Math.floor(q.t0 - 4))}">⏱ ${t('fix_watch')} · ${Math.floor(q.t0 / 60)}:${String(Math.floor(q.t0 % 60)).padStart(2, '0')}</button>` : ''}
           ${q.opts.map((o, oi) => `<div class="q-opt${answers[qi] === oi ? ' sel' : ''}" data-q="${qi}" data-o="${oi}" role="button" tabindex="0"><span class="radio"></span><span>${esc(o)}</span></div>`).join('')}
           ${/* no "How sure are you?" row: João + John, 5 Nov 2026, redundant */''}
         </div>`).join('')}
-        <div class="ck-foot"><span class="ck-note">${t('mc_note')}</span>
+        <div class="ck-foot"><span class="ck-note">${fix ? '' : t('mc_note')}</span>
           <button class="btn btn-primary btn-sm" id="mcGo"${answers.some(a => a === null) ? ' disabled' : ''}>${t('mc_submit')}</button></div>
       </div>`;
       ov.querySelectorAll('.q-opt').forEach(el => el.addEventListener('click', () => { answers[+el.dataset.q] = +el.dataset.o; paint(); }));
@@ -6000,28 +6183,55 @@ function showModuleCheck(c, mod, after) {
           q: q.q, given: q.opts[answers[i]], correct: q.opts[q.a], ok: answers[i] === q.a,
           type: q.type, audit: q.audit, conf: conf[i], t0: q.t0
         }));
-        const score = detail.filter(d => d.ok).length;
-        if (score === qs.length) awardXp(5, t('mc_eyebrow'));
-        S.quizzesPassed = (S.quizzesPassed || 0) + (score === qs.length ? 1 : 0);
+        let score = detail.filter(d => d.ok).length;
+        /* a fix scores the WHOLE lesson: the earlier right answers stand, the fixed ones are added */
+        let full = null, fullTotal = qs.length;
+        if (fix) {
+          const right = new Set(fix.wrong.filter((w, i) => detail[i] && detail[i].ok).map(w => w.q));
+          full = fix.base.detail.map(d => right.has(d.q) ? Object.assign({}, d, { ok: true, fixedAt: Date.now() }) : d);
+          score = full.filter(d => d.ok).length; fullTotal = fix.base.total;
+        }
+        if (!fix && score === qs.length) awardXp(5, t('mc_eyebrow'));
+        if (fix && score === fullTotal) awardXp(3, t('fix_eyebrow'));
+        S.quizzesPassed = (S.quizzesPassed || 0) + (!fix && score === qs.length ? 1 : 0);
         /* the hour credits on SUBMISSION — the feedback screen that follows is
            teaching, not a further hurdle */
         const res = { kind: 'assessment', score, total: qs.length, passed: score === qs.length, detail, at: Date.now() };
-        creditTraining(c.id, mod, res);
+        if (retake) {
+          S.checkRetakes = S.checkRetakes || {}; const k = c.id + ':' + mod;
+          /* the detail is kept so a later fix knows exactly which questions are still wrong */
+          (S.checkRetakes[k] = S.checkRetakes[k] || []).push({ score, total: fullTotal, at: res.at, detail: full || detail, fix: !!fix });
+          ledgerAppend(fix ? 'check_fix' : 'check_retake', { courseId: c.id, mod, score, total: fullTotal });
+          save();
+        } else creditTraining(c.id, mod, res);
+        try { if (window.curPlayer && playing && playing.courseId === c.id && playing.mod === mod) window.curPlayer(c, mod); } catch (e) {}
         updateXpChip();
         detail.forEach((d, i) => { if (!d.ok) scheduleReview(c.id, mod, qs[i]); });
         /* feedback state: the why, and the way back to the exact moment */
         ov.innerHTML = `<div class="ck-card">
-          <div class="ob-eyebrow">${t('mc_result')} · ${score}/${qs.length}</div>
+          <div class="ob-eyebrow">${t('mc_result')} · ${score}/${fullTotal}</div>
           ${qs.map((q, i) => `<div class="mc-fb ${detail[i].ok ? 'ok' : 'ko'}">
             <div class="ck-q">${detail[i].ok ? '✓' : '✗'} ${esc(q.q)}</div>
-            ${detail[i].ok ? '' : `<p class="mc-ans">${t('mc_correct_was')} <b>${esc(q.opts[q.a])}</b></p>`}
-            ${q.why ? `<p class="mc-why">${esc(q.why)}</p>` : ''}
+            ${/* merit (round 5): a wrong answer is never handed the right one — the learner reviews the moment
+                  and earns it in "Review" later. The explanation shows only for answers they got right. */''}
+            ${detail[i].ok && q.why ? `<p class="mc-why">${esc(q.why)}</p>` : ''}
+            ${detail[i].ok ? '' : `<p class="mc-ans">${t('mc_try_later')}</p>`}
             ${(!detail[i].ok && q.t0 != null) ? `<button class="btn btn-glass btn-sm" data-action="review-moment" data-id="${c.id}" data-mod="${mod}" data-t="${Math.max(0, Math.floor(q.t0 - 4))}">⏱ ${t('mc_moment')} ${Math.floor(q.t0 / 60)}:${String(Math.floor(q.t0 % 60)).padStart(2, '0')}</button>` : ''}
           </div>`).join('')}
-          <div class="ck-foot"><span class="ck-note">${score === qs.length ? t('mc_all_right') : t('mc_recorded')}</span>
-            <button class="btn btn-primary btn-sm" id="mcDone">${t('mc_continue')}</button></div>
+          <div class="ck-foot"><span class="ck-note">${score === fullTotal ? t('mc_all_right') : t('mc_recorded')}</span>
+            ${/* round 7: after a mistake the way forward IS the retry — review the moment, then answer again here */''}
+            ${score < fullTotal
+              ? `<button class="link-quiet" id="mcDone">${t('mc_skip_now')}</button><button class="btn btn-primary btn-sm" id="mcRetry">${t('mc_answer_again')} →</button>`
+              : `<button class="btn btn-primary btn-sm" id="mcDone">${t('mc_continue')}</button>`}</div>
         </div>`;
         $('#mcDone').addEventListener('click', () => { ov.classList.remove('on'); ov.innerHTML = ''; if (after) after(); });
+        /* round 6: correct a miss right here, on the first go — only the missed questions, answer still not shown */
+        const rt = $('#mcRetry');
+        if (rt) rt.addEventListener('click', () => {
+          const x = window.CUR && CUR.misses(c.id, mod);
+          ov.classList.remove('peek');
+          if (x) showModuleCheck(c, mod, after, { fix: x }); else showModuleCheck(c, mod, after, { retake: true });
+        });
       });
     };
     paint();
@@ -6052,8 +6262,8 @@ function openReviewSession() {
     ov.querySelectorAll('.q-opt').forEach(el => el.addEventListener('click', () => {
       if (answered) return; answered = true;
       const sel = +el.dataset.o, ok = sel === v.a;
-      ov.querySelectorAll('.q-opt').forEach((x, oi) => { if (oi === v.a) x.classList.add('correct'); else if (oi === sel) x.classList.add('wrong'); });
-      $('#revNote').innerHTML = ok ? t('ck_right') : `${t('mc_correct_was')} <b>${esc(v.opts[v.a])}</b>` +
+      ov.querySelectorAll('.q-opt').forEach((x, oi) => { if (oi === sel) x.classList.add(oi === v.a ? 'correct' : 'wrong'); });   /* merit: the right option is never revealed */
+      $('#revNote').innerHTML = ok ? t('ck_right') : `${t('mc_try_later')}` +
         ((v.t0 != null) ? ` · <button class="btn btn-glass btn-sm" data-action="review-moment" data-id="${e.courseId}" data-mod="${e.mod}" data-t="${Math.max(0, Math.floor(v.t0 - 4))}">⏱ ${t('mc_moment')}</button>` : '');
       reviewOutcome(e, ok);
       $('#revNext').style.display = '';
@@ -6129,6 +6339,7 @@ function showCertEarned(courseId) {
   try { makeFocusable(ov); } catch (e) {}
 }
 function resolveTakeawaysNext(n, toQuiz) {
+  if (window.curAfter && window.curAfter(n)) return;   /* curriculum: the course result card */
   if (toQuiz && n.courseId) { closePlayer(); setTimeout(() => openQuiz(n.courseId), 250); return; }   /* watch → assess loop */
   if (n.kind === 'next') { _openPaused = true; openPlayer(n.courseId, n.mod); }   /* the learner presses play; nothing starts on its own after a check */
   else if (n.kind === 'end') closePlayer();
@@ -6584,10 +6795,21 @@ let reelCheckWatch = null;
    is genuinely the active slide and the page is visible, so a backgrounded feed
    no longer counts as watching. */
 function stopReelCheck() { if (reelCheckWatch) { reelCheckWatch.stop(); reelCheckWatch = null; } }
-function armReelCheck(el, r, vid) {
+function armReelCheck(el, r, vid, vimeo) {
   stopReelCheck();
   if (!reelCheckOf(r) || el.dataset.rcDone || el.querySelector('.rc')) return;
   const fire = () => { stopReelCheck(); raiseReelCheck(el, r); };
+
+  if (vimeo) {
+    /* the reel loops, so Vimeo never sends 'ended': fire near the end, or when the clock wraps back to 0 */
+    let lastSec = 0;
+    const onTime = d => { if (!d || !d.duration) return;
+      if (d.seconds >= d.duration - 0.35 || (lastSec >= d.duration * 0.9 && d.seconds < lastSec - 2)) fire();
+      lastSec = d.seconds; };
+    vimeo.on('timeupdate', onTime);
+    reelCheckWatch = { stop: () => { try { vimeo.off('timeupdate', onTime); } catch (e) {} } };
+    return;
+  }
 
   if (vid) {
     const onTime = () => {
@@ -6706,6 +6928,8 @@ const reelsAll = () => canCurateReels() ? QW_ALL() : qwApproved();
 /* pending is only ever SHOWN to someone who can act on it */
 const reelPending = r => canCurateReels() && !qwPublished(r) && qwState().approved.indexOf(r.id) < 0;
 const reelField = v => eduField(v);
+/* a reel's length as video apps show it: 0:29 */
+const reelLen = r => { const n = Math.round(r.seconds || 30); return Math.floor(n / 60) + ':' + String(n % 60).padStart(2, '0'); };
 function reelPoster(r, showHook) {
   const tone = toneOf(r.theme || r.id);   /* same picker as the rail chip, so a reel keeps one colour in both places */
   const img = r.poster ? ` style="background-image:url('${esc(r.poster)}')"` : '';
@@ -6722,7 +6946,9 @@ function reelMediaHTML(r, i) {
   const m = r.media || {};
   const poster = r.poster ? ` poster="${esc(r.poster)}"` : '';
   if (m.type === 'mp4')     return `<video class="reel-vid" data-i="${i}" src="${esc(m.src)}"${poster} loop muted playsinline preload="none"></video>`;
-  if (m.type === 'vimeo')   return `<iframe class="reel-vid" data-i="${i}" src="https://player.vimeo.com/video/${esc(m.id)}?${m.h ? 'h=' + esc(m.h) + '&' : ''}background=1&loop=1&muted=1&title=0&byline=0&portrait=0&dnt=1" allow="autoplay; fullscreen" allowfullscreen loading="lazy"></iframe>`;
+  /* Vimeo: a real player with its own chrome hidden (controls=0), driven by the Player SDK.
+     NOT background=1: background mode forces silence, and a narrated reel must be able to speak. */
+  if (m.type === 'vimeo')   return `<iframe class="reel-vid reel-vm" data-i="${i}" src="https://player.vimeo.com/video/${esc(m.id)}?${m.h ? 'h=' + esc(m.h) + '&' : ''}controls=0&autoplay=0&muted=1&loop=1&playsinline=1&autopause=0&title=0&byline=0&portrait=0&keyboard=0&dnt=1" allow="autoplay; fullscreen; picture-in-picture" title="${esc(reelField(r.title))}" tabindex="-1"></iframe>`;
   if (m.type === 'youtube') return `<iframe class="reel-vid" data-i="${i}" src="https://www.youtube-nocookie.com/embed/${esc(m.id)}?loop=1&mute=1&controls=0&rel=0&playlist=${esc(m.id)}" allow="autoplay" allowfullscreen loading="lazy"></iframe>`;
   return '';
 }
@@ -6730,7 +6956,7 @@ function reelSlideHTML(r, i) {
   const d = qwDeeper(r), e = r.educator ? Object.assign({ id: r.educator }, EDU_ALL()[r.educator] || {}) : null;
   const saved = (S.reelSaved || []).indexOf(r.id) > -1;
   const ph = !!r.placeholder;
-  return `<article class="reel" data-i="${i}" data-id="${r.id}">
+  return `<article class="reel${r.poster ? ' has-ambient' : ''}" data-i="${i}" data-id="${r.id}"${r.poster ? ` style="--reel-art:url('${esc(new URL(r.poster, location.href).href)}')"` : ''}>
     ${reelPoster(r, ph)}
     <div class="reel-media" data-media="${esc(JSON.stringify(r.media || {}).slice(0, 0))}"></div>
     <div class="reel-scrim"></div>
@@ -6740,11 +6966,13 @@ function reelSlideHTML(r, i) {
       <button class="reel-act" data-action="reel-mute" aria-label="${t('reel_sound')}">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="wave" d="M17 8.5a5 5 0 0 1 0 7"/><path class="slash" d="M18 8l4 8"/></svg></button>
     </div>
+    <input class="reel-seek" type="range" min="0" max="1000" value="0" step="1" data-id="${esc(r.id)}" aria-label="${_lang() === 'pt' ? 'Posição no reel' : 'Reel position'}">
     <div class="reel-copy">
       ${ph ? `<span class="reel-ph">${t('reel_placeholder')}</span>` : ''}
-      <div class="reel-meta">${reelPending(r) ? `<span class="pend">${t('reel_pending')}</span> &middot; ` : ''}${r.seconds || 30}s${r.theme ? ` &middot; ${esc(r.theme)}` : ''}</div>
-      <h2>${esc(reelField(r.title))}</h2>
-      ${ph ? '' : `<p>${esc(reelField(r.line))}</p>`}
+      ${reelPending(r) ? `<div class="reel-meta"><span class="pend">${t('reel_pending')}</span></div>` : ''}
+      ${/* headline = the outcome, subheadline = what is in it for me (feedback 3: "why should I give it two seconds?") */''}
+      <h2>${esc(reelField(r.head) || reelField(r.title))}</h2>
+      ${/* 9 Nov notes: the headline alone in the feed — no subheadline over the video */''}
       ${/* THE LESSON IN TEXT.
             A reel is twenty seconds of someone talking. That is a bad format for
             a noisy tractor cab, a shared phone, a hearing aid, or anyone who
@@ -6754,30 +6982,7 @@ function reelSlideHTML(r, i) {
             written from its own transcript, and a learner can take it either way.
             Collapsed by default: the feed is the feed, and a wall of text on top
             of video is neither. */''}
-      ${reelField(r.lesson) ? `<button class="reel-read" data-action="reel-read" data-id="${esc(r.id)}">${reelOpen === r.id ? t('reel_hide') : t('reel_read')}</button>` : ''}
-      ${reelOpen === r.id && reelField(r.lesson) ? `<div class="reel-lesson">${esc(reelField(r.lesson))}${
-          r.videoLang && r.videoLang !== _lang() ? `<span class="reel-vlang">${t('reel_vlang').replace('{l}', r.videoLang.toUpperCase())}</span>` : ''}</div>` : ''}
-      ${e && e.name ? `<button class="edu-byline" data-action="edu-open" data-edu="${e.id}">${eduAvatarHTML(e, 'xs')}<span class="edu-nm">${esc(e.name)}</span></button>` : ''}
-      ${/* A filled button on top of video is a colour block fighting the
-             footage — and it was the demo brand's accent, so it read as a
-             different product. The handoff is the point of a reel, but it is
-             the QUIET point: one line, the course named, an arrow. Type and
-             space, not a slab (law 3, law 8). The stop-slide keeps a real
-             button because there it IS the action, not an aside. */''}
-      ${(() => {
-        /* the graph knows which LESSON this clip sits beside; the course is the
-           fallback, not the answer. "Go deeper → Total Responsibility" is a
-           handoff; "Go deeper → Above the Line" is a shrug. */
-        const b = graphBeside(r.id);
-        if (b) return `<button class="reel-deeper" data-action="reel-goto" data-id="${esc(b.course)}" data-mod="${b.mod}">
-        <span class="rd-verb">${t('reel_beside')}</span>
-        <span class="rd-name">${esc(b.title)}</span>
-        <span class="rd-arrow" aria-hidden="true">&#8250;</span></button>`;
-        return d ? `<button class="reel-deeper" data-action="reel-goto" data-id="${d.course.id}">
-        <span class="rd-verb">${d.done ? t('qw_deeper_done') : d.started ? t('qw_deeper_resume') : t('qw_deeper')}</span>
-        <span class="rd-name">${esc(ctitle(d.course))}</span>
-        <span class="rd-arrow" aria-hidden="true">&#8250;</span></button>` : '';
-      })()}
+      ${/* minimal (round 5): headline + why only — no read-more, time, educator or deeper link over the video */''}
     </div>
   </article>`;
 }
@@ -6795,6 +7000,15 @@ function reelPauseHTML(i) {
     </div>
   </article>`;
 }
+/* per-account saved reels (S is the account's own state, synced with it) */
+function savedReelsHTML() {
+  const ids = S.reelSaved || [], list = ids.map(id => qwById(id)).filter(Boolean);
+  if (!list.length) return `<section class="admin-section"><h2>${t('me_saved')}</h2><p class="sect-sub sub-auto">${t('saved_none')}</p></section>`;
+  return `<section class="admin-section"><h2>${t('me_saved')}</h2><p class="sect-sub sub-auto">${t('saved_sub')}</p>
+    <div class="rail-wrap"><div class="rail">${list.map(r => `<button class="reel-thumb" data-action="goto" data-route="#/reels/${esc(r.id)}" aria-label="${esc(reelField(r.head) || reelField(r.title))}">
+      <img src="${esc(r.poster)}" alt="" decoding="async"><span class="rt-time">${reelLen(r)}</span>
+      <span class="rt-title">${esc(reelField(r.head) || reelField(r.title))}</span></button>`).join('')}</div></div></section>`;
+}
 function renderReels() {
   const list = reelsAll();
   if (!list.length) return `<div class="page"><div class="page-pad"><h1 class="page-title">${t('reel_h')}</h1>
@@ -6802,18 +7016,23 @@ function renderReels() {
   const slides = [];
   list.forEach((r, i) => {
     slides.push(reelSlideHTML(r, slides.length));
-    if ((i + 1) % FEED_PAUSE_AFTER === 0 && i < list.length - 1) slides.push(reelPauseHTML(slides.length));
+    /* no "take a breath" stop card (round 5: "remove this") */
   });
   /* The feed takes the whole screen and the app's chrome steps out of the way:
      the header and tutor button sat ON TOP of the first build, and the FAB
      landed on the "go deeper" button. An immersive surface has to actually be
      immersive, and it has to say how to leave. */
   return `<div class="reel-wrap">
+    <div class="reel-ambient" id="reelAmbient" aria-hidden="true"></div>
     <div class="reel-top">
       <button class="reel-x" data-action="reel-exit" aria-label="${t('close')}">&#8592;</button>
       <div class="reel-prog">${slides.map((_, i) => `<span data-p="${i}"></span>`).join('')}</div>
     </div>
     <div class="reel-feed" id="reelFeed">${slides.join('')}</div>
+    <div class="reel-nav" aria-label="${_lang() === 'pt' ? 'Navegar nos reels' : 'Reel navigation'}">
+      <button class="reel-nav-b" data-action="reel-step" data-d="-1" aria-label="${_lang() === 'pt' ? 'Reel anterior' : 'Previous reel'}"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></button>
+      <button class="reel-nav-b" data-action="reel-step" data-d="1" aria-label="${_lang() === 'pt' ? 'Reel seguinte' : 'Next reel'}"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+    </div>
     <div class="reel-hint" id="reelHint" aria-hidden="true"><span></span></div>
   </div>`;
 }
@@ -6827,6 +7046,39 @@ function renderReels() {
    behaviour depended on it would have shipped playing nothing, silently, on
    whichever devices behave that way. Scroll position is always true. rAF keeps
    it to one read per frame. */
+/* Vimeo reels: one SDK player per mounted iframe (dropped with the iframe when it leaves the
+   mount window). The current slide plays from the start with the feed's sound setting; its
+   neighbours stay paused at 0 so the next swipe starts instantly. */
+const reelPlayers = new WeakMap();
+function reelVimeo(ifr, on, el) {
+  loadVimeoSDK().then(() => {
+    if (!window.Vimeo || !document.body.contains(ifr)) return;
+    let pl = reelPlayers.get(ifr);
+    if (!pl) { try { pl = new Vimeo.Player(ifr); } catch (e) { return; } reelPlayers.set(ifr, pl);
+      /* the progress bar under the reel: follows playback, and dragging it moves the video (9 Nov notes) */
+      const bar = el.querySelector('.reel-seek');
+      if (bar) {
+        let dragging = false, dur = 0;
+        pl.on('timeupdate', d => { if (!d || !d.duration) return; dur = d.duration; if (!dragging) bar.value = Math.round(d.seconds / d.duration * 1000); bar.style.setProperty('--p', (bar.value / 10) + '%'); });
+        bar.addEventListener('pointerdown', e => { dragging = true; e.stopPropagation(); });
+        ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(ev => bar.addEventListener(ev, () => setTimeout(() => { dragging = false; }, 50)));
+        bar.addEventListener('input', () => { bar.style.setProperty('--p', (bar.value / 10) + '%'); });
+        bar.addEventListener('change', () => { dragging = false; if (dur) pl.setCurrentTime(bar.value / 1000 * dur).catch(() => {}); });
+      } }
+    if (!on) { pl.pause().catch(() => {}); pl.setCurrentTime(0).catch(() => {}); return; }
+    const sound = !!($('#reelFeed') && $('#reelFeed').classList.contains('sound'));
+    const still = () => el.classList.contains('current') && document.body.contains(ifr);
+    /* if sound is refused (no gesture yet), fall back to muted. Every step re-checks that this is
+       still the current slide: a swipe's pause() rejects a pending play(), and restarting then
+       would leave the old reel playing under the new one. */
+    pl.setMuted(!sound).then(() => still() ? pl.play() : null)
+      .catch(() => { if (!still()) return;
+        /* sound refused (no gesture yet): play muted, and say so — the icon must not claim sound */
+        const f = $('#reelFeed'); if (f) f.classList.remove('sound');
+        pl.setMuted(true).then(() => still() ? pl.play() : null).catch(() => {}); });
+    /* no question at the end of a reel (round 5) — reels are the hook, checks live in the lessons */
+  }).catch(() => {});
+}
 function armReelFeed() {
   const feed = $('#reelFeed'); if (!feed) return;
   let ticking = false;
@@ -6855,11 +7107,16 @@ function armReelFeed() {
         if (on) { v.preload = 'auto'; v.play().catch(() => {}); }
         else { v.preload = 'metadata'; v.pause(); try { v.currentTime = 0; } catch (e) {} }
       }
+      const vm = box.querySelector('iframe.reel-vm');
       /* the check rises when the clip has actually FINISHED a pass — see armReelCheck */
-      if (on) { const rr = qwById(el.dataset.id); if (rr) armReelCheck(el, rr, v); }
+      if (vm) reelVimeo(vm, on, el);
+      else if (on) { const rr = qwById(el.dataset.id); if (rr) armReelCheck(el, rr, v); }
     }
     const prog = $('.reel-prog');
     if (prog) [...prog.children].forEach((sp, k) => sp.classList.toggle('on', k <= idx));
+    /* one still backdrop for the whole feed: only the video card moves on a swipe, like Shorts (round 5) */
+    { const amb = $('#reelAmbient'), cr = slides[idx] && qwById(slides[idx].dataset.id);
+      if (amb && cr && cr.poster) amb.style.backgroundImage = `url('${new URL(cr.poster, location.href).href}')`; }
     const hint = $('#reelHint'); if (hint && idx > 0) hint.classList.add('gone');
     const cur = slides[idx];
     if (cur && cur.dataset.id && feedSeen.indexOf(cur.dataset.id) < 0) {
@@ -6878,6 +7135,14 @@ function armReelFeed() {
   };
   /* keyboard parity with the swipe — a feed reachable only by thumb is a feed
      half the users cannot reach at all */
+  /* mouse swipe on desktop: drag up or down like a finger (touch already scrolls natively) */
+  let drag = null;
+  feed.onpointerdown = ev => { if (ev.pointerType !== 'mouse' || ev.button !== 0 || ev.target.closest('button, a, .rc, input')) return; drag = { y: ev.clientY, t: Date.now() }; };
+  feed.onpointerup = ev => { if (!drag) return; const dy = ev.clientY - drag.y, quick = Date.now() - drag.t < 900; drag = null;
+    if (Math.abs(dy) < 50 || !quick) return;
+    const to = feed.children[Math.max(0, Math.min(feed.children.length - 1, Math.max(0, feedIdx) + (dy < 0 ? 1 : -1)))];
+    if (to) to.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+  feed.onpointerleave = () => { drag = null; };
   feed.tabIndex = 0;
   feed.onkeydown = ev => {
     if (ev.key !== 'ArrowDown' && ev.key !== 'ArrowUp' && ev.key !== ' ') return;
@@ -6887,7 +7152,10 @@ function armReelFeed() {
     if (to) to.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
   document.body.classList.add('reels-open');
-  feedIdx = -1; sync();                       /* mount + mark slide 0 on open */
+  /* #/reels/<id> opens the feed AT that reel (a tapped thumbnail), not at the top */
+  const want = decodeURIComponent((location.hash.split('/')[2] || ''));
+  if (want) { const at = [...feed.children].findIndex(el => el.dataset.id === want); if (at > 0) feed.scrollTop = at * (feed.clientHeight || 1); }
+  feedIdx = -1; sync();                       /* mount + mark the opening slide */
   try { feed.focus({ preventScroll: true }); } catch (e) {}
 }
 
@@ -7168,6 +7436,7 @@ function quickWinCardHTML(q) {
   </article>`;
 }
 function quickWinsShelfHTML() {
+  if (BRAND.quickWinsShelf === false) return '';   /* the reels rail already shows the same library */
   const ap = qwApproved(); if (!ap.length) return '';
   return `<section class="rail-section">
     <div class="rail-head"><h2>${t('qw_h')}</h2></div>
@@ -7217,7 +7486,9 @@ function creditTraining(courseId, mod, assessment) {
   const dur = (live && watchEv.dur) || 0;
   const covered = segs.length ? watchCoveredSec() : 0;
   const coverage = dur ? Math.min(1, covered / dur) : null;
-  const credited = coverage == null ? mins / 60 : (mins / 60) * coverage;
+  /* No watch evidence = no credited time. Answering the questions proves the questions, not the minutes
+     (5 Nov 2026). The nominal length stays on the entry as ev.nominalMin for the record. */
+  const credited = coverage == null ? 0 : (mins / 60) * coverage;
   const rel = isJobRelevant(c);
   const entry = {
     courseId, mod, title: (cmods(c)[mod] || c.modules[mod]),
@@ -7306,7 +7577,7 @@ const tagsAt = (key, n) => ((TAGS && TAGS.lessons[key]) || []).slice(0, n || 4);
 function loadGraph() {
   loadTags();
   if (GRAPH !== null) return Promise.resolve(GRAPH);
-  const v = ((document.querySelector('script[src*="core/app.js"]') || {}).src || '').match(/v=(edr\d+)/);
+  const v = ((document.querySelector('script[src*="core/app.js"]') || {}).src || '').match(/v=([a-z]+\d+)/);
   return fetch('knowledge/graph.json?v=' + (v ? v[1] : ''))
     .then(r => (r.ok ? r.json() : null)).then(g => (GRAPH = g && g.edges ? g : false)).catch(() => (GRAPH = false));
 }
@@ -7346,7 +7617,7 @@ function loadQuizV2(courseId) {
   if (QUIZ_V2[courseId] !== undefined) return Promise.resolve(QUIZ_V2[courseId]);
   /* cache-bust rides the same edrNNN as every other asset — derived from the
      app script's own src so no separate constant can drift out of step */
-  const v = ((document.querySelector('script[src*="core/app.js"]') || {}).src || '').match(/v=(edr\d+)/);
+  const v = ((document.querySelector('script[src*="core/app.js"]') || {}).src || '').match(/v=([a-z]+\d+)/);
   return fetch('knowledge/quizzes/' + courseId + '.json?v=' + (v ? v[1] : ''))
     .then(r => r.ok ? r.json() : null)
     .then(b => (QUIZ_V2[courseId] = b && b.modules ? b : null))
@@ -7382,12 +7653,18 @@ function shuffledView(q, lang) {
 }
 /* The pair for the hour-crediting check: one recall + one application/scenario,
    deterministic per module so a retake asks the same thing and records compare. */
-function v2CheckPair(courseId, mod, lang) {
+function v2CheckPair(courseId, mod, lang, attempt) {
   const bank = QUIZ_V2[courseId];
-  const qs = bank && bank.modules && bank.modules[mod];
+  let qs = bank && bank.modules && bank.modules[mod];
   if (!qs || !qs.length) return null;
-  const rec = qs.find(x => x.type === 'recall') || qs[0];
-  const app = qs.find(x => x !== rec && (x.type === 'application' || x.type === 'scenario')) || qs.find(x => x !== rec);
+  /* one recall + one applied question. A retake takes the NEXT question of each type (attempt n → the n-th
+     of each, wrapping), so it is never the same two again. Banks are ordered by type, so rotating the
+     whole list (the previous approach) landed on the same pair on the first retake. */
+  const n = attempt || 0;
+  const recs = qs.filter(x => x.type === 'recall'), apps = qs.filter(x => x.type === 'application' || x.type === 'scenario');
+  const rec = recs.length ? recs[n % recs.length] : qs[n % qs.length];
+  const appPool = apps.length ? apps : qs.filter(x => x !== rec);
+  const app = appPool.length ? appPool[n % appPool.length] : null;
   return [rec, app].filter(Boolean).map(q => shuffledView(q, lang));
 }
 
@@ -7482,18 +7759,18 @@ function completeModule(courseId, mod) {
     p.done = true; p.pct = 100; delete p.mod;
     p.doneAt = p.doneAt || Date.now();   /* spaced-repetition anchor */
     save();
-    toast(`${_lang() === 'pt' ? 'Curso concluído' : 'Course complete'}: ${ctitle(c)}`, '🏆');
+    if (!window.CUR) toast(`${_lang() === 'pt' ? 'Curso concluído' : 'Course complete'}: ${ctitle(c)}`, '🏆');
     awardXp(XP.module + XP.course, 'course complete');
     checkBadges();
-    showTakeaways(c, mod, { kind: 'course-done', courseId, checkFor: { courseId, mod } });
+    { let nx = { kind: 'course-done', courseId, checkFor: { courseId, mod } }; if (window.curNext) nx = window.curNext(courseId, mod, nx); showTakeaways(c, mod, nx); }
   } else {
     const nextMedia = modMedia(c, mod + 1);
     p.mod = mod + 1;
     if (!_wasDone) p.pct = Math.round((p.mod / coreN(c)) * 100);
     save();
-    awardXp(XP.module, 'module');
+    awardXp(XP.module, window.CUR ? CUR.L('lesson_one') : 'module');
     checkBadges();
-    showTakeaways(c, mod, Object.assign(mod >= c.modules.length - 1 ? { kind: 'end' } : (nextMedia && nextMedia.type === 'soon') ? { kind: 'soon' } : { kind: 'next', courseId, mod: mod + 1 }, { checkFor: { courseId, mod } }));
+    { let nx = Object.assign(mod >= c.modules.length - 1 ? { kind: 'end' } : (nextMedia && nextMedia.type === 'soon') ? { kind: 'soon' } : { kind: 'next', courseId, mod: mod + 1 }, { checkFor: { courseId, mod } }); if (window.curNext) nx = window.curNext(courseId, mod, nx); showTakeaways(c, mod, nx); }
   }
 }
 
@@ -8144,6 +8421,9 @@ function regenPath() {
     if (rest.length > 2) { const cur = rest.shift(); rest.push(rest.shift()); rest.unshift(cur); } /* keep current, rotate the queue */
     /* (the old demo used to splice in made-up course ids here — a re-plan only reorders real courses) */
     S.path = [...done, ...rest];
+    /* keep the module path in the same order as the re-planned items */
+    if (Array.isArray(S.pathMods) && window.CUR) { const src = mid => (CUR.modules.find(x => x.id === mid) || {}).source;
+      S.pathMods = S.pathMods.map((mid, k) => [mid, k]).sort((a, b) => (S.path.indexOf(src(a[0])) - S.path.indexOf(src(b[0]))) || (a[1] - b[1])).map(x => x[0]); }
     S.rationaleIdx = (S.rationaleIdx + 1) % PATH_RATIONALES.length;
     save(); render();
     toast('Path re-planned by ' + brandName() + ' AI', '✦');
@@ -8165,7 +8445,10 @@ document.addEventListener('click', e => {
     case 'play': openPlayer(id, mod != null ? +mod : undefined); break;
     case 'toggle-path':
       if (isHowto(courseById(id))) { toast(t('howto_no_path'), 'ℹ️'); break; }
-      if (inPath(id)) { S.path = S.path.filter(x => x !== id); toast(`Removed from your path`, '－'); }
+      if (inPath(id)) { S.path = S.path.filter(x => x !== id);
+        /* the module path follows: drop this item's modules too, or "removed" would remove nothing */
+        if (Array.isArray(S.pathMods) && window.CUR) S.pathMods = S.pathMods.filter(mid => { const m = CUR.modules.find(x => x.id === mid); return !m || m.source !== id; });
+        toast(`Removed from your path`, '－'); }
       else { S.path.push(id); toast(`Added to your AI path — it'll be sequenced after your current step`, '✦'); }
       save(); render(); break;
     case 'quiz': openQuiz(id); break;
@@ -8195,7 +8478,9 @@ document.addEventListener('click', e => {
         playerEl.classList.add('open'); videoEl.play().catch(() => {});
       }, 600); break;
     }
-    case 'lib-filter': libFilter = cat; render(); break;
+    case 'lib-filter': { const y = scrollY; libFilter = cat; render();
+      /* the page redraw (view transition) lands after this frame: hold the position until it has */
+      [0, 60, 200, 420].forEach(ms => setTimeout(() => { if (Math.abs(scrollY - y) > 2) scrollTo({ top: y, behavior: 'instant' }); }, ms)); break; }
     case 'ai-overview': {
       const c = courseById(id);
       setTutorOpen(true);
@@ -8303,8 +8588,7 @@ document.addEventListener('click', e => {
       const am = $('#askModal'); if (am) am.classList.remove('open'); setTutorOpen(false);
       const rid = el.dataset.id;
       ledgerAppend('moment_open', { reel: rid, t: +el.dataset.t, via: 'ask' });
-      location.hash = '#/reels';
-      scrollToReel(rid);
+      location.hash = '#/reels/' + encodeURIComponent(rid);   /* the feed opens at this reel */
       break;
     }
     case 'tag-seek': {
@@ -8359,7 +8643,9 @@ document.addEventListener('click', e => {
       break;
     }
     case 'reel-exit': { document.body.classList.remove('reels-open'); stopReelCheck();
-      history.length > 1 ? history.back() : (location.hash = '#/home'); break; }
+      /* back to the page the feed was opened from. history.back() could leave the app (opened from a
+         link) or land on another reels address; the last non-reels page is always the right place. */
+      location.hash = lastNonReelHash || '#/home'; break; }
     case 'rc-answer': answerReelCheck(el.dataset.id, +el.dataset.i); break;
     case 'rc-skip': { const rc = el.closest('.rc'); if (rc) rc.classList.remove('up');
       const sl = el.closest('.reel'); if (sl) sl.dataset.rcDone = '1';
@@ -8371,11 +8657,17 @@ document.addEventListener('click', e => {
     case 'reel-mute': { const f = $('#reelFeed'); if (!f) break;
       const on = f.classList.toggle('sound');
       f.querySelectorAll('video').forEach(v => { v.muted = !on; });
+      f.querySelectorAll('iframe.reel-vm').forEach(ifr => { const pl = reelPlayers.get(ifr); if (!pl) return;
+        const cur = ifr.closest('.reel') && ifr.closest('.reel').classList.contains('current');
+        pl.setMuted(!on).then(() => on ? pl.setVolume(1) : null).then(() => cur ? pl.play() : null).catch(() => {}); });
       const ic = $('#reelMuteIcon'); if (ic) ic.textContent = on ? '\u266b' : '\u266a';
       break; }
     case 'reel-goto': { ledgerAppend('reel_to_course', { course: el.dataset.id, from: 'feed' });
       if (el.dataset.mod != null && el.dataset.mod !== '') { document.body.classList.remove('reels-open'); stopReelCheck(); location.hash = `#/play/${el.dataset.id}/${el.dataset.mod}`; break; }
       location.hash = '#/course/' + el.dataset.id; break; }
+    case 'reel-step': { const f = $('#reelFeed'); if (!f) break;
+      const to = f.children[Math.max(0, Math.min(f.children.length - 1, Math.max(0, feedIdx) + (+el.dataset.d)))];
+      if (to) to.scrollIntoView({ behavior: 'smooth', block: 'start' }); break; }
     case 'reel-more': { ledgerAppend('reel_continue', { after: FEED_PAUSE_AFTER });
       const p = el.closest('.reel'); const nx = p && p.nextElementSibling;
       if (nx) nx.scrollIntoView({ behavior: 'smooth', block: 'start' }); break; }
@@ -8452,6 +8744,13 @@ document.addEventListener('click', e => {
     case 'pwa-dismiss': localStorage.setItem('eden-pwa-nudged', '1'); const pb2 = $('#pwaBar'); if (pb2) pb2.remove(); break;
     case 'seed-demo': seedDemo(); break;
     case 'voice-search': startVoiceSearch(); break;
+    case 'mis-set': {
+      const title = ($('#misT') && $('#misT').value || '').trim();
+      if (!title) { if ($('#misT')) $('#misT').focus(); break; }
+      saveMissionDef(el.dataset.id, { title, brief: ($('#misB').value || '').trim(), deliver: ($('#misD').value || '').trim(),
+        xp: Math.max(0, Math.min(500, +($('#misX').value) || 100)), by: myEmail(), at: Date.now() });
+      break; }
+    case 'mis-clear': saveMissionDef(el.dataset.id, null); break;
     case 'review-moment': {
       const ck = $('#ckOv');
       const same = playing && playing.courseId === el.dataset.id && playing.mod === +el.dataset.mod && playerEl.classList.contains('open');
@@ -8460,9 +8759,18 @@ document.addEventListener('click', e => {
            folds into a bottom sheet while the lesson replays, with a way back */
         ck.classList.add('peek');
         if (!ck.querySelector('.ck-back')) {
-          const b = document.createElement('button'); b.className = 'btn btn-primary btn-sm ck-back'; b.textContent = t('mc_back_result');
+          /* round 5 funnel: the folded card always offers the way back AND the way forward — never a dead end */
+          const bar = document.createElement('div'); bar.className = 'ck-peekbar';
+          const b = document.createElement('button'); b.className = 'btn btn-glass btn-sm ck-back'; b.textContent = t('mc_back_result');
           b.addEventListener('click', () => { ck.classList.remove('peek'); try { vimeoPlayer && vimeoPlayer.pause(); } catch (e) {} try { videoEl.pause(); } catch (e) {} });
-          if (ck.firstElementChild) ck.firstElementChild.prepend(b);
+          const f = document.createElement('button'); f.className = 'btn btn-primary btn-sm ck-fwd'; f.textContent = t('mc_continue') + ' →';
+          f.addEventListener('click', () => { try { vimeoPlayer && vimeoPlayer.pause(); } catch (e) {}
+            /* round 7: after reviewing the moment, Continue opens the missed questions on the same screen */
+            ck.classList.remove('peek');
+            /* answering again (no result buttons yet): just unfold back to the questions — never wipe them */
+            const go = ck.querySelector('#mcRetry') || ck.querySelector('#mcDone'); if (go) go.click(); });
+          bar.append(b, f);
+          if (ck.firstElementChild) ck.firstElementChild.prepend(bar);
         }
         const tt = +el.dataset.t;
         if (vimeoPlayer) vimeoPlayer.setCurrentTime(tt).then(() => vimeoPlayer.play()).catch(() => {});
@@ -8582,9 +8890,21 @@ document.addEventListener('click', e => {
       saveAssignments(assignments, 'Assignment removed');
       break;
     }
+    case 'goal-switch': { const g = el.dataset.g; if (!GOAL_PRESETS[g]) break;
+      S.goal = g; S.path = [...GOAL_PRESETS[g]]; S.pathMods = [...((typeof GOAL_MODS === 'object' && GOAL_MODS[g]) || [])];
+      if (S.profile) S.profile.goal = g;
+      ledgerAppend('goal_switch', { goal: g }); save(); render();
+      toast(`${t('your_path_to')} ${qgoal(g)} ${_lang() === 'pt' ? 'está pronto' : 'is ready'}`, '✦'); break; }
     case 'me-tab': meTab = el.dataset.v; if (location.hash.startsWith('#/paths')) { location.hash = '#/me'; } else render(); break;
     case 'cockpit-retry': initAdmin(); break;
-    case 'reset-demo': { try { Object.keys(localStorage).filter(k => k.startsWith(BRAND_SLUG)).forEach(k => localStorage.removeItem(k)); } catch (e) {} localStorage.removeItem(STATE_KEY); location.hash = '#/home'; location.reload(); break; }
+    case 'reset-demo': {
+      /* resets THIS person's progress only. The local database (every account) and the sign-in mode survive;
+         with the local backend the account's stored copy is cleared too, or the reload would restore it. */
+      const keep = new Set([BRAND_SLUG + '-localdb-v1', AUTH_MODE_KEY]);
+      try { if (window.EdenCloud && EdenCloud.resetMine) EdenCloud.resetMine(); } catch (e) {}
+      try { Object.keys(localStorage).filter(k => k.startsWith(BRAND_SLUG) && !keep.has(k)).forEach(k => localStorage.removeItem(k)); } catch (e) {}
+      localStorage.removeItem(STATE_KEY); location.hash = '#/home'; location.reload(); break;
+    }
   }
 });
 
@@ -8619,6 +8939,13 @@ $('#playerComplete').addEventListener('click', () => {
   const c = courseById(playing.courseId), p = prog(playing.courseId);
   const doneMod = isDone(playing.courseId) || (p && !p.done && (p.mod || 0) > playing.mod) || (S.trainingLog || []).some(e => e.courseId === playing.courseId && e.mod === playing.mod);
   if (doneMod) {   /* already recorded: this button is now "next lesson" (or back to the course) */
+    if (window.curNext && window.CUR) {
+      /* curriculum: the same next step as the end of a lesson — within the module, or the Module complete window */
+      const n = window.curNext(playing.courseId, playing.mod, { checkFor: null });
+      if (n && n.kind === 'next') { _openPaused = true; openPlayer(n.courseId, n.mod); }
+      else if (!(n && window.curAfter && window.curAfter(n))) closePlayer();
+      return;
+    }
     if (c && playing.mod + 1 < c.modules.length) { _openPaused = true; openPlayer(playing.courseId, playing.mod + 1); }
     else closePlayer();
     return;
@@ -8832,21 +9159,30 @@ function startOnboarding() {
 }
 function drawOnboard() {
   const body = $('#obBody');
+  /* an existing learner reopening "Change role & goal" can always back out; a new one cannot skip */
+  { const card = $('#onboard .onboard-card'); let x = $('#obClose');
+    if (S.onboarded && card && !x) { x = document.createElement('button'); x.id = 'obClose'; x.className = 'ob-close'; x.type = 'button';
+      x.setAttribute('aria-label', _lang() === 'pt' ? 'Fechar' : 'Close'); x.innerHTML = '&times;';
+      x.addEventListener('click', () => { $('#onboard').classList.remove('open'); }); card.prepend(x); }
+    if (x) x.hidden = !S.onboarded; }
   $('#obFill').style.width = [33, 66, 100][ob.step] + '%';
   if (ob.step === 0) {
     body.innerHTML = `
       <div class="ob-eyebrow">${t('ob_step')} 1 ${t('of')} 3 · ${t('ob_welcome')}</div>
       <div class="ob-title">${t('ob_hi')} ${firstName()}</div>
-      <p class="ob-sub">${t('ob_pick_handle')}</p>
-      <div class="ob-handle"><span>@</span><input id="obUsername" class="ob-input" maxlength="20" autocomplete="off" placeholder="${suggestHandle()}" value="${esc((ob.username || '').replace(/^@/, ''))}"></div>
+      ${OPEN_MODE ? `<p class="ob-sub">${_lang() === 'pt' ? 'O seu nome — aparece no seu comprovativo de formação.' : 'Your name — it appears on your training certificate.'}</p>
+      <div class="ob-handle"><input id="obUsername" class="ob-input" maxlength="60" autocomplete="name" placeholder="${_lang() === 'pt' ? 'Nome e apelido' : 'First and last name'}" value="${esc(ob.username || ((S.profile && S.profile.name) || ''))}"></div>`
+      : `<p class="ob-sub">${t('ob_pick_handle')}</p>
+      <div class="ob-handle"><span>@</span><input id="obUsername" class="ob-input" maxlength="20" autocomplete="off" placeholder="${suggestHandle()}" value="${esc((ob.username || '').replace(/^@/, ''))}"></div>`}
       <p class="ob-sub" style="margin-top:16px;">${t('ob_role_q')}</p>
       <div class="ob-grid">${ROLE_OPTIONS.map(r => `
         <div class="ob-option ${ob.role === r.key ? 'sel' : ''}" data-role="${r.key}">
-          <span class="oi">${svgIcon(r.icon)}</span><div>${trole(r)}<div class="od">${tgoal(r.goals[0])} ${t('track_more')}</div></div>
+          <span class="oi">${svgIcon(r.icon)}</span><div>${trole(r)}<div class="od">${esc(_lang() === 'pt' ? (r.pt_d || '') : (r.en_d || ''))}</div></div>
         </div>`).join('')}
       </div>
       <div class="ob-foot">
-        <button class="ob-skip" id="obSkip">${t('ob_skip')}</button>
+        ${/* no "Skip, explore on my own": the department shapes the whole path (João + Pedro, 5 Nov 2026) */''}
+        <span class="ob-hint">${ob.role ? '' : (_lang() === 'pt' ? 'Escolha o seu departamento' : 'Choose your department')}</span>
         <span style="flex:1"></span>
         <button class="btn btn-primary" id="obNext" ${ob.role ? '' : 'data-needs="role" style="opacity:.55"'}>${t('ob_continue')}</button>
       </div>`;
@@ -8861,16 +9197,16 @@ function drawOnboard() {
   } else if (ob.step === 1) {
     const role = ROLE_OPTIONS.find(r => r.key === ob.role) || ROLE_OPTIONS[0];
     /* three goals, the department's own first; less to read, nothing that looks like a duplicate (João, 4 Nov 2026) */
-    const goals = [...new Set([...role.goals, ...Object.keys(GOAL_PRESETS)])].filter(g => GOAL_PRESETS[g]).slice(0, 3);
+    const goals = role.goals.filter(g => GOAL_PRESETS[g]).slice(0, 3);   /* the department's own three, nothing generic */
     /* the role already implies a first goal — pre-select it so the step is one click, not two */
     if (!ob.goal || !GOAL_PRESETS[ob.goal]) ob.goal = goals[0];
     body.innerHTML = `
       <div class="ob-eyebrow">${t('ob_step')} 2 ${t('of')} 3 · ${t('ob_destination')}</div>
       <div class="ob-title">${t('ob_q2')}</div>
       <p class="ob-sub">${t('ob_q2_sub')}</p>
-      <div class="ob-grid ob-goals">${goals.map(g => { const gi = (typeof GOAL_INFO !== 'undefined' && GOAL_INFO[g]) || null; return `
-        <div class="ob-option ${ob.goal === g ? 'sel' : ''}" data-goal="${g}">
-          <span class="oi">${svgIcon((gi && gi.icon) || (courseById(GOAL_PRESETS[g][0]) || {}).icon || 'leaf')}</span><div>${tgoal(g)}${gi ? `<div class="od">${esc(_lang() === 'pt' ? gi.pt : gi.en)}</div>` : ''}</div>
+      <div class="ob-grid ob-goals">${goals.map((g, gk) => { const gi = (typeof GOAL_INFO !== 'undefined' && GOAL_INFO[g]) || null; const ax = (Array.isArray(t('goal_axes')) ? t('goal_axes') : [])[gk]; return `
+        <div class="ob-option ${ob.goal === g ? 'sel' : ''}" data-goal="${attr(g)}">
+          <span class="oi">${svgIcon((gi && gi.icon) || (courseById(GOAL_PRESETS[g][0]) || {}).icon || 'leaf')}</span><div>${ax ? `<span class="ob-axis">${esc(ax)}</span>` : ''}${esc(tgoal(g))}${gi ? `<div class="od">${esc(_lang() === 'pt' ? gi.pt : gi.en)}</div>` : ''}</div>
         </div>`; }).join('')}
       </div>
       <div class="ob-foot">
@@ -8884,12 +9220,12 @@ function drawOnboard() {
     body.innerHTML = `
       <div class="ob-gen">
         <div class="orb-spin"></div>
-        <div class="ob-title" style="font-size:24px;">${t('ob_building')} ${tgoal(ob.goal)}</div>
+        <div class="ob-title" style="font-size:24px;">${t('ob_building')} ${qgoal(ob.goal)}</div>
         <div class="gen-line" id="genLine">${_lang() === 'pt' ? 'A ler o seu perfil…' : 'Reading your role profile…'}</div>
       </div>`;
     const lines = _lang() === 'pt'
-      ? ['A ler o seu perfil…', 'A percorrer a biblioteca ' + brandName() + '…', 'A ver competências que pode saltar…', 'A sequenciar 4–6 cursos…', 'Concluído ✓']
-      : ['Reading your role profile…', 'Scanning the ' + brandName() + ' library…', 'Checking skills you can skip…', 'Sequencing 4–6 courses…', 'Done ✓'];
+      ? ['A ler o seu departamento…', 'A percorrer a biblioteca ' + brandName() + '…', 'A escolher os módulos do seu objetivo…', 'A ordenar o percurso…', 'Concluído ✓']
+      : ['Reading your department…', 'Scanning the ' + brandName() + ' library…', 'Choosing the modules for your goal…', 'Putting your path in order…', 'Done ✓'];
     let i = 0;
     const iv = setInterval(() => {
       i++;
@@ -8897,20 +9233,26 @@ function drawOnboard() {
       clearInterval(iv);
       S.goal = ob.goal;
       S.path = [...GOAL_PRESETS[ob.goal]];
+      S.pathMods = [...((typeof GOAL_MODS === 'object' && GOAL_MODS[ob.goal]) || [])];
       S.role = ob.role;
       const handle = slugHandle(ob.username) || suggestHandle();
-      /* guests have no auth name — the handle they just picked becomes their display name */
-      S.profile = Object.assign({}, S.profile, { username: handle, role: ob.role }, (S.profile && S.profile.name) ? {} : { name: handle });
+      /* guests have no auth name — the handle they just picked becomes their display name;
+         with no sign-in at all (OPEN_MODE) the field asks for the real name, used on certificates */
+      const realName = OPEN_MODE ? String(ob.username || '').replace(/\s+/g, ' ').trim().slice(0, 60) : '';
+      S.profile = Object.assign({}, S.profile, { username: handle, role: ob.role }, realName ? { name: realName } : (S.profile && S.profile.name) ? {} : { name: handle });
       S.onboarded = true;
       save();   /* → syncs the profile (name, @username, role) + path to the account in Firestore */
       $('#onboard').classList.remove('open');
       render();
-      toast(`${_lang() === 'pt' ? 'O seu percurso para' : 'Your AI path to'} ${tgoal(ob.goal)} ${_lang() === 'pt' ? 'está pronto' : 'is ready'}`, '✦');
+      toast(`${_lang() === 'pt' ? 'O seu percurso para' : 'Your path to'} ${qgoal(ob.goal)} ${_lang() === 'pt' ? 'está pronto' : 'is ready'}`, '✦');
     }, 750);
   }
   const next = $('#obNext');
   if (next) next.addEventListener('click', () => {
-    if (ob.step === 0) { const u = $('#obUsername'); if (u) ob.username = u.value.trim(); if (!ob.role) return; }
+    if (ob.step === 0) { const u = $('#obUsername'); if (u) ob.username = u.value.trim();
+      /* no sign-in: the name is the only identity on the certificate, so it is required */
+      if (OPEN_MODE && u && ob.username.length < 2) { u.focus(); u.setAttribute('aria-invalid', 'true'); u.placeholder = _lang() === 'pt' ? 'Escreva o seu nome para continuar' : 'Type your name to continue'; return; }
+      if (!ob.role) return; }
     if (ob.step === 1 && !ob.goal) return;
     ob.step++; drawOnboard();
   });
@@ -9077,7 +9419,15 @@ function applyPendingJoin() {
     toast((_lang() === 'pt' ? 'Bem-vindo à ' : 'Welcome to ') + companyName() + ' 🏢', '✦'); render();
   }).catch(() => { localStorage.removeItem('eden-join'); toast(_lang() === 'pt' ? 'Código de convite inválido' : 'Invalid invite code', '⚠️'); });
 }
-loadGraph().then(() => { if (GRAPH) render(); });
+/* the knowledge graph (+ tags) feeds reel hand-offs, lesson "beside" shorts and
+   related modules — none of it is on the first screen. Fetched once the page
+   has loaded, so on a phone it no longer takes a connection from the hero. */
+/* Home's markup does not use the graph, and re-rendering it replays the hero's entrance animation
+   about a second after first paint; other screens use it (reel hand-offs, related modules) and refresh. */
+const _onHome = () => { const h = (location.hash || '#/home').split('/')[1] || 'home'; return h === 'home'; };
+const _kickGraph = () => loadGraph().then(() => { if (GRAPH && !_onHome()) render(); });
+if (document.readyState === 'complete') setTimeout(_kickGraph, 0);
+else addEventListener('load', () => setTimeout(_kickGraph, 0), { once: true });
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   /* AUTO-UPDATE: when a newer version is deployed, the new service worker
      activates (sw.js does skipWaiting + clients.claim) and takes control →

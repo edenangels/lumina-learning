@@ -71,7 +71,9 @@
   meta('meta[name="twitter:image"]', 'content', B.ogImage);
   const fav = document.querySelector('link[rel="icon"]'); if (fav && B.favicon) fav.setAttribute('href', B.favicon);
   const fl = document.getElementById('brandFonts');
-  if (fl && B.fonts && B.fonts.link && fl.getAttribute('href') !== B.fonts.link) fl.setAttribute('href', B.fonts.link);
+  /* compare without the ?v= cache-buster: index.html already links this file,
+     and swapping in the bare URL fetched and parsed it a second time */
+  if (fl && B.fonts && B.fonts.link && (fl.getAttribute('href') || '').split('?')[0] !== B.fonts.link.split('?')[0]) fl.setAttribute('href', B.fonts.link);
 
   /* ---- logo + wordmark (body elements — after DOM is ready) --------------
      Wordmark text is always applied (reproduces the founding brand exactly);

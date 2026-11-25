@@ -351,7 +351,9 @@ window.EdenCloud = {
   },
   async saveOrgConfig(cfg) {
     if (!auth.currentUser) throw new Error('not-signed-in');
-    await setDoc(doc(db, 'config', cid() === 'edenrise' ? 'org' : cid()), cfg, { merge: true });
+    /* mergeFields replaces each given top-level field whole: setDoc+merge deep-merges maps, so removing a
+       course from `missions` (or a rule from `aiGuard`) silently came back on the next load */
+    await setDoc(doc(db, 'config', cid() === 'edenrise' ? 'org' : cid()), cfg, { mergeFields: Object.keys(cfg) });
   },
   heartbeat() {
     const u = auth.currentUser; if (!u) return;
