@@ -19,7 +19,7 @@ export NPM_CONFIG_CACHE="$NPMC" npm_config_cache="$NPMC"
 node test/run.mjs >/dev/null || { echo "✗ tests failing — not deploying"; exit 1; }
 if [ "${1:-}" != "--no-bump" ]; then
   V=$(grep -o "v=edr[0-9]*" index.html | sort -u | head -1 | grep -oE "[0-9]+"); N=$((V+1))
-  sed -i '' "s/v=edr$V/v=edr$N/g" index.html; sed -i '' "s/edenrise-v$V/edenrise-v$N/" sw.js
+  sed -i '' "s/v=edr$V/v=edr$N/g; s/v='edr$V'/v='edr$N'/g" index.html; sed -i '' "s/edenrise-v$V/edenrise-v$N/" sw.js
   echo "· version edr$V → edr$N"
 fi
 rm -rf "$DIST"; mkdir -p "$DIST"
