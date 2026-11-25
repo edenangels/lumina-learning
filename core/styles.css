@@ -4822,3 +4822,21 @@ body:has(.take-overlay.open, .ck-ov.on, #onboard.open, #quizModal.open, .daily-o
 }
 
 .ai-fab.dodge { opacity: 0; pointer-events: none; transform: scale(.85); }   /* something clickable is under it */
+
+/* Welcome card (Sajid, 24 Nov 2026): while it is open the page behind does not scroll, so no
+   side scrollbar that moves and does nothing. A card taller than the screen scrolls inside the
+   overlay instead (no bar drawn), and is top-aligned so its first and last rows stay reachable. */
+html:has(#onboard.open), body:has(#onboard.open) { overflow: hidden; }
+.onboard-overlay { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; padding: 18px 0; }
+.onboard-overlay::-webkit-scrollbar { display: none; }
+.onboard-card { margin: auto; }
+/* two columns that share the card, never wider than it (the second one was cut off on phones) */
+.ob-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.ob-option > div { min-width: 0; }
+@media (max-width: 480px) {
+  .onboard-card { width: calc(100vw - 20px); padding: 28px 16px 24px; }
+  .ob-option { padding: 14px 10px; gap: 8px; font-size: 14px; }
+  .ob-option .oi svg { width: 22px; height: 22px; }
+  .ob-foot { margin-top: 22px; }
+  .ob-foot .btn { white-space: nowrap; }
+}
