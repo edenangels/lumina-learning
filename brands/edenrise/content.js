@@ -34,13 +34,13 @@ const CATALOG = [
        because silently serving English to someone who chose Portuguese is what
        makes people stop trusting the language switch. */
     moduleMedia_pt: [
-      { type: 'vimeo', id: '1206810959' },   /* 1. Acima da Linha, Abaixo da Linha */
-      { type: 'vimeo', id: '1206811136' },   /* 2. Não Há Fracasso, Só Feedback */
-      { type: 'vimeo', id: '1217937969' },   /* 3. Responsabilidade Total */
-      { type: 'vimeo', id: '1217938258' },   /* 4. Comunicação — Esclareça */
-      { type: 'vimeo', id: '1217938100' },   /* 5. Benchmark de Excelência */
-      { type: 'vimeo', id: '1217937799' },   /* 6. Atenção ao Detalhe */
-      { type: 'vimeo', id: '1217939147' }    /* 7. Seja Aprendiz */
+      { type: 'vimeo', id: '1206810959', h: 'a490705556' },   /* 1. Acima da Linha, Abaixo da Linha */
+      { type: 'vimeo', id: '1206811136', h: '2e084c1a25' },   /* 2. Não Há Fracasso, Só Feedback */
+      { type: 'vimeo', id: '1217937969', h: '64af6b333a' },   /* 3. Responsabilidade Total */
+      { type: 'vimeo', id: '1217938258', h: '5b0e04c4c8' },   /* 4. Comunicação — Esclareça */
+      { type: 'vimeo', id: '1217938100', h: '64216c78be' },   /* 5. Benchmark de Excelência */
+      { type: 'vimeo', id: '1217937799', h: '1070d817fb' },   /* 6. Atenção ao Detalhe */
+      { type: 'vimeo', id: '1217939147', h: 'efd2b66e52' }    /* 7. Seja Aprendiz */
       /* 8. A Ciência da Gratidão — not recorded in PT yet */
     ],
     moduleDurations_pt: [5, 4, 6, 6, 6, 6, 6],   /* real: 5:06 4:29 6:19 6:20 6:19 5:39 5:48 */
@@ -104,11 +104,11 @@ const CATALOG = [
     ],
     moduleDurations_pt: [7, 7, 6, 6, 6],   /* real: 6:59 6:43 6:06 6:26 5:55 */
     moduleMedia_pt: [
-      { type: 'vimeo', id: '1217931540' },   /* 1. Propósito último */
-      { type: 'vimeo', id: '1220784470' },   /* 2. Definição de objetivos */
-      { type: 'vimeo', id: '1221805932' },   /* 3. Kaizen */
-      { type: 'vimeo', id: '1222970612' },   /* 4. Crenças vencedoras */
-      { type: 'vimeo', id: '1223417488' }    /* As seis necessidades humanas básicas — domine a sua reação */
+      { type: 'vimeo', id: '1217931540', h: '8ccfa9eb1b' },   /* 1. Propósito último */
+      { type: 'vimeo', id: '1220784470', h: 'c129434573' },   /* 2. Definição de objetivos */
+      { type: 'vimeo', id: '1221805932', h: '725e3f6724' },   /* 3. Kaizen */
+      { type: 'vimeo', id: '1222970612', h: '41d23498a5' },   /* 4. Crenças vencedoras */
+      { type: 'vimeo', id: '1223417488', h: 'b108ef1d6d' }    /* As seis necessidades humanas básicas — domine a sua reação */
     ]
   },
   {

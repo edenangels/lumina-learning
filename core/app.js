@@ -5548,7 +5548,35 @@ function initMotion() {
 const playerEl = $('#player'), videoEl = $('#playerVideo');
 const simStage = $('#simStage'), simFill = $('#simFill');
 const vimeoWrap = $('#vimeoWrap'), soonStage = $('#soonStage');
-const modMedia = (c, i) => (c.moduleMedia && c.moduleMedia[i]) || null;
+/* ===== PER-LANGUAGE VIDEO (restored 25 Nov 2026; dropped by accident on 17 Aug) =====
+   Where a course has been recorded in the reader's language, `moduleMedia_<lang>`
+   holds that cut and it plays. A brand with no such list (Belong) is unaffected.
+   FALLBACK IS DISCLOSED, NOT SILENT: a module with no recording in the reader's
+   language plays the base cut and the player says so (lang_fallback). */
+const modCut = (c, i) => { const by = c && c['moduleMedia_' + _lang()]; return (by && by[i]) || null; };
+const modMedia = (c, i) => modCut(c, i) || (c && c.moduleMedia && c.moduleMedia[i]) || null;
+/* true when this course HAS a cut in the reader's language but this module is not in it */
+const modLangFallback = (c, i) => { const by = c && c['moduleMedia_' + _lang()]; return !!(by && !by[i] && c.moduleMedia && c.moduleMedia[i] && c.moduleMedia[i].type !== 'soon'); };
+/* Every timestamp the app keeps (question anchors, search moments, tags) was taken
+   on the BASE cut. When the language cut plays, the same sentence is spoken at a
+   different second, so a base time is translated through the two transcripts: how
+   far into the script the base cut is at that second, and when the language cut
+   reaches the same point. Checked against 18 hand-anchored pairs: within 2 s for
+   most, 6 s at worst, so it starts 3 s early rather than risk starting late. */
+function cutTime(c, mod, tRef) {
+  const m = modCut(c, mod);
+  if (!m || !(tRef > 0)) return Promise.resolve(tRef);
+  return Promise.all([loadTranscript(c.id, mod, 'base'), loadTranscript(c.id, mod)]).then(([a, b]) => {
+    if (!a || !b || a === b || String(b.vimeoId) !== String(m.id)) return tRef;
+    const cum = segs => { let n = 0; return segs.map(g => { const s0 = n; n += (g.text || '').length + 1; return [g.t0, g.t1, s0, n]; }); };
+    const A = cum(a.segments), B = cum(b.segments); if (!A.length || !B.length) return tRef;
+    let pos = 0;
+    for (const [t0, t1, s0, s1] of A) { if (tRef >= t1) pos = s1; else { if (tRef > t0) pos = s0 + (s1 - s0) * (tRef - t0) / Math.max(.01, t1 - t0); else pos = Math.max(pos, s0); break; } }
+    const q = pos / A[A.length - 1][3] * B[B.length - 1][3];
+    for (const [t0, t1, s0, s1] of B) if (q < s1) return Math.max(0, Math.floor(t0 + (t1 - t0) * Math.max(0, (q - s0) / Math.max(1, s1 - s0)) - 3));
+    return Math.max(0, Math.floor(B[B.length - 1][0]));
+  }).catch(() => tRef);
+}
 /* A course "has real content" when its modules carry actual media — Vimeo or
    YouTube ids the client filmed — rather than falling through to the shared
    sample clips. The hero must lead with one of those: a billboard for a course
@@ -5661,6 +5689,13 @@ function openPlayer(courseId, mod, startAt) {
   /* a chapter at 0:00 is an explicit start: do not resume from the saved position */
   { const pp = prog(courseId); if (_seekTo == null && !explicitStart && pp && pp.pos && pp.pos.mod === mod && pp.pos.t > 8) _seekTo = Math.max(0, pp.pos.t - 3); }
   const media = modMedia(c, mod);
+  if (_seekTo != null && explicitStart && modCut(c, mod)) {
+    const ref = _seekTo;
+    cutTime(c, mod, ref).then(tm => {
+      if (tm === ref || !playing || playing.courseId !== courseId || playing.mod !== mod) return;
+      if (_seekTo === ref) _seekTo = tm; else if (_seekTo == null) seekTo(tm);
+    });
+  }
   clearCheckpoint();
   watchedSeconds = 0;
   watchStart(courseId + ':' + mod, 'pending');
@@ -5699,7 +5734,7 @@ function openPlayer(courseId, mod, startAt) {
   }
 
   $('#playerTitle').textContent = ctitle(c);
-  $('#playerSub').textContent = `${t('module')} ${mod + 1} ${t('of')} ${c.modules.length} · ${cmods(c)[mod]}`;
+  $('#playerSub').textContent = `${t('module')} ${mod + 1} ${t('of')} ${c.modules.length} · ${cmods(c)[mod]}` + (modLangFallback(c, mod) ? ' · ' + t('lang_fallback') : '');
   const pg = $('#playerGoal'); if (pg) { const goal = (takeawaysFor(c, mod) || [])[0] || ''; pg.textContent = goal ? ` ${t('lesson_goal')}: ${goal}` : ''; }
   const pe = $('#playerEduStrip'); if (pe) pe.innerHTML = eduStripHTML(c, mod);
   $('#playerPills').innerHTML = c.modules.map((m, i) => {
@@ -5906,13 +5941,20 @@ function armVimeo(c, mod) {
    now shows the Whisper transcript of the actual lesson: each line clickable
    (seeks the video), the current line highlighted as the trainer speaks. */
 const _trCache = {};
-function loadTranscript(courseId, mod) {
-  const k = courseId + ':' + mod;
+function loadTranscript(courseId, mod, which) {
+  /* the transcript of the cut that PLAYS: when the reader's language has its own
+     recording of this module, m<N>.<lang>.json, but only if it was made from that
+     very video (vimeoId) — a translated transcript of the base cut carries the base
+     cut's timestamps and would highlight the wrong line. `which === 'base'` always
+     returns the base file (cutTime needs both). */
+  const cut = which === 'base' ? null : modCut(courseById(courseId), mod);
+  const lang = cut ? _lang() : '';
+  const k = courseId + ':' + mod + (lang ? ':' + lang : '');
   if (_trCache[k] !== undefined) return Promise.resolve(_trCache[k]);
-  return fetch('media/transcripts/' + courseId + '/m' + mod + '.json')
-    .then(r => r.ok ? r.json() : null)
-    .then(j => (_trCache[k] = j && j.segments ? j : null))
-    .catch(() => (_trCache[k] = null));
+  const get = f => fetch('media/transcripts/' + courseId + '/' + f).then(r => r.ok ? r.json() : null).then(j => (j && j.segments ? j : null)).catch(() => null);
+  const base = () => get('m' + mod + '.json');
+  return (cut ? get('m' + mod + '.' + lang + '.json').then(j => (j && String(j.vimeoId) === String(cut.id)) ? j : base()) : base())
+    .then(j => (_trCache[k] = j));
 }
 function seekTo(sec) {
   if (vimeoPlayer) { vimeoPlayer.setCurrentTime(sec).catch(() => {}); return; }
@@ -8772,9 +8814,10 @@ document.addEventListener('click', e => {
           bar.append(b, f);
           if (ck.firstElementChild) ck.firstElementChild.prepend(bar);
         }
-        const tt = +el.dataset.t;
-        if (vimeoPlayer) vimeoPlayer.setCurrentTime(tt).then(() => vimeoPlayer.play()).catch(() => {});
-        else { try { videoEl.currentTime = tt; videoEl.play(); } catch (e) {} }
+        cutTime(courseById(el.dataset.id), +el.dataset.mod, +el.dataset.t).then(tt => {
+          if (vimeoPlayer) vimeoPlayer.setCurrentTime(tt).then(() => vimeoPlayer.play()).catch(() => {});
+          else { try { videoEl.currentTime = tt; videoEl.play(); } catch (e) {} }
+        });
         break;
       }
       /* from a review card elsewhere: open the player four seconds before the moment */

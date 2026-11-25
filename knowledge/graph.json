@@ -1,5 +1,5 @@
 {
- "generatedAt": 1795621632978,
+ "generatedAt": 1795622118048,
  "nodes": [
   {
    "id": "course:alignment-journey",
@@ -3618,12 +3618,6 @@
    "w": 0.471
   },
   {
-   "from": "reel:raise-the-energy",
-   "to": "module:trust-journey:1",
-   "rel": "beside",
-   "w": 0.278
-  },
-  {
    "from": "reel:safe-to-speak",
    "to": "module:land-team-journey:7",
    "rel": "beside",
@@ -3745,6 +3739,12 @@
   },
   {
    "from": "module:land-team-journey:2",
+   "to": "module:trust-journey:0",
+   "rel": "related",
+   "w": 0.143
+  },
+  {
+   "from": "module:land-team-journey:2",
    "to": "module:land-team-journey:3",
    "rel": "related",
    "w": 0.127
@@ -3756,10 +3756,10 @@
    "w": 0.159
   },
   {
-   "from": "module:land-team-journey:7",
-   "to": "module:trust-journey:2",
+   "from": "module:land-team-journey:5",
+   "to": "module:trust-journey:0",
    "rel": "related",
-   "w": 0.143
+   "w": 0.159
   },
   {
    "from": "module:land-team-journey:9",
@@ -4181,8 +4181,8 @@
    "in": 36,
    "about": 330,
    "deeper": 5,
-   "beside": 7,
-   "related": 22,
+   "beside": 6,
+   "related": 23,
    "similar": 67
   }
  },
