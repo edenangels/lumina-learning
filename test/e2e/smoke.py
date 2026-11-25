@@ -34,9 +34,10 @@ with sync_playwright() as p:
     if L == 'pt':
         c.add_init_script("localStorage.getItem('edenrise-state-v2')||localStorage.setItem('edenrise-state-v2',JSON.stringify({lang:'pt'}))")
     pg = c.new_page(); pg.set_default_timeout(10000); errs = []
-    VIMEO_NOISE = 'player.vimeo.com" from accessing a frame'   # Safari: Vimeo's own frame probing its parent; not ours, harmless
+    VIMEO_NOISE = 'player.vimeo.com" from accessing a frame'
+    EXTERNAL = ('opentimestamps.org', 'net::ERR_FAILED')   # public timestamp calendars: best-effort, outages are not ours   # Safari: Vimeo's own frame probing its parent; not ours, harmless
     pg.on('pageerror', lambda e: (None if VIMEO_NOISE in str(e) else errs.append('PAGEERR ' + str(e)[:200])))
-    pg.on('console', lambda m: errs.append('CONSOLE ' + m.text[:160]) if m.type == 'error' and 'ERR_NETWORK' not in m.text else None)
+    pg.on('console', lambda m: errs.append('CONSOLE ' + m.text[:160]) if m.type == 'error' and not any(x in m.text for x in EXTERNAL) and 'ERR_NETWORK' not in m.text else None)
 
     pg.goto(B + '#/home'); pg.wait_for_timeout(4000)
     g = pg.query_selector('#authGuest')

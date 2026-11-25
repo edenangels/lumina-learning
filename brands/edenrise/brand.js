@@ -59,8 +59,8 @@
   /* 25 Nov 2026: ADEN runs the shared engine Belong was approved on. The engine's loader needs the backend
      named: 'firebase' keeps everyone's real accounts. (Missing = no-login mode.) */
   backend: 'firebase',
-  /* Belong-approved choices, mirrored: the video ending opens the questions (no Mark complete button),
-     no "knowledge verified" counter, no second reels shelf. NOT mirrored on purpose: watchGate stays ON
+  /* Belong-approved choices, mirrored: the video ending opens the recap and questions ("Mark lesson complete"
+     stays as the manual way in), no "knowledge verified" counter, no second reels shelf. NOT mirrored on purpose: watchGate stays ON
      (Belong turned it off only for testing) and the full profile stays (NIF/contract for the 40-h record). */
   markComplete: false,
   hideVerifiedStat: true,

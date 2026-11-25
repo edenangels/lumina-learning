@@ -5301,3 +5301,5 @@ body.rerender #app * { animation: none !important; }
 /* Welcome card (Sajid, 24 Nov 2026): while it is open the page behind does not scroll, so no
    side scrollbar that moves and does nothing. The card itself already fits the window (5 Nov). */
 html:has(#onboard.open), body:has(#onboard.open) { overflow: hidden; }
+/* watch rule: the Mark-complete button says how far the lesson has been watched (round 3) */
+#playerComplete.is-waiting { background: transparent; color: var(--text, #fff); border: 1px solid var(--accent-2, #c9a45c); }
