@@ -112,6 +112,37 @@ const CATALOG = [
     ]
   },
   {
+    id: 'trust-journey', title: 'Trust & Ownership', cat: 'Leadership', grad: 2, icon: 'compass',
+    outcomes: ['Build trust with six everyday behaviours — and see why it makes everything faster', 'Keep your word, and say so early when you cannot', 'Notice the small broken promises that quietly wear a team down', 'Bring a solution, not only the problem: from amplifier or reporter to solution owner'],
+    outcomes_pt: ['Criar confiança com seis comportamentos do dia a dia — e perceber porque torna tudo mais rápido', 'Cumprir a sua palavra, e avisar cedo quando não consegue', 'Reparar nas pequenas promessas por cumprir que desgastam uma equipa em silêncio', 'Trazer uma solução, não só o problema: de amplificador ou relator a dono da solução'],
+    /* The THIRD journey. Vimeo folders "3rd Course" (EN 31163010, PT 31163011),
+       uploaded 5 → 23 Nov 2026; wired 25 Nov 2026 (Sajid). Three lessons so far.
+       The PT cut is listed below (moduleMedia_pt) but DOES NOT PLAY YET: the app has
+       not read any moduleMedia_pt since 17 Aug 2026, so Portuguese readers get the
+       English video on every course. PT transcripts and a PT-timed question bank are
+       left out until that is restored, so "review the moment" seeks the video that
+       actually plays. Page text, takeaways and questions are in both languages. Ids were
+       read from the folders through the Vimeo API, never typed. The course title is provisional (the Vimeo folder
+       only says "3rd Course"): João / John to confirm. */
+    level: 'All levels', learners: 0, ai: true, isNew: true, updated: '2026-11', poster: 'media/covers/trust-journey.webp', heroArt: 'media/covers/trust-journey-hero.webp',
+    hook: 'Be the person the team can rely on when things get hard.',
+    hookSub: 'Trust, promises kept and owning the solution: three habits that make work faster and lighter.',
+    desc: 'The third journey is about what other people can count on you for. You will see why trust makes everything faster and cheaper, practise the six behaviours that build it, learn what keeping your word does for the people who depend on it (and how to own it when you cannot), and move from amplifying or reporting problems to owning the solution.',
+    modules: ['The Speed of Trust', 'Promises Kept', 'The Three Levels of Problem-Solving'],
+    moduleDurations: [6, 5, 7],   /* real Vimeo lengths: 5:57 5:26 6:36 */
+    moduleMedia: [
+      { type: 'vimeo', id: '1243672325', h: '371d7da7ac' },   /* 1. The Speed of Trust */
+      { type: 'vimeo', id: '1247222331', h: '70e8d3a188' },   /* 2. Promises Kept */
+      { type: 'vimeo', id: '1249378163', h: '8cd5f63758' }    /* 3. The Three Levels of Problem-Solving */
+    ],
+    moduleDurations_pt: [7, 6, 7],   /* real: 6:32 6:10 7:13 */
+    moduleMedia_pt: [
+      { type: 'vimeo', id: '1243673142', h: '8c9cda1041' },   /* 1. A Velocidade da Confiança */
+      { type: 'vimeo', id: '1249383058', h: '6a2d51af5f' },   /* 2. Promessas Cumpridas */
+      { type: 'vimeo', id: '1249387943', h: 'd7f1ba22db' }    /* 3. Os Três Níveis de Resolução de Problemas */
+    ]
+  },
+  {
     id: 'fire-truck-training', title: 'Fire Truck Training', cat: 'Stewardship', grad: 4, icon: 'fire', recertMonths: 12, featured: true, updated: '2026-07',
     outcomes: ['Start and drive the truck safely — brake pressure, handbrake and gears', 'Fill the tank from the pump house, the gravity tank or a well', 'Handle hills and narrow tracks, and work the pump and fire gun as a pair', 'Shut down safely and keep the truck ready all season'],
     outcomes_pt: ['Arrancar e conduzir o camião em segurança — pressão dos travões, travão de mão e mudanças', 'Encher o depósito na casa das bombas, no depósito por gravidade ou num poço', 'Lidar com encostas e caminhos estreitos, e trabalhar a bomba e a agulheta a dois', 'Desligar em segurança e manter o camião pronto toda a época'],
@@ -197,6 +228,7 @@ const COURSE_HOOKS = {
   'fire-truck-training': ['When fire comes, you will know the truck.', 'Start it, drive it, fill it, pump it — hands-on, step by step, before you ever need it.'],
   'alignment-journey': ['One team, one way of working — starting with a warm welcome.', 'John’s welcome, the ESIP framework, moving beyond fear, and caring for body, soul and spirit.'],
   'growth-journey': ['Know why you get up — and set goals that stick.', 'Purpose, 90-day goals, kaizen and the beliefs that carry you through a hard season.'],
+  'trust-journey': ['Be the person the team can rely on when things get hard.', 'Trust, promises kept and owning the solution: three habits that make work faster and lighter.'],
   'land-team-journey': ['Choose how you show up — even on the hard days.', 'Eight mindset habits that make you someone the team can rely on.'],
   'land-literacy': ['Learn to read the land like a story.', 'Slope, soil, water, wind — see what the land has been telling you all along.'],
   'living-soil': ['There’s a universe under your feet.', 'Feed the soil, and everything above it thrives.'],
@@ -224,6 +256,7 @@ const COURSE_HOOKS_PT = {
   'fire-truck-training': ['Quando o fogo vier, vai conhecer o camião.', 'Arrancar, conduzir, encher, bombear — na prática, passo a passo, antes de alguma vez precisar.'],
   'alignment-journey': ['Uma equipa, uma forma de trabalhar — a começar por boas-vindas calorosas.', 'As boas-vindas do John, o ESIP, ir para além do medo, e cuidar do corpo, alma e espírito.'],
   'growth-journey': ['Saiba porque se levanta — e defina objetivos que ficam.', 'Propósito, objetivos a 90 dias, kaizen e as crenças que o sustentam numa época difícil.'],
+  'trust-journey': ['Seja a pessoa com quem a equipa pode contar quando as coisas ficam difíceis.', 'Confiança, promessas cumpridas e ser dono da solução: três hábitos que tornam o trabalho mais rápido e mais leve.'],
   'land-team-journey': ['Escolha como aparece — mesmo nos dias difíceis.', 'Oito hábitos de mentalidade que fazem de si alguém em quem a equipa pode confiar.'],
   'land-literacy': ['Aprenda a ler a terra como uma história.', 'Declive, solo, água, vento — veja o que a terra sempre lhe quis dizer.'],
   'living-soil': ['Há um universo debaixo dos seus pés.', 'Alimente o solo, e tudo acima dele floresce.'],
@@ -419,6 +452,30 @@ const TAKEAWAYS = {
        'Para, repara na necessidade, escolhe a resposta. A consciência cria escolha, e melhores escolhas criam melhores resultados.']
     ]
   },
+  'trust-journey': {
+    en: [
+      ['When trust goes up, speed goes up and cost goes down. Low trust is a tax: more meetings, more checking, more delay.',
+       'Six behaviours build it: talk straight, create clarity, keep commitments, practise accountability, listen first, extend trust.',
+       'Trust is made in hundreds of small moments, not one big event. It asks for integrity, not perfection.'],
+      ['When you promise something, someone starts arranging part of their life around your words.',
+       'Breaking a commitment is not always a failure of character; refusing to own it can become one. Reach out first: what happened, and what you will do.',
+       'Small broken promises nobody acknowledges eat at a team like termites. Every promise you honour builds trust and your own integrity.'],
+      ['Level one amplifies the problem: more energy goes into describing it than into solving it.',
+       'Level two reports the problem clearly, but hands the thinking to someone else. Safety, serious risks and decisions beyond your authority still go up at once.',
+       'Level three owns the solution: look into it, bring options and a recommendation, and ask for approval. Ownership is not working alone.']
+    ],
+    pt: [
+      ['Quando a confiança sobe, a velocidade sobe e o custo desce. A falta de confiança é um imposto: mais reuniões, mais verificações, mais atrasos.',
+       'Seis comportamentos constroem-na: falar com franqueza, criar clareza, cumprir compromissos, assumir a responsabilidade, ouvir primeiro, dar confiança.',
+       'A confiança nasce de centenas de pequenos momentos, não de um grande acontecimento. Exige integridade, não perfeição.'],
+      ['Quando promete alguma coisa, alguém começa a organizar parte da sua vida em torno das suas palavras.',
+       'Quebrar um compromisso nem sempre é uma falha de caráter; recusar assumi-lo pode tornar-se uma. Tome a iniciativa: o que aconteceu e o que vai fazer.',
+       'As pequenas promessas quebradas que ninguém reconhece roem uma equipa como térmitas. Cada promessa que honra constrói confiança e a sua própria integridade.'],
+      ['O nível um amplifica o problema: gasta-se mais energia a descrevê-lo do que a resolvê-lo.',
+       'O nível dois comunica o problema com clareza, mas passa o pensamento a outra pessoa. Segurança, riscos graves e decisões acima da sua autoridade continuam a ir de imediato à chefia.',
+       'O nível três é dono da solução: investiga, traz alternativas e uma recomendação, e pede aprovação. Ser dono não é trabalhar sozinho.']
+    ]
+  },
   'land-team-journey': {
     en: [
       ['Above the line is openness, curiosity and commitment to learning; below it is defensiveness, blame and needing to be right.',
@@ -478,6 +535,7 @@ const COURSE_PT = {
     'Corpo, Alma e Espírito · Introdução', 'Corpo, Alma e Espírito · Análise Profunda'
   ] },
   'growth-journey': { title:'Propósito Último', desc:'A segunda jornada da Equipa da Terra — do propósito à prática diária. Porque se levanta, os objetivos que daí decorrem, a disciplina das pequenas melhorias, as crenças que o sustentam e as seis necessidades por trás de cada reação.', hook:'Saiba porque se levanta — e defina objetivos que ficam.', hookSub:'Propósito, objetivos a 90 dias, kaizen e as crenças que o sustentam numa época difícil.', modules:['Propósito Último', 'Definição de Objetivos', 'Kaizen', 'Crenças Vencedoras', 'As Seis Necessidades Humanas', 'Definição de Objetivos: Animação', 'Os Seus Objetivos a 90 Dias', 'Os Seus 5 Principais Objetivos', 'Definição de Objetivos: Síntese'] },
+  'trust-journey': { title:'Confiança e Responsabilidade', desc:'A terceira jornada é sobre aquilo com que os outros podem contar da sua parte. Vai perceber porque é que a confiança torna tudo mais rápido e mais barato, praticar os seis comportamentos que a constroem, aprender o que cumprir a sua palavra faz pelas pessoas que dependem dela (e como assumir quando não consegue), e passar de amplificar ou comunicar problemas a ser dono da solução.', hook:'Seja a pessoa com quem a equipa pode contar quando as coisas ficam difíceis.', hookSub:'Confiança, promessas cumpridas e ser dono da solução: três hábitos que tornam o trabalho mais rápido e mais leve.', modules:['A Velocidade da Confiança', 'Promessas Cumpridas', 'Os Três Níveis de Resolução de Problemas'] },
   'land-team-journey': { title:'Acima da Linha', desc:'A jornada de crescimento da Equipa da Terra — a mentalidade e os hábitos que moldam como trabalhamos a terra, e uns aos outros. Começa com uma pergunta que muda a forma como aparecemos.', modules:['Acima da Linha, Abaixo da Linha','Não Há Fracasso, Só Feedback','Responsabilidade Total','Comunicação — Esclareça','Benchmark de Excelência','Atenção ao Detalhe','Seja Aprendiz','A Ciência da Gratidão','Acima da Linha: Pensamento Simples e Poderoso','Acima da Linha: Análise Profunda','Acima da Linha: Síntese','Sem Fracasso: a Animação','Sem Fracasso: Síntese'], hook:'Escolha como aparece — mesmo nos dias difíceis.', hookSub:'Oito hábitos de mentalidade que fazem de si alguém em quem a equipa pode confiar.' },
   'land-literacy': { title:'Ler a Terra', desc:'Antes de mudar uma paisagem, aprenda a lê-la. Declive, água, solo, sol e sucessão — a literacia com que começa todo o ato de zeladoria.', modules:['Ficar quieto: como observar','Ler o declive e a água','O solo ao toque e à vista','Sol, sombra e exposição','Sucessão e o que a terra quer','Mapear o seu terreno'] },
   'living-soil': { title:'Solo Vivo', desc:'O solo não é terra morta — é uma comunidade viva. Conheça o microbioma sob os seus pés e as práticas que o alimentam em vez de o esgotar.', modules:['A teia alimentar do solo','Porque deixámos de lavrar','Compostagem como inoculante','Culturas de cobertura e raízes vivas','Cobertura morta e solo nu','Ler uma análise de solo'] },
@@ -506,6 +564,7 @@ const COURSE_SKILLS = {
   'alignment-journey': ['leadership', 'community'],
   'land-team-journey': ['leadership', 'community'],
   'growth-journey': ['leadership'],
+  'trust-journey': ['leadership', 'community'],
 };
 
 /* ===== REQ-L-021 · SPECIAL REGIMES =========================================

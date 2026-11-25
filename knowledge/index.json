@@ -1,5 +1,5 @@
 {
- "generatedAt": 1795534293962,
+ "generatedAt": 1795621632850,
  "courses": {
   "alignment-journey": {
    "title": "The ADEN Alignment Journey",
@@ -1862,6 +1862,185 @@
        "t0": 86,
        "teaches": "You are facing a difficult situation in your personal life and are feeling overwhelmed. What should you do to move forwa",
        "audit": "corrected"
+      }
+     ],
+     "questions": 6
+    }
+   ]
+  },
+  "trust-journey": {
+   "title": "Trust & Ownership",
+   "modules": [
+    {
+     "mod": 0,
+     "title": "The Speed of Trust",
+     "language": "en",
+     "translated": null,
+     "segments": 74,
+     "chars": 4788,
+     "durationSec": 357,
+     "capability": "leadership",
+     "tags": [
+      "leadership",
+      "community",
+      "trust",
+      "responsibility",
+      "down",
+      "wrong",
+      "honest",
+      "covey",
+      "speed",
+      "communication"
+     ],
+     "regime": null,
+     "summary": "Think about a person you really trust at work. When they say they'll do something, you believe them. You can speak openly with them. You don't waste time second-guessing their",
+     "url": "https://academy.edenrise.com/#/play/trust-journey/0",
+     "moments": [
+      {
+       "t0": 37,
+       "teaches": "According to the lesson, what happens when trust goes up?",
+       "audit": "verified"
+      },
+      {
+       "t0": 100,
+       "teaches": "What does \"talking straight\" mean in this lesson?",
+       "audit": "verified"
+      },
+      {
+       "t0": 135,
+       "teaches": "Before important work begins, what should you get clear?",
+       "audit": "verified"
+      },
+      {
+       "t0": 168,
+       "teaches": "Circumstances change and you can no longer deliver what you promised. What does the lesson ask you to do?",
+       "audit": "verified"
+      },
+      {
+       "t0": 232,
+       "teaches": "A colleague did not do what you expected, and you catch yourself thinking \"they just don't care\". What is the \"listen fi",
+       "audit": "verified"
+      },
+      {
+       "t0": 269,
+       "teaches": "You work with a capable teammate but you check every step they take. What does the lesson suggest instead?",
+       "audit": "verified"
+      }
+     ],
+     "questions": 6
+    },
+    {
+     "mod": 1,
+     "title": "Promises Kept",
+     "language": "en",
+     "translated": null,
+     "segments": 68,
+     "chars": 4488,
+     "durationSec": 323,
+     "capability": "leadership",
+     "tags": [
+      "leadership",
+      "community",
+      "promise",
+      "trust",
+      "worth",
+      "begins",
+      "commitment",
+      "imagine",
+      "actions",
+      "integrity"
+     ],
+     "regime": null,
+     "summary": "What is your word really worth? Not what you say it's worth, not what you hope others believe it's worth. But what is it worth to the people who depend on it? Think about that for a moment. Every time you make a promise, something invisible",
+     "url": "https://academy.edenrise.com/#/play/trust-journey/1",
+     "moments": [
+      {
+       "t0": 17,
+       "teaches": "What invisible thing happens every time you make a promise?",
+       "audit": "verified"
+      },
+      {
+       "t0": 68,
+       "teaches": "When a small promise is not honoured, what unspoken message does the lesson say it sends?",
+       "audit": "verified"
+      },
+      {
+       "t0": 94,
+       "teaches": "You realise you cannot deliver what you promised. Which response does the lesson describe?",
+       "audit": "verified"
+      },
+      {
+       "t0": 118,
+       "teaches": "After a commitment has been broken, what does the lesson say is essential to rebuild confidence?",
+       "audit": "verified"
+      },
+      {
+       "t0": 171,
+       "teaches": "In a team, forgotten commitments and unanswered messages are never acknowledged, yet everything still looks fine. What d",
+       "audit": "verified"
+      },
+      {
+       "t0": 197,
+       "teaches": "A teammate says: \"They never keep their word, so why should I?\" What does the lesson say is happening?",
+       "audit": "verified"
+      }
+     ],
+     "questions": 6
+    },
+    {
+     "mod": 2,
+     "title": "The Three Levels of Problem-Solving",
+     "language": "en",
+     "translated": null,
+     "segments": 85,
+     "chars": 5594,
+     "durationSec": 394,
+     "capability": "leadership",
+     "tags": [
+      "leadership",
+      "community",
+      "level",
+      "solution",
+      "difficulty",
+      "creates",
+      "difficult",
+      "responsibility",
+      "progress",
+      "three"
+     ],
+     "regime": null,
+     "summary": "Every workplace faces challenges. Plans change, equipment fails, deadlines slip, unexpected complications arise. These difficulties are a normal part of work.",
+     "url": "https://academy.edenrise.com/#/play/trust-journey/2",
+     "moments": [
+      {
+       "t0": 90,
+       "teaches": "What defines level one, the problem amplifier?",
+       "audit": "verified"
+      },
+      {
+       "t0": 169,
+       "teaches": "Level two, the problem reporter, communicates the problem clearly. What is missing?",
+       "audit": "verified"
+      },
+      {
+       "t0": 190,
+       "teaches": "Which of these should still be escalated promptly, not handled on your own?",
+       "audit": "verified"
+      },
+      {
+       "t0": 275,
+       "teaches": "What does being a solution owner mean?",
+       "audit": "verified"
+      },
+      {
+       "t0": 245,
+       "teaches": "A delivery you depend on has not arrived. Which message is a level three response?",
+       "audit": "verified"
+      },
+      {
+       "t0": 134,
+       "teaches": "A machine breaks and a colleague tells four people \"this is a disaster, everything is going wrong\". Which level is this,",
+       "audit": "verified"
       }
      ],
      "questions": 6

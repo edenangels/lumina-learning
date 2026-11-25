@@ -1,0 +1,552 @@
+{
+ "course": "trust-journey",
+ "lang": "default",
+ "modules": {
+  "0": [
+   {
+    "a": 1,
+    "en": {
+     "q": "According to the lesson, what happens when trust goes up?",
+     "opts": [
+      "Speed goes down and cost goes up",
+      "Speed goes up and cost goes down",
+      "Speed and cost both go up",
+      "Nothing changes except the mood"
+     ],
+     "why": "When trust goes up, speed goes up and cost goes down. Low trust does the opposite."
+    },
+    "pt": {
+     "q": "Segundo a lição, o que acontece quando a confiança sobe?",
+     "opts": [
+      "A velocidade desce e o custo sobe",
+      "A velocidade sobe e o custo desce",
+      "A velocidade e o custo sobem ambos",
+      "Nada muda, a não ser o ambiente"
+     ],
+     "why": "Quando a confiança sobe, a velocidade sobe e o custo desce. A falta de confiança faz o contrário."
+    },
+    "t0": 37,
+    "type": "recall",
+    "gen": true,
+    "model": "claude-fable-5-2",
+    "src": "vimeo-captions",
+    "generatedAt": 1795621128689,
+    "verified": true
+   },
+   {
+    "a": 2,
+    "en": {
+     "q": "What does \"talking straight\" mean in this lesson?",
+     "opts": [
+      "Saying whatever you feel, however it lands",
+      "Keeping quiet to avoid conflict",
+      "Being clear, respectful and truthful",
+      "Telling the manager instead of the person"
+     ],
+     "why": "Talking straight is not being aggressive or insensitive. It means being clear, respectful and truthful."
+    },
+    "pt": {
+     "q": "O que significa \"falar com franqueza\" nesta lição?",
+     "opts": [
+      "Dizer tudo o que sente, doa a quem doer",
+      "Ficar calado para evitar conflitos",
+      "Ser claro, respeitoso e verdadeiro",
+      "Dizer ao gestor em vez de dizer à pessoa"
+     ],
+     "why": "Falar com franqueza não é ser agressivo ou insensível. É ser claro, respeitoso e verdadeiro."
+    },
+    "t0": 100,
+    "type": "recall",
+    "gen": true,
+    "model": "claude-fable-5-2",
+    "src": "vimeo-captions",
+    "generatedAt": 1795621128689,
+    "verified": true
+   },
+   {
+    "a": 0,
+    "en": {
+     "q": "Before important work begins, what should you get clear?",
+     "opts": [
+      "What we want to achieve, who is responsible, when, and what a good result looks like",
+      "Only the deadline",
+      "Who will be blamed if it goes wrong",
+      "Nothing: it becomes clear along the way"
+     ],
+     "why": "Clarity builds confidence: the goal, who is responsible for what, when, and what success looks like."
+    },
+    "pt": {
+     "q": "Antes de começar um trabalho importante, o que deve esclarecer?",
+     "opts": [
+      "O que queremos alcançar, quem é responsável, quando, e como é um bom resultado",
+      "Apenas o prazo",
+      "De quem será a culpa se correr mal",
+      "Nada: fica claro pelo caminho"
+     ],
+     "why": "A clareza gera confiança: o objetivo, quem é responsável pelo quê, quando, e como é um resultado bem-sucedido."
+    },
+    "t0": 135,
+    "type": "application",
+    "gen": true,
+    "model": "claude-fable-5-2",
+    "src": "vimeo-captions",
+    "generatedAt": 1795621128689,
+    "verified": true
+   },
+   {
+    "a": 3,
+    "en": {
+     "q": "Circumstances change and you can no longer deliver what you promised. What does the lesson ask you to do?",
+     "opts": [
+      "Wait and hope nobody notices",
+      "Deliver late without a word",
+      "Explain afterwards, if someone asks",
+      "Say so early: here is the situation, and here is what I propose"
+     ],
+     "why": "Communicate early. Trust does not require perfection, it requires integrity."
+    },
+    "pt": {
+     "q": "As circunstâncias mudam e já não consegue cumprir o que prometeu. O que lhe pede a lição?",
+     "opts": [
+      "Esperar que ninguém repare",
+      "Entregar mais tarde sem dizer nada",
+      "Explicar depois, se alguém perguntar",
+      "Avisar cedo: a situação é esta, e é isto que proponho"
+     ],
+     "why": "Comunique cedo. A confiança não exige perfeição, exige integridade."
+    },
+    "t0": 168,
+    "type": "application",
+    "gen": true,
+    "model": "claude-fable-5-2",
+    "src": "vimeo-captions",
+    "generatedAt": 1795621128689,
+    "verified": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "q": "A colleague did not do what you expected, and you catch yourself thinking \"they just don't care\". What is the \"listen first\" move?",
+     "opts": [
+      "Tell the rest of the team what happened",
+      "Ask \"Help me understand what happened\" and listen before judging",
+      "Stop giving them work",
+      "Wait for them to apologise"
+     ],
+     "why": "Assumptions are not facts. Become curious, listen before defending, understand before judging."
+    },
+    "pt": {
+     "q": "Um colega não fez o que esperava, e dá por si a pensar \"ele não quer saber\". Qual é o passo de \"ouvir primeiro\"?",
+     "opts": [
+      "Contar ao resto da equipa o que aconteceu",
+      "Perguntar \"Ajude-me a perceber o que aconteceu\" e ouvir antes de julgar",
+      "Deixar de lhe dar trabalho",
+      "Esperar que peça desculpa"
+     ],
+     "why": "Suposições não são factos. Seja curioso, ouça antes de se defender, compreenda antes de julgar."
+    },
+    "t0": 232,
+    "type": "scenario",
+    "gen": true,
+    "model": "claude-fable-5-2",
+    "src": "vimeo-captions",
+    "generatedAt": 1795621128689,
+    "verified": true
+   },
+   {
+    "a": 2,
+    "en": {
+     "q": "You work with a capable teammate but you check every step they take. What does the lesson suggest instead?",
+     "opts": [
+      "Blind trust: never check anything",
+      "Keep checking, it shows you care",
+      "Smart trust: weigh the situation and the person's competence and character, then give enough trust to act",
+      "Take the task back and do it yourself"
+     ],
+     "why": "People who are constantly monitored stop taking initiative. Smart trust is not blind trust."
+    },
+    "pt": {
+     "q": "Trabalha com um colega capaz, mas verifica cada passo que ele dá. O que sugere a lição?",
+     "opts": [
+      "Confiança cega: nunca verificar nada",
+      "Continuar a verificar, mostra que se importa",
+      "Confiança inteligente: pesar a situação, a competência e o caráter da pessoa, e dar confiança suficiente para agir",
+      "Ficar com a tarefa e fazê-la sozinho"
+     ],
+     "why": "Quem é constantemente vigiado deixa de tomar a iniciativa. Confiança inteligente não é confiança cega."
+    },
+    "t0": 269,
+    "type": "scenario",
+    "gen": true,
+    "model": "claude-fable-5-2",
+    "src": "vimeo-captions",
+    "generatedAt": 1795621128689,
+    "verified": true
+   }
+  ],
+  "1": [
+   {
+    "a": 0,
+    "en": {
+     "q": "What invisible thing happens every time you make a promise?",
+     "opts": [
+      "Someone begins arranging part of their life around your words",
+      "You gain authority over the other person",
+      "Nothing, until the deadline arrives",
+      "The other person stops being responsible"
+     ],
+     "why": "Their time, energy, expectations and often their trust start to depend on what you said."
+    },
+    "pt": {
+     "q": "Que coisa invisível acontece sempre que faz uma promessa?",
+     "opts": [
+      "Alguém começa a organizar parte da sua vida em torno das suas palavras",
+      "Passa a ter autoridade sobre a outra pessoa",
+      "Nada, até chegar o prazo",
+      "A outra pessoa deixa de ser responsável"
+     ],
+     "why": "O tempo, a energia, as expectativas e muitas vezes a confiança dessa pessoa passam a depender do que disse."
+    },
+    "t0": 17,
+    "type": "recall",
+    "gen": true,
+    "model": "claude-fable-5-2",
+    "src": "vimeo-captions",
+    "generatedAt": 1795621128689,
+    "verified": true
+   },
+   {
+    "a": 3,
+    "en": {
+     "q": "When a small promise is not honoured, what unspoken message does the lesson say it sends?",
+     "opts": [
+      "\"I was very busy\"",
+      "\"The task was not important\"",
+      "\"You should have reminded me\"",
+      "\"My time matters more than yours\""
+     ],
+     "why": "The deepest cost is not the inconvenience, it is that unspoken message."
+    },
+    "pt": {
+     "q": "Quando uma pequena promessa não é honrada, que mensagem fica por dizer, segundo a lição?",
+     "opts": [
+      "\"Estive muito ocupado\"",
+      "\"A tarefa não era importante\"",
+      "\"Devia ter-me lembrado\"",
+      "\"O meu tempo importa mais do que o teu\""
+     ],
+     "why": "O custo mais profundo não é o incómodo, é essa mensagem que fica por dizer."
+    },
+    "t0": 68,
+    "type": "recall",
+    "gen": true,
+    "model": "claude-fable-5-2",
+    "src": "vimeo-captions",
+    "generatedAt": 1795621128689,
+    "verified": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "q": "You realise you cannot deliver what you promised. Which response does the lesson describe?",
+     "opts": [
+      "Wait until you are confronted, then explain",
+      "Reach out first: I made a commitment, I have not fulfilled it, I am sorry, here is what happened and what I will do",
+      "Send a long list of reasons why it was not your fault",
+      "Quietly move the date"
+     ],
+     "why": "No elaborate excuses and no shifting blame: honesty, responsibility and a real effort to make it right."
+    },
+    "pt": {
+     "q": "Percebe que não vai conseguir cumprir o que prometeu. Que resposta descreve a lição?",
+     "opts": [
+      "Esperar que o confrontem e depois explicar",
+      "Tomar a iniciativa: assumi um compromisso, não o cumpri, peço desculpa, foi isto que aconteceu e é isto que vou fazer",
+      "Enviar uma longa lista de razões pelas quais a culpa não foi sua",
+      "Mudar a data sem dizer nada"
+     ],
+     "why": "Sem desculpas elaboradas e sem passar a culpa: honestidade, responsabilidade e um esforço genuíno para corrigir."
+    },
+    "t0": 94,
+    "type": "application",
+    "gen": true,
+    "model": "claude-fable-5-2",
+    "src": "vimeo-captions",
+    "generatedAt": 1795621128689,
+    "verified": true
+   },
+   {
+    "a": 2,
+    "en": {
+     "q": "After a commitment has been broken, what does the lesson say is essential to rebuild confidence?",
+     "opts": [
+      "A very good explanation",
+      "Time alone",
+      "Consistent, trustworthy actions; an apology helps but is not enough",
+      "Promising something bigger next time"
+     ],
+     "why": "Apologies can help repair the damage, but consistent trustworthy actions rebuild confidence."
+    },
+    "pt": {
+     "q": "Depois de um compromisso quebrado, o que diz a lição ser essencial para recuperar a credibilidade?",
+     "opts": [
+      "Uma explicação muito boa",
+      "Apenas o tempo",
+      "Ações consistentes e dignas de confiança; pedir desculpa ajuda, mas não chega",
+      "Prometer algo maior da próxima vez"
+     ],
+     "why": "Um pedido de desculpas pode ajudar a reparar o dano, mas são as ações consistentes que recuperam a credibilidade."
+    },
+    "t0": 118,
+    "type": "application",
+    "gen": true,
+    "model": "claude-fable-5-2",
+    "src": "vimeo-captions",
+    "generatedAt": 1795621128689,
+    "verified": true
+   },
+   {
+    "a": 0,
+    "en": {
+     "q": "In a team, forgotten commitments and unanswered messages are never acknowledged, yet everything still looks fine. What does the termite image warn about?",
+     "opts": [
+      "Trust is being eaten away quietly, and the damage happens long before anyone notices",
+      "Only one big betrayal can damage a team",
+      "Small things do not matter if the results are good",
+      "The building needs new management"
+     ],
+     "why": "Trust erodes through a thousand small moments of indifference, not one dramatic betrayal."
+    },
+    "pt": {
+     "q": "Numa equipa, compromissos esquecidos e mensagens sem resposta nunca são reconhecidos, mas tudo parece bem. Para que alerta a imagem das térmitas?",
+     "opts": [
+      "A confiança está a ser roída em silêncio, e o dano acontece muito antes de alguém reparar",
+      "Só uma grande traição pode prejudicar uma equipa",
+      "As pequenas coisas não importam se os resultados forem bons",
+      "O edifício precisa de nova gestão"
+     ],
+     "why": "A confiança desgasta-se em mil pequenos momentos de indiferença, não numa grande traição."
+    },
+    "t0": 171,
+    "type": "scenario",
+    "gen": true,
+    "model": "claude-fable-5-2",
+    "src": "vimeo-captions",
+    "generatedAt": 1795621128689,
+    "verified": true
+   },
+   {
+    "a": 2,
+    "en": {
+     "q": "A teammate says: \"They never keep their word, so why should I?\" What does the lesson say is happening?",
+     "opts": [
+      "Healthy competition",
+      "A fair way to balance the workload",
+      "The behaviour is spreading, and the team is losing its invisible foundation",
+      "Nothing serious, it is only talk"
+     ],
+     "why": "When promises are not kept, people stop relying on each other and the behaviour spreads."
+    },
+    "pt": {
+     "q": "Um colega diz: \"Eles nunca cumprem a palavra, porque hei de cumprir eu?\" O que está a acontecer, segundo a lição?",
+     "opts": [
+      "Competição saudável",
+      "Uma forma justa de equilibrar o trabalho",
+      "O comportamento está a espalhar-se, e a equipa está a perder a sua base invisível",
+      "Nada de grave, é só conversa"
+     ],
+     "why": "Quando as promessas não se cumprem, as pessoas deixam de contar umas com as outras e o comportamento espalha-se."
+    },
+    "t0": 197,
+    "type": "scenario",
+    "gen": true,
+    "model": "claude-fable-5-2",
+    "src": "vimeo-captions",
+    "generatedAt": 1795621128689,
+    "verified": true
+   }
+  ],
+  "2": [
+   {
+    "a": 2,
+    "en": {
+     "q": "What defines level one, the problem amplifier?",
+     "opts": [
+      "They hide the problem",
+      "They solve the problem alone",
+      "More energy goes into describing the problem than into finding a solution",
+      "They report the problem calmly and wait"
+     ],
+     "why": "Level one makes the problem bigger through the way it is communicated."
+    },
+    "pt": {
+     "q": "O que define o nível um, o amplificador de problemas?",
+     "opts": [
+      "Esconde o problema",
+      "Resolve o problema sozinho",
+      "Gasta mais energia a descrever o problema do que a encontrar uma solução",
+      "Comunica o problema com calma e espera"
+     ],
+     "why": "No nível um, o problema torna-se maior pela forma como é comunicado."
+    },
+    "t0": 90,
+    "type": "recall",
+    "gen": true,
+    "model": "claude-fable-5-2",
+    "src": "vimeo-captions",
+    "generatedAt": 1795621128689,
+    "verified": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "q": "Level two, the problem reporter, communicates the problem clearly. What is missing?",
+     "opts": [
+      "Enough detail about the problem",
+      "Taking responsibility for developing a solution",
+      "A written report",
+      "Telling more people"
+     ],
+     "why": "The thinking is handed to someone else. As a habit, that creates dependency, not capability."
+    },
+    "pt": {
+     "q": "O nível dois, o relator de problemas, comunica o problema com clareza. O que falta?",
+     "opts": [
+      "Mais pormenores sobre o problema",
+      "Assumir a responsabilidade de desenvolver uma solução",
+      "Um relatório escrito",
+      "Contar a mais pessoas"
+     ],
+     "why": "O pensamento é passado a outra pessoa. Como hábito, isso cria dependência em vez de capacidade."
+    },
+    "t0": 169,
+    "type": "recall",
+    "gen": true,
+    "model": "claude-fable-5-2",
+    "src": "vimeo-captions",
+    "generatedAt": 1795621128689,
+    "verified": true
+   },
+   {
+    "a": 3,
+    "en": {
+     "q": "Which of these should still be escalated promptly, not handled on your own?",
+     "opts": [
+      "Any problem that is boring to solve",
+      "Every small difficulty of the day",
+      "Only problems that other people caused",
+      "Safety concerns, serious risks and decisions beyond your authority"
+     ],
+     "why": "For ordinary challenges, reporting is the beginning, not the end. Safety, serious risk and decisions above your authority go up at once."
+    },
+    "pt": {
+     "q": "Qual destas situações deve continuar a ser comunicada de imediato à chefia, em vez de a resolver sozinho?",
+     "opts": [
+      "Qualquer problema aborrecido de resolver",
+      "Todas as pequenas dificuldades do dia",
+      "Só os problemas causados por outras pessoas",
+      "Preocupações de segurança, riscos graves e decisões acima da sua autoridade"
+     ],
+     "why": "Nos desafios do dia a dia, comunicar é o início, não o fim. Segurança, riscos graves e decisões acima da sua autoridade sobem de imediato."
+    },
+    "t0": 190,
+    "type": "application",
+    "gen": true,
+    "model": "claude-fable-5-2",
+    "src": "vimeo-captions",
+    "generatedAt": 1795621128689,
+    "verified": true
+   },
+   {
+    "a": 0,
+    "en": {
+     "q": "What does being a solution owner mean?",
+     "opts": [
+      "Accepting responsibility for moving things forward, and asking for help when you need it",
+      "Knowing the answer to everything",
+      "Working alone and refusing help",
+      "Never telling your manager about problems"
+     ],
+     "why": "Ownership is not knowing everything or working alone. It is taking responsibility for moving things forward."
+    },
+    "pt": {
+     "q": "O que significa ser dono da solução?",
+     "opts": [
+      "Aceitar a responsabilidade de fazer as coisas avançar, e pedir ajuda quando precisa",
+      "Saber a resposta para tudo",
+      "Trabalhar sozinho e recusar ajuda",
+      "Nunca falar de problemas ao seu gestor"
+     ],
+     "why": "Ser dono não é saber tudo nem trabalhar sozinho. É aceitar a responsabilidade de fazer as coisas avançar."
+    },
+    "t0": 275,
+    "type": "application",
+    "gen": true,
+    "model": "claude-fable-5-2",
+    "src": "vimeo-captions",
+    "generatedAt": 1795621128689,
+    "verified": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "q": "A delivery you depend on has not arrived. Which message is a level three response?",
+     "opts": [
+      "\"The delivery has not arrived. What should we do?\"",
+      "\"The delivery is late. I contacted the supplier and found two alternatives. I recommend this one. Can I go ahead?\"",
+      "\"This is a disaster, everything is going wrong.\"",
+      "Say nothing and wait for it to arrive"
+     ],
+     "why": "Level three looks into it, brings options and a recommendation, and asks for approval."
+    },
+    "pt": {
+     "q": "Uma entrega de que depende não chegou. Que mensagem é uma resposta de nível três?",
+     "opts": [
+      "\"A entrega não chegou. O que devemos fazer?\"",
+      "\"A entrega está atrasada. Já contactei o fornecedor e encontrei duas alternativas. Recomendo esta. Posso avançar?\"",
+      "\"Isto é um desastre, está tudo a correr mal.\"",
+      "Não dizer nada e esperar que chegue"
+     ],
+     "why": "O nível três investiga, traz alternativas e uma recomendação, e pede aprovação."
+    },
+    "t0": 245,
+    "type": "scenario",
+    "gen": true,
+    "model": "claude-fable-5-2",
+    "src": "vimeo-captions",
+    "generatedAt": 1795621128689,
+    "verified": true
+   },
+   {
+    "a": 2,
+    "en": {
+     "q": "A machine breaks and a colleague tells four people \"this is a disaster, everything is going wrong\". Which level is this, and what is the effect?",
+     "opts": [
+      "Level three: it shows how much they care",
+      "Level two: the problem is clearly reported",
+      "Level one: the team now has to manage the problem and the extra anxiety around it",
+      "No level: it is just how they talk"
+     ],
+     "why": "Repeated dramatisation creates concern, not confidence, and adds to the burden."
+    },
+    "pt": {
+     "q": "Uma máquina avaria e um colega diz a quatro pessoas \"isto é um desastre, está tudo a correr mal\". Que nível é este, e qual é o efeito?",
+     "opts": [
+      "Nível três: mostra o quanto se importa",
+      "Nível dois: o problema fica claramente comunicado",
+      "Nível um: a equipa tem agora de gerir o problema e a ansiedade a mais à volta dele",
+      "Nenhum nível: é só a maneira de falar"
+     ],
+     "why": "A dramatização repetida gera preocupação, não confiança, e aumenta o peso."
+    },
+    "t0": 134,
+    "type": "scenario",
+    "gen": true,
+    "model": "claude-fable-5-2",
+    "src": "vimeo-captions",
+    "generatedAt": 1795621128689,
+    "verified": true
+   }
+  ]
+ }
+}

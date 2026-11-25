@@ -1,5 +1,5 @@
 {
- "generatedAt": 1795534294690,
+ "generatedAt": 1795621632978,
  "nodes": [
   {
    "id": "course:alignment-journey",
@@ -1197,6 +1197,118 @@
    "id": "concept:down",
    "kind": "concept",
    "title": "down"
+  },
+  {
+   "id": "course:trust-journey",
+   "kind": "course",
+   "title": "Trust & Ownership"
+  },
+  {
+   "id": "module:trust-journey:0",
+   "kind": "module",
+   "title": "The Speed of Trust",
+   "course": "trust-journey",
+   "mod": 0,
+   "url": "https://academy.edenrise.com/#/play/trust-journey/0",
+   "seconds": 357
+  },
+  {
+   "id": "concept:trust",
+   "kind": "concept",
+   "title": "trust"
+  },
+  {
+   "id": "concept:honest",
+   "kind": "concept",
+   "title": "honest"
+  },
+  {
+   "id": "concept:covey",
+   "kind": "concept",
+   "title": "covey"
+  },
+  {
+   "id": "concept:speed",
+   "kind": "concept",
+   "title": "speed"
+  },
+  {
+   "id": "module:trust-journey:1",
+   "kind": "module",
+   "title": "Promises Kept",
+   "course": "trust-journey",
+   "mod": 1,
+   "url": "https://academy.edenrise.com/#/play/trust-journey/1",
+   "seconds": 323
+  },
+  {
+   "id": "concept:promise",
+   "kind": "concept",
+   "title": "promise"
+  },
+  {
+   "id": "concept:worth",
+   "kind": "concept",
+   "title": "worth"
+  },
+  {
+   "id": "concept:begins",
+   "kind": "concept",
+   "title": "begins"
+  },
+  {
+   "id": "concept:commitment",
+   "kind": "concept",
+   "title": "commitment"
+  },
+  {
+   "id": "concept:imagine",
+   "kind": "concept",
+   "title": "imagine"
+  },
+  {
+   "id": "concept:actions",
+   "kind": "concept",
+   "title": "actions"
+  },
+  {
+   "id": "concept:integrity",
+   "kind": "concept",
+   "title": "integrity"
+  },
+  {
+   "id": "module:trust-journey:2",
+   "kind": "module",
+   "title": "The Three Levels of Problem-Solving",
+   "course": "trust-journey",
+   "mod": 2,
+   "url": "https://academy.edenrise.com/#/play/trust-journey/2",
+   "seconds": 394
+  },
+  {
+   "id": "concept:solution",
+   "kind": "concept",
+   "title": "solution"
+  },
+  {
+   "id": "concept:difficulty",
+   "kind": "concept",
+   "title": "difficulty"
+  },
+  {
+   "id": "concept:creates",
+   "kind": "concept",
+   "title": "creates"
+  },
+  {
+   "id": "concept:difficult",
+   "kind": "concept",
+   "title": "difficult"
+  },
+  {
+   "id": "concept:progress",
+   "kind": "concept",
+   "title": "progress"
   },
   {
    "id": "reel:bring-the-energy",
@@ -3218,6 +3330,204 @@
    "w": 1
   },
   {
+   "from": "module:trust-journey:0",
+   "to": "course:trust-journey",
+   "rel": "in",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:0",
+   "to": "concept:leadership",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:0",
+   "to": "concept:community",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:0",
+   "to": "concept:trust",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:0",
+   "to": "concept:responsibility",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:0",
+   "to": "concept:down",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:0",
+   "to": "concept:wrong",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:0",
+   "to": "concept:honest",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:0",
+   "to": "concept:covey",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:0",
+   "to": "concept:speed",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:0",
+   "to": "concept:communication",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:1",
+   "to": "course:trust-journey",
+   "rel": "in",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:1",
+   "to": "concept:leadership",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:1",
+   "to": "concept:community",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:1",
+   "to": "concept:promise",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:1",
+   "to": "concept:trust",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:1",
+   "to": "concept:worth",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:1",
+   "to": "concept:begins",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:1",
+   "to": "concept:commitment",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:1",
+   "to": "concept:imagine",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:1",
+   "to": "concept:actions",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:1",
+   "to": "concept:integrity",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:2",
+   "to": "course:trust-journey",
+   "rel": "in",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:2",
+   "to": "concept:leadership",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:2",
+   "to": "concept:community",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:2",
+   "to": "concept:level",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:2",
+   "to": "concept:solution",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:2",
+   "to": "concept:difficulty",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:2",
+   "to": "concept:creates",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:2",
+   "to": "concept:difficult",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:2",
+   "to": "concept:responsibility",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:2",
+   "to": "concept:progress",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:trust-journey:2",
+   "to": "concept:three",
+   "rel": "about",
+   "w": 1
+  },
+  {
    "from": "reel:bring-the-energy",
    "to": "course:land-team-journey",
    "rel": "deeper",
@@ -3306,6 +3616,12 @@
    "to": "module:land-team-journey:0",
    "rel": "beside",
    "w": 0.471
+  },
+  {
+   "from": "reel:raise-the-energy",
+   "to": "module:trust-journey:1",
+   "rel": "beside",
+   "w": 0.278
   },
   {
    "from": "reel:safe-to-speak",
@@ -3438,6 +3754,12 @@
    "to": "module:land-team-journey:6",
    "rel": "related",
    "w": 0.159
+  },
+  {
+   "from": "module:land-team-journey:7",
+   "to": "module:trust-journey:2",
+   "rel": "related",
+   "w": 0.143
   },
   {
    "from": "module:land-team-journey:9",
@@ -3850,17 +4172,17 @@
  ],
  "stats": {
   "nodes": {
-   "course": 4,
-   "module": 33,
+   "course": 5,
+   "module": 36,
    "reel": 5,
-   "concept": 178
+   "concept": 194
   },
   "edges": {
-   "in": 33,
-   "about": 300,
+   "in": 36,
+   "about": 330,
    "deeper": 5,
-   "beside": 6,
-   "related": 21,
+   "beside": 7,
+   "related": 22,
    "similar": 67
   }
  },

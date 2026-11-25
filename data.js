@@ -71,8 +71,8 @@ const PATH_RATIONALES = [
 const GOAL_PRESETS = {
   /* outcome goals (John, 13 Oct 2026: "Land Team is not a goal") — each sequences the
      filmed courses toward something a learner can want */
-  'Show up Above the Line':       ['alignment-journey', 'land-team-journey', 'growth-journey'],
-  'Purpose & goals that stick':   ['alignment-journey', 'growth-journey', 'land-team-journey'],   /* John's welcome first, whatever the goal */
+  'Show up Above the Line':       ['alignment-journey', 'land-team-journey', 'growth-journey', 'trust-journey'],
+  'Purpose & goals that stick':   ['alignment-journey', 'growth-journey', 'land-team-journey', 'trust-journey'],   /* John's welcome first, whatever the goal */
   'Fire-season ready':            ['fire-truck-training', 'land-team-journey'],
   'Work well with AI':            ['ai-literacy', 'land-team-journey'],
   /* kept so paths chosen before 13 Oct 2026 still resolve; shown as "The full journey" */
