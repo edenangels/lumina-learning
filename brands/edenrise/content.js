@@ -820,3 +820,132 @@ const REELS = [
 ];
 
 const QUICKWINS = REELS;
+
+
+/* ============================================================================
+   COURSE LAYER (25 Nov 2026, "round 3": mirror Belong) — Academy → Courses → Modules → Lessons.
+   core/curriculum.js reads this. A CATALOG item is a MODULE; its videos are the LESSONS ("<id>:<n>",
+   the same keys every learner record already uses). Each course owns its certificate: every required
+   lesson completed and ≥ passMark across its lesson questions. Records made before `since` keep counting.
+   Level Up with AI is not in a course until it is filmed.
+============================================================================ */
+const CURRICULUM = {
+  passMark: 70,
+  since: '2026-11-25T00:00:00Z',
+  moduleArt: 'video',   /* module tiles show a video frame: ADEN's posters are lettered title cards */
+  courses: [
+    {
+      id: 'aden-foundations',
+      title: 'ADEN Foundations',
+      promise: 'Who we are, how we think, and how we work together.',
+      desc: 'John welcomes you to ADEN and lays out ESIP, the frame for how we think, decide and act, then the habits of people who show up above the line: owning the outcome, treating mistakes as feedback, clarifying instead of assuming, and the detail that makes the job. The shared ground for everyone at ADEN, in every team.',
+      outcomes: ['Explain ESIP and use it to think through a decision', 'Catch yourself below the line under pressure, and step back above it', 'Treat every mistake as feedback and own the outcome', 'Clarify instead of assuming, and keep the standard in the details'],
+      audience: 'Everyone at ADEN, in every team.',
+      prerequisites: '',
+      poster: 'media/covers/alignment-journey.webp', posterPos: 'left center',
+      modules: [
+        { id: 'alignment-journey', cats: ['everyone', 'office'] },
+        { id: 'land-team-journey', optional: [8, 9, 10, 11, 12], cats: ['everyone', 'land', 'building', 'hospitality', 'animals'],
+          optionalNote: 'Optional: the five "go deeper" lessons at the end.',
+          pt: { optionalNote: 'Opcional: as cinco lições "para aprofundar" no fim.' } }
+      ],
+      pt: {
+        title: 'Fundamentos ADEN',
+        promise: 'Quem somos, como pensamos e como trabalhamos juntos.',
+        desc: 'O John dá-lhe as boas-vindas à ADEN e apresenta o ESIP, a forma como pensamos, decidimos e agimos, e depois os hábitos de quem está acima da linha: assumir o resultado, tratar os erros como feedback, clarificar em vez de supor, e o detalhe que faz o trabalho. A base comum para toda a gente na ADEN, em todas as equipas.',
+        outcomes: ['Explicar o ESIP e usá-lo para pensar uma decisão', 'Reconhecer quando está abaixo da linha sob pressão e voltar acima dela', 'Tratar cada erro como feedback e assumir o resultado', 'Clarificar em vez de supor, e manter o padrão nos detalhes'],
+        audience: 'Toda a gente na ADEN, em todas as equipas.'
+      }
+    },
+    {
+      id: 'purpose-growth',
+      title: 'Purpose & Growth',
+      promise: 'Why you get up, and goals that stick.',
+      desc: 'Your ultimate purpose, how to set goals you will keep, small daily improvements (Kaizen), the beliefs that help you win and the six core human needs, then a workshop to write your top five and 90-day goals.',
+      outcomes: ['Put your ultimate purpose into words', 'Set goals you will keep, and break them into 90-day steps', 'Improve a little every day, the Kaizen way'],
+      audience: 'Everyone at ADEN who wants to grow in their work; team leaders especially.',
+      prerequisites: 'ADEN Foundations is recommended first.',
+      poster: 'media/covers/growth-journey.webp',
+      modules: [
+        { id: 'growth-journey', optional: [5, 6, 7, 8], cats: ['everyone', 'office'],
+          optionalNote: 'Optional: the four goal-setting workshop lessons at the end.',
+          pt: { optionalNote: 'Opcional: as quatro lições do workshop de objetivos no fim.' } }
+      ],
+      pt: {
+        title: 'Propósito e Crescimento',
+        promise: 'Porque se levanta de manhã, e objetivos que ficam.',
+        desc: 'O seu propósito último, como definir objetivos que cumpre, pequenas melhorias diárias (Kaizen), as crenças que ajudam a vencer e as seis necessidades humanas, e depois um workshop para escrever os seus cinco objetivos principais e os de 90 dias.',
+        outcomes: ['Pôr em palavras o seu propósito último', 'Definir objetivos que cumpre e dividi-los em passos de 90 dias', 'Melhorar um pouco todos os dias, à maneira Kaizen'],
+        audience: 'Toda a gente na ADEN que quer crescer no trabalho; sobretudo chefes de equipa.',
+        prerequisites: 'Recomenda-se fazer primeiro os Fundamentos ADEN.'
+      }
+    },
+    {
+      id: 'safety-land',
+      title: 'Safety on the Land',
+      promise: 'Ready for fire season, on the truck and as a crew.',
+      desc: 'The fire truck from start to spray: starting and driving it, filling the water tank, off-road driving, the pump and spraying, power and safety, and the drill the crew runs together.',
+      outcomes: ['Start and drive the fire truck safely, on and off road', 'Fill the tank and run the pump and spray', 'Run the safety checks and the crew drill'],
+      audience: 'The land, building and animal-care teams, and anyone on the fire crew.',
+      prerequisites: '',
+      poster: 'media/covers/fire-truck-training.webp',
+      modules: [
+        { id: 'fire-truck-training', cats: ['land', 'building', 'animals'] }
+      ],
+      pt: {
+        title: 'Segurança no Terreno',
+        promise: 'Prontos para a época de incêndios, no camião e em equipa.',
+        desc: 'O camião de incêndio do arranque à aspersão: arrancar e conduzir, encher o tanque de água, condução fora de estrada, a bomba e a aspersão, energia e segurança, e o exercício que a equipa faz em conjunto.',
+        outcomes: ['Arrancar e conduzir o camião de incêndio em segurança, na estrada e fora dela', 'Encher o tanque e pôr a bomba e a aspersão a funcionar', 'Fazer as verificações de segurança e o exercício da equipa'],
+        audience: 'As equipas da terra, da construção e do cuidado animal, e quem faz parte da equipa de incêndio.'
+      }
+    }
+  ],
+  /* Library filters = who a module is useful to, by ADEN department (data.js DEPTS) */
+  categories: [
+    { key: 'everyone',    en: 'For everyone',               pt: 'Para todos' },
+    { key: 'land',        en: 'Land & Gardens',             pt: 'Terra e Jardins' },
+    { key: 'building',    en: 'Building & Maintenance',     pt: 'Construção e Manutenção' },
+    { key: 'hospitality', en: 'Malhão Pardo & Hospitality', pt: 'Malhão Pardo e Hospitalidade' },
+    { key: 'animals',     en: 'Animal Care',                pt: 'Cuidado Animal' },
+    { key: 'office',      en: 'Office & Leadership',        pt: 'Escritório e Liderança' }
+  ]
+};
+
+/* each lesson's Vimeo thumbnail (oEmbed), for lesson rows and module tiles: a real frame of the video,
+   never a lettered title card cropped to a tile */
+const LESSON_THUMBS = {
+   "alignment-journey:0": "https://i.vimeocdn.com/video/1986508114-913e7bfa5ddcd59e98d6e76bdb5a69385ca4bfac3f60adc97ae62ba9814c66e1-d",
+   "alignment-journey:1": "https://i.vimeocdn.com/video/1984069233-c84778fd7478ccf6e383ffed951bb8d8fb8b913e5b2e2836f9108d1cf75185b3-d",
+   "alignment-journey:2": "https://i.vimeocdn.com/video/1984070260-406f78d4aba58e521831c2ac266154c0bd01fbbaf74809043003d589d70daea8-d",
+   "alignment-journey:3": "https://i.vimeocdn.com/video/1984071714-553cc1ac0790d30586ff3539a840ceb91a9c88625d21959ab0ae5671e9b388b6-d",
+   "alignment-journey:4": "https://i.vimeocdn.com/video/1984080538-a2f3596ce3868edab6528d9c726297d449f0ee10c6d408cb1446216ede43f9b8-d",
+   "alignment-journey:5": "https://i.vimeocdn.com/video/1984088608-02b81fd3409c6116fc9b69a91a4fbf241b922c1f714df313d6854540dc703a9e-d",
+   "alignment-journey:6": "https://i.vimeocdn.com/video/1984087734-abdc2273d5191330cf5f0bbf8b20289f9a8dedabffbdb5e069f01e5f7aed85f0-d",
+   "land-team-journey:0": "https://i.vimeocdn.com/video/2189734848-dd12488d3e43c8ae070138436a646a44cb129d986c1fef959eab90fb85290290-d",
+   "land-team-journey:1": "https://i.vimeocdn.com/video/2189740318-a50e007d7cdbc53d104e4c6a6550bbb4fdbd75f60ec53c4e0a9f24054d753ff6-d",
+   "land-team-journey:2": "https://i.vimeocdn.com/video/2189738967-8333a3ad206ec0a074c2cc7a101e7494ad8ecacac98f37b75565f2c227d81d64-d",
+   "land-team-journey:3": "https://i.vimeocdn.com/video/2189737304-6fc598d3ea8066d962e6eda91c78b1483078a476329d57502b041bfbf7301a4f-d",
+   "land-team-journey:4": "https://i.vimeocdn.com/video/2189738111-83877e374eb68da72acb83a4115ddaf49dc6974896991ec79802003dfe184d8d-d",
+   "land-team-journey:5": "https://i.vimeocdn.com/video/2189737369-01a8e24aabdc85acd9c29180ad02e7f59b040ea11bf2291a068c5021a3b04290-d",
+   "land-team-journey:6": "https://i.vimeocdn.com/video/2189737586-f3e8c8814b48822c693ce8d72301e697a800c263979bf01b24980733f660710a-d",
+   "land-team-journey:7": "https://i.vimeocdn.com/video/2191023950-91261ad49bc622079aab686f6485f571041d165ba0cf394a2580934b594295d9-d",
+   "land-team-journey:8": "https://i.vimeocdn.com/video/1984002314-0f3be6bb2ad273769efb3ae9032d97dcbc39986cc2b9861e873d73d86dfd9068-d",
+   "land-team-journey:9": "https://i.vimeocdn.com/video/1984002712-d38a63cb4202afdb3f3241ccd53a557f84c5adcac99c061193648a6eb8e62e59-d",
+   "land-team-journey:10": "https://i.vimeocdn.com/video/1984003073-208ce62b620b90f90541020e65da74efe3be28e92764ca122822ab191c8353fe-d",
+   "land-team-journey:11": "https://i.vimeocdn.com/video/1984060034-64e6d17591d55bb23028fa56a81165b892f21972bc753b2bbe6ef937ecfef9a8-d",
+   "land-team-journey:12": "https://i.vimeocdn.com/video/1984068908-78d3c5689ff35e12d28a176b455da81aa6262c11806fa744e69af51b85357007-d",
+   "growth-journey:0": "https://i.vimeocdn.com/video/2189738239-f60517e476b7c5d502955a390617db5ccc0b6d04212050e7cd62fe2946bb13fb-d",
+   "growth-journey:1": "https://i.vimeocdn.com/video/2193317996-785ac41364cb4702f37597afe473e06d7b9bfd0140ab7c221213fe1a5ec59770-d",
+   "growth-journey:2": "https://i.vimeocdn.com/video/2194604786-3b2c7ffee922041ffe92638dec17d4546e8aeac97053e300840fc80a6d572b9a-d",
+   "growth-journey:3": "https://i.vimeocdn.com/video/2196067372-85b94daa165f34012e175b7cbc52bf6d7c4d562f4417739040fd4be9d867e00e-d",
+   "growth-journey:4": "https://i.vimeocdn.com/video/2196629189-ab146b736dbd8048b2e0db54d174306961e4e9038cbff0b683b03e216ce7d5d2-d",
+   "growth-journey:5": "https://i.vimeocdn.com/video/1984084742-723414cc2645729cbd27efa0046889ac12d4ee1d8ac621854d4b3e5a97cec6d8-d",
+   "growth-journey:6": "https://i.vimeocdn.com/video/1984084255-da36a23e5fbb7a38202e66cdd28639544f113e6c1e6d11b54fb59fcc4f7598ba-d",
+   "growth-journey:7": "https://i.vimeocdn.com/video/1984085182-1d205990436e08d0484b1347967d01f0bdf04f13fa813dcb5cf996304ca2abac-d",
+   "growth-journey:8": "https://i.vimeocdn.com/video/1984086715-28f34b55f3d0e858d8aca4955735a79088e7b992f278b12fa4da895e525f56e1-d",
+   "fire-truck-training:0": "https://i.vimeocdn.com/video/2176861106-1fde4ba0c52ba0a751fcf926b97133d90766f336dc52c4faa9bce3af0d587b25-d",
+   "fire-truck-training:1": "https://i.vimeocdn.com/video/2177246862-730f96ded5dc362d3c321fa57110bc94e6305a9576fd43b262a280ad4e346dff-d",
+   "fire-truck-training:2": "https://i.vimeocdn.com/video/2177254651-af01677a9510548ccc7ae566859eaf1ad30147541b28e40b904bc0d8715d81ce-d",
+   "fire-truck-training:3": "https://i.vimeocdn.com/video/2177254417-0a62279d770f7d3affabca997ee344fba13e652f40b373d4f24a33fba4f65932-d"
+  };

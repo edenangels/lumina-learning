@@ -5727,9 +5727,9 @@ function openPlayer(courseId, mod, startAt) {
     scrollSurely(strip, Math.max(0, target));
   }, 260);
   { const pp = prog(courseId); const dm = isDone(courseId) || (pp && !pp.done && (pp.mod || 0) > mod) || (S.trainingLog || []).some(e => e.courseId === courseId && e.mod === mod);
-    /* markComplete:false — no manual "Mark complete" (the video ending opens the questions); a lesson already
-       done keeps the button, because there it means "Next lesson" / "Back to course" */
-    $('#playerComplete').style.display = (media && media.type === 'soon') || (BRAND.markComplete === false && !dm) ? 'none' : '';
+    /* the button stays: the video ending completes a watched lesson by itself, and "Mark lesson complete" is the
+       way into the recap and questions after a partial watch (Belong, approved; screenshot 25 Nov 2026) */
+    $('#playerComplete').style.display = (media && media.type === 'soon') ? 'none' : '';
     $('#playerComplete').textContent = dm ? (mod + 1 < c.modules.length ? t('next_lesson_btn') : t('back_to_course')) : t('mark_complete'); }
   playerEl.classList.add('open');
   playerChrome.show(true);
@@ -8951,7 +8951,15 @@ $('#playerComplete').addEventListener('click', () => {
     return;
   }
   /* the same gate the natural end has — a scrubbed-to-the-end lesson is not a watched lesson */
-  if (watchEv && watchEv.dur && watchCoverage() < WATCH_MIN_COVERAGE) { toast(t('watch_more'), 'ℹ️'); return; }
+  if (watchEv && watchEv.dur && watchCoverage() < WATCH_MIN_COVERAGE) {
+    /* say it where the eye is (ADEN round 3: "the recap and the quiz do not appear" — the watch rule had
+       blocked them with only a small toast): the button itself shows how far the lesson has been watched */
+    const pc = $('#playerComplete'), pct = Math.round(watchCoverage() * 100), need = Math.round(WATCH_MIN_COVERAGE * 100);
+    toast(t('watch_more'), 'ℹ️');
+    if (pc) { pc.textContent = t('watch_progress').replace('{p}', pct).replace('{n}', need); pc.classList.add('is-waiting');
+      clearTimeout(pc._wt); pc._wt = setTimeout(() => { pc.classList.remove('is-waiting'); pc.textContent = t('mark_complete'); }, 5000); }
+    return;
+  }
   completeModule(playing.courseId, playing.mod);
 });
 $('#aiFab').addEventListener('click', () => setTutorOpen(!tutorPanel.classList.contains('open')));

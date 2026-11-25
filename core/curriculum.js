@@ -244,7 +244,10 @@
   }
   /* modules cut from one item share its poster; never show the same thumbnail twice (round 5) */
   const sharedPoster = m => modules.filter(x => x.source === m.source).length > 1;
-  const modPoster = m => (sharedPoster(m) && lThumb(m.source, m.lessons[0])) ? lThumb(m.source, m.lessons[0]).replace('_320x180', '_640x360') : m.item.poster;
+  /* CURRICULUM.moduleArt 'video': a module's tile is a frame of its first lesson, never a lettered title card
+     cropped to a tile (ADEN, round 3: "the words are not readable, 'Above' is cut") */
+  const videoArt = CURRICULUM.moduleArt === 'video';
+  const modPoster = m => ((videoArt || sharedPoster(m)) && lThumb(m.source, m.lessons[0])) ? lThumb(m.source, m.lessons[0]).replace('_320x180', '_640x360') : m.item.poster;
   function moduleCardHTML(m, locked) {
     const st = moduleStats(m), co = courseOf(m.courseId), pos = sharedPoster(m) ? null : m.item.posterPos;
     return `<article class="card cur-card${locked ? ' locked' : ''}"${locked ? ' aria-disabled="true"' : ` data-action="goto" data-route="#/module/${m.id}"`}>

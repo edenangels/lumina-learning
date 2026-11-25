@@ -5297,3 +5297,6 @@ body.rerender #app * { animation: none !important; }
 .open-mode .prof-guest,
 .open-mode .comm-signin { display: none !important; }
 .open-mode #obUsername[aria-invalid="true"] { border-color: var(--accent, #be594d); }
+
+/* watch rule: the Mark-complete button says how far the lesson has been watched (round 3) */
+#playerComplete.is-waiting { background: transparent; color: var(--text, #fff); border: 1px solid var(--accent-2, #c9a45c); }

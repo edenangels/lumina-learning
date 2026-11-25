@@ -64,33 +64,61 @@ const PATH_RATIONALES = [
 ];
 
 
-/* One goal, built only from what has actually been filmed. Four presets used to
-   fan out across twenty courses that did not exist — a path whose every step
-   after the first says "unlocks after assessment" for a lesson nobody shot is
-   worse than a short, honest path. Add goals back as the library is produced. */
-const GOAL_PRESETS = {
-  /* outcome goals (John, 13 Oct 2026: "Land Team is not a goal") — each sequences the
-     filmed courses toward something a learner can want */
-  'Show up Above the Line':       ['alignment-journey', 'land-team-journey', 'growth-journey'],
-  'Purpose & goals that stick':   ['alignment-journey', 'growth-journey', 'land-team-journey'],   /* John's welcome first, whatever the goal */
-  'Fire-season ready':            ['fire-truck-training', 'land-team-journey'],
-  'Work well with AI':            ['ai-literacy', 'land-team-journey'],
-  /* kept so paths chosen before 13 Oct 2026 still resolve; shown as "The full journey" */
-  'Land Team':                    ['alignment-journey', 'land-team-journey', 'fire-truck-training', 'ai-literacy']
-};
-const GOALS_EN = { 'Land Team': 'The full Land Team journey' };
-
-const ROLE_OPTIONS = [
-  /* the real ADEN crews — salaried team incl. construction, houses and kitchen */
-  { key: 'land',      label: 'Land & Farming',             icon: 'sprout',   goals: ['Show up Above the Line', 'Fire-season ready'] },
-  { key: 'build',     label: 'Construction & Maintenance', icon: 'mountain', goals: ['Show up Above the Line', 'Fire-season ready'] },
-  { key: 'hosting',   label: 'Hospitality & Housekeeping', icon: 'people',   goals: ['Show up Above the Line', 'Purpose & goals that stick'] },
-  { key: 'kitchen',   label: 'Kitchen & Food',             icon: 'leaf',     goals: ['Show up Above the Line', 'Purpose & goals that stick'] },
-  { key: 'nature',    label: 'Nature & Wellbeing',         icon: 'tree',     goals: ['Purpose & goals that stick', 'Show up Above the Line'] },
-  { key: 'water',     label: 'Water & Climate',            icon: 'drop',     goals: ['Fire-season ready', 'Show up Above the Line'] },
-  { key: 'community', label: 'Community & Place',          icon: 'sun',      goals: ['Show up Above the Line', 'Purpose & goals that stick'] },
-  { key: 'office',    label: 'Office & Leadership',        icon: 'compass',  goals: ['Purpose & goals that stick', 'Work well with AI'] }
+/* Goals and departments (25 Nov 2026, round 3 — mirror Belong). Each department has three goals that say
+   what that team does, each built only from FILMED modules (the curriculum's module ids). GOAL_MODS is the
+   exact module path; GOAL_PRESETS stays the catalogue-item view older screens read. */
+const GOAL_DEFS = [
+  { k: 'Work as one land team', icon: 'people', pt: 'Trabalhar como uma só equipa da terra',
+    en_d: 'How we think and act together, and owning the result on the land.', pt_d: 'Como pensamos e agimos juntos, e assumir o resultado no terreno.', mods: ['alignment-journey', 'land-team-journey'] },
+  { k: 'Be ready for fire season', icon: 'fire', pt: 'Estar pronto para a época de incêndios',
+    en_d: 'The fire truck from start to spray, and the habits that keep the crew safe.', pt_d: 'O camião de incêndio do arranque à aspersão, e os hábitos que protegem a equipa.', mods: ['alignment-journey', 'fire-truck-training', 'land-team-journey'] },
+  { k: 'Grow in your work', icon: 'sprout', pt: 'Crescer no seu trabalho',
+    en_d: 'Your purpose, goals you keep, and a little better every day.', pt_d: 'O seu propósito, objetivos que cumpre e um pouco melhor todos os dias.', mods: ['alignment-journey', 'growth-journey'] },
+  { k: 'Own every job, start to finish', icon: 'hands', pt: 'Assumir cada trabalho do início ao fim',
+    en_d: 'Responsibility, clarifying instead of assuming, and the detail that makes the job.', pt_d: 'Responsabilidade, clarificar em vez de supor, e o detalhe que faz o trabalho.', mods: ['alignment-journey', 'land-team-journey'] },
+  { k: 'Back the fire crew', icon: 'fire', pt: 'Apoiar a equipa de incêndio',
+    en_d: 'Drive, fill and run the fire truck when the season comes.', pt_d: 'Conduzir, encher e operar o camião de incêndio quando chega a época.', mods: ['alignment-journey', 'fire-truck-training'] },
+  { k: 'Show up for every guest', icon: 'sun', pt: 'Estar presente para cada hóspede',
+    en_d: 'Above-the-line habits at reception, in the houses and at the table.', pt_d: 'Hábitos acima da linha na receção, nas casas e à mesa.', mods: ['alignment-journey', 'land-team-journey'] },
+  { k: 'Work as one with every team', icon: 'people', pt: 'Trabalhar em conjunto com cada equipa',
+    en_d: 'The ADEN way of working, shared with the land, building and office teams.', pt_d: 'A forma ADEN de trabalhar, partilhada com as equipas da terra, da construção e do escritório.', mods: ['alignment-journey', 'land-team-journey', 'growth-journey'] },
+  { k: 'Care for the animals as a team', icon: 'leaf', pt: 'Cuidar dos animais em equipa',
+    en_d: 'Responsibility, feedback and attention to detail, every day.', pt_d: 'Responsabilidade, feedback e atenção ao detalhe, todos os dias.', mods: ['alignment-journey', 'land-team-journey'] },
+  { k: 'Lead above the line', icon: 'compass', pt: 'Liderar acima da linha',
+    en_d: 'Lead with responsibility, feedback and benchmarks of excellence.', pt_d: 'Liderar com responsabilidade, feedback e padrões de excelência.', mods: ['alignment-journey', 'land-team-journey', 'growth-journey'] },
+  { k: 'Set goals the team can reach', icon: 'seed', pt: 'Definir objetivos que a equipa alcança',
+    en_d: 'Purpose, 90-day goals and Kaizen, for you and your team.', pt_d: 'Propósito, objetivos a 90 dias e Kaizen, para si e para a equipa.', mods: ['alignment-journey', 'growth-journey'] },
+  { k: 'Bring a newcomer in the ADEN way', icon: 'hands', pt: 'Integrar alguém novo à maneira ADEN',
+    en_d: 'Welcome someone new with ESIP and the above-the-line habits.', pt_d: 'Acolher alguém novo com o ESIP e os hábitos acima da linha.', mods: ['alignment-journey', 'land-team-journey'] }
 ];
+const GOAL_MODS = {}, GOAL_PRESETS = {}, GOAL_INFO = {}, GOALS_PT = {};
+(function () {
+  GOAL_DEFS.forEach(g => {
+    GOAL_MODS[g.k] = g.mods.slice();
+    GOAL_PRESETS[g.k] = g.mods.slice();   /* ADEN modules are whole catalogue items */
+    GOAL_INFO[g.k] = { icon: g.icon, en: g.en_d, pt: g.pt_d };
+    GOALS_PT[g.k] = g.pt;
+  });
+})();
+const GOALS_EN = {};
+
+/* ADEN's five departments (the same teams as DEPTS, used by the admin cockpit) */
+const ROLE_OPTIONS = [
+  { key: 'land',        label: 'Land & Gardens',             icon: 'sprout',   en_d: 'The land, gardens, orchards and grounds', pt_d: 'A terra, jardins, pomares e espaços exteriores',
+    goals: ['Work as one land team', 'Be ready for fire season', 'Grow in your work'] },
+  { key: 'building',    label: 'Building & Maintenance',     icon: 'mountain', en_d: 'Construction, repairs, systems and machines', pt_d: 'Construção, reparações, sistemas e máquinas',
+    goals: ['Own every job, start to finish', 'Back the fire crew', 'Grow in your work'] },
+  { key: 'hospitality', label: 'Malhão Pardo & Hospitality', icon: 'people',   en_d: 'Guests, houses, reception and the kitchen', pt_d: 'Hóspedes, casas, receção e cozinha',
+    goals: ['Show up for every guest', 'Work as one with every team', 'Grow in your work'] },
+  { key: 'animals',     label: 'Animal Care',                icon: 'bird',     en_d: 'The animals, their feed and their health', pt_d: 'Os animais, a alimentação e a saúde',
+    goals: ['Care for the animals as a team', 'Be ready for fire season', 'Grow in your work'] },
+  { key: 'office',      label: 'Office & Leadership',        icon: 'compass',  en_d: 'Team leaders, admin and the office', pt_d: 'Chefes de equipa, administração e escritório',
+    goals: ['Lead above the line', 'Set goals the team can reach', 'Bring a newcomer in the ADEN way'] }
+];
+/* departments and goals that shipped before 25 Nov 2026 — a stored profile keeps working */
+const ROLE_ALIASES = { build: 'building', hosting: 'hospitality', kitchen: 'hospitality', nature: 'land', water: 'land', community: 'hospitality' };
+const GOAL_ALIASES = { 'Show up Above the Line': 'Work as one land team', 'Purpose & goals that stick': 'Grow in your work',
+  'Fire-season ready': 'Be ready for fire season', 'Work well with AI': 'Lead above the line', 'Land Team': 'Work as one land team' };
 
 /* Gamification — growth-themed levels (nature) + subtle badges. Tuned to lift completion. */
 const LEVELS = [
@@ -162,6 +190,7 @@ const MAIL = {
 const _lang = () => (typeof S !== 'undefined' && S.lang) || 'en';
 const UI = {
   en: {
+    watch_progress:'Watched {p}% · the questions open at {n}%',
     fix_eyebrow:'Review',
     fix_sub_ck:'The questions you have not got yet. Watch that moment of the lesson again, then answer. Your earlier right answers still count.',
     fix_watch:'Watch this moment',
@@ -196,7 +225,7 @@ const UI = {
     saved_sub:'Reels you saved, on this account.',
     goal_axes:'',
     cov_malformed:'Broken question',
-    cov_h:'Does every video end with a question?', cov_module:'Module', cov_none:'No question', cov_ok:'Verified', cov_reel:'Short', cov_sub:'videos have a verified question', cov_unverified:'Unverified', rc_next:'Next', rc_not_quite:'Not quite.', rc_right:'That\u2019s it.', rc_skip:'Skip', reel_h:'Shorts', reel_keep_watching:'Keep watching', srv_local:'On this device only — sign in to keep a server copy', srv_ok:'Every event is mirrored to the server', srv_behind:'{m} of {t} events mirrored to the server', srv_blocked:'The server copy has been refused since {d} — your record is safe on this device and still exports, but it is not yet held independently. Your administrator can see this.', cov_loading:'Loading the question banks…', cov_how:'Every question was written from this module\u2019s own transcript, then answered blind by a second model against the same transcript. Agreement ships it; disagreement corrects it or discards it. Open a row to see the working.', cov_key:'Answer:', cov_said:'At that moment the trainer says:', cov_a_verified:'Both models agreed', cov_a_corrected:'Corrected by the audit', cov_a_unaudited:'Not audited', cov_prov:'Written by {m} from a {s} transcript', cov_no_trail:'audited before the working was recorded', cov_authored:'Written by a person', reel_read:'Read it', reel_hide:'Hide', reel_vlang:'Video is in {l} — this text is in your language', reel_beside:'In the lesson', graph_shorts:'Shorts', graph_related:'Also covered in', close:'Close', loading:'Loading…', reel_pending:'Pending review', reel_none:'No shorts in this library yet.', reel_open:'Open feed', reel_pause_eyebrow:'Take a breath', reel_pause_h:'That is five in a row.', reel_pause_sub:'Shorts are the hook. The hours, and what you can prove, live in the course.', reel_placeholder:'Placeholder — script coming', reel_save:'Save', reel_sound:'Sound',
+    cov_h:'Does every video end with a question?', cov_module:'Lesson', cov_none:'No question', cov_ok:'Verified', cov_reel:'Short', cov_sub:'videos have a verified question', cov_unverified:'Unverified', rc_next:'Next', rc_not_quite:'Not quite.', rc_right:'That\u2019s it.', rc_skip:'Skip', reel_h:'Reels', reel_keep_watching:'Keep watching', srv_local:'On this device only — sign in to keep a server copy', srv_ok:'Every event is mirrored to the server', srv_behind:'{m} of {t} events mirrored to the server', srv_blocked:'The server copy has been refused since {d} — your record is safe on this device and still exports, but it is not yet held independently. Your administrator can see this.', cov_loading:'Loading the question banks…', cov_how:'Every question was written from this lesson\u2019s own transcript, then answered blind by a second model against it.', cov_key:'Answer:', cov_said:'At that moment the trainer says:', cov_a_verified:'Both models agreed', cov_a_corrected:'Corrected by the audit', cov_a_unaudited:'Not audited', cov_prov:'Written by {m} from a {s} transcript', cov_no_trail:'audited before the working was recorded', cov_authored:'Written by a person', reel_read:'Read it', reel_hide:'Hide', reel_vlang:'Video is in {l} — this text is in your language', reel_beside:'In the lesson', graph_shorts:'Shorts', graph_related:'Also covered in', close:'Close', loading:'Loading…', reel_pending:'Pending review', reel_none:'No reels in this library yet.', reel_open:'Start watching', reel_pause_eyebrow:'Take a breath', reel_pause_h:'That is five in a row.', reel_pause_sub:'Shorts are the hook. The hours, and what you can prove, live in the course.', reel_placeholder:'Placeholder — script coming', reel_save:'Save', reel_sound:'Sound',
     lang_fallback:'in English — Portuguese version coming',
     nav_home:'Home', nav_library:'Library', nav_paths:'Paths', nav_live:'Live', nav_progress:'Progress', nav_analytics:'Analytics', nav_admin:'Team', nav_me:'My learning', nav_settings:'Settings', nav_community:'Community',
     comm_title:'Community', comm_sub:'', comm_channels:'Community', comm_paths:'Learning paths', ch_intro:'Introductions', ch_general:'General', ch_wins:'Wins & harvests',
@@ -205,7 +234,7 @@ const UI = {
     comm_online:'Online now', comm_top:'Leader’s board', comm_newest:'New in the community', comm_next_live:'Next live session', comm_members:'Members', comm_all_members:'See all members →', comm_member_since:'here since', comm_add_poll:'+ Poll', comm_poll_opt:'Option', comm_poll_votes:'votes', comm_vote:'Vote', comm_no_members:'The community grows as the team signs in',
     comm_pinned:'Pinned', comm_official:'Official',
     cert_title:'Record of Training Completed', cert_awarded:'Awarded to', cert_for:'for completing', cert_dl:'Download certificate', cert_li:'Add to LinkedIn', certs_h:'Training records', certs_sub:'', cert_none:'Finish a course to receive your first training record.',
-    asg_assigned:'Assigned to you', asg_due:'Due', asg_overdue:'Overdue', asg_start:'Start', dept_label:'Department', dept_none:'Choose your department', mod_locked:'Finish the previous module to unlock this one',
+    asg_assigned:'Assigned to you', asg_due:'Due', asg_overdue:'Overdue', asg_start:'Start', dept_label:'Department', dept_none:'Choose your department', mod_locked:'Finish the previous lesson to unlock this one',
     mis_h:'Field Mission', mis_sub:'Take what you learned onto the land — photo proof earns real XP.', mis_note_ph:'What did you notice? What did you do?', mis_photo:'Add photo proof', mis_submit:'Submit for review', mis_pending:'Submitted — awaiting review', mis_approved:'Mission approved!', mis_claim:'Claim', mis_declined:'Not approved this time — read the brief again and resubmit.', mis_done:'Mission complete', mis_signin:'Sign in to take on field missions', mis_photo_fail:'That photo couldn’t be used — try a JPG or PNG, or a smaller image.',
     coach_h:'Practice arena', coach_sub:'A safe place to practice the hard conversation — with an AI playing the other side.', coach_goal:'Your goal', coach_start:'Start the conversation', coach_end:'End & get feedback', coach_again:'Practice again', coach_ph:'Your reply…', coach_score:'Your feedback', coach_thinking:'…', coach_err:'Connection hiccup — your last message wasn’t lost. Send it again, or check the AI key in Settings.',
     rate_h:'How was this course?', rate_thanks:'Thank you — this helps us grow the library.',
@@ -220,7 +249,7 @@ const UI = {
     story_h:'My learning story', story_sub:'', story_btn:'Tell me where I am', story_refresh:'↺ Refresh',
     lesson_goal:'In this lesson', nudge_today_one:'You have 1 suggested action today', nudge_today:'You have {n} suggested actions today',
     trust_peek:'See exactly what the AI knows about me', trust_peek_note:'That’s the whole list — the AI sees nothing else about you.',
-    knows_name:'Who you are', knows_goal:'Your goal', knows_path:'Your path', knows_open:'Course open now', knows_stats:'Your rhythm', knows_quizzes:'quizzes passed',
+    knows_name:'Who you are', knows_goal:'Your goal', knows_path:'Your path', knows_open:'Module open now', knows_stats:'Your rhythm', knows_quizzes:'quizzes passed',
     flash_missed:'missed in a quiz', flash_missed_n:'missed questions queued — they come first',
     quiz_flag_tip:'Something wrong with this question? Flag it for review', quiz_flagged:'Flagged — your training admin will review this question. Thank you!',
     updated_lbl:'Updated', ask_by:'Answered by',
@@ -241,18 +270,18 @@ const UI = {
     vcert_btn:'Proven record', vcert_locked:'Not proven yet — finish, then answer again in a week.', hourlog_btn:'Hour log', cert_popup:'Allow pop-ups to open the record', ots_none:'', ots_pending:'Timestamp pending', ots_confirmed:'Timestamped publicly · block {b}',
     ck_h:'Quick check', ck_continue:'Continue watching', ck_right:'Spot on — keep going', ck_wrong:'Not quite — the right answer is highlighted. It will come back in your review deck.',
     gdpr_doc_done:'Document downloaded — open it and print to PDF', gdpr_retention:'Retention policy (PT)', gdpr_art30:'Record of processing — art. 30 (PT)', gdpr_dpa:'DPA template — art. 28 (PT)', edu_about:'About', edu_your:'Your educator', edu_more:'More from', edu_external:'external trainer', edu_teaches:'Teaches', edu_band_h:'Learn from your team', edu_avatar:'AI avatar', edu_avatar_note:'This lesson is presented by an AI avatar of the educator, with their consent. The words and the expertise are theirs.', course_one:'course', courses_n:'courses',
-    cap_h:'What you can prove', cap_none:'Nothing proven yet — finish a module and it appears here.',
-    cap_module:'module', cap_modules:'modules', cap_proven:'Proven', cap_today:'today',
+    cap_h:'What you can prove', cap_none:'Nothing proven yet — finish a lesson and it appears here.',
+    cap_module:'lesson', cap_modules:'lessons', cap_proven:'Proven', cap_today:'today',
     cap_lapsed:'Lapsed', cap_expires_in:'Expires in', cap_valid:'Valid',
-    cap_gaps:'Your role also asks for', cap_no_course:'No course teaches this yet', cap_close_gap:'Start',
+    cap_gaps:'Your role also asks for', cap_no_course:'No module teaches this yet', cap_close_gap:'Start',
     cap_org_h:'Who can do what', cap_org_sub:'Derived from evidence — never self-rated. Thin cover first.',
     cap_org_none:'No capabilities proven across the team yet.',
     cap_who:'Who', cap_holder:'person', cap_holders:'people', cap_people:'people',
     cap_one_person:'Only one person', cap_nobody:'Nobody',
     attrib_refs:'Referenced in this lesson', edu_learn_more:'Learn more about them',
     qw_h:'Quick wins', qw_none:'No quick wins in this library yet.', qw_deeper:'Go deeper',
-    qw_deeper_resume:'Continue the course', qw_deeper_done:'You completed', qw_opens_into:'Opens into',
-    qw_no_deeper:'No course behind this one yet', qw_approved_of:'approved of',
+    qw_deeper_resume:'Continue the module', qw_deeper_done:'You completed', qw_opens_into:'Opens into',
+    qw_no_deeper:'No module behind this one yet', qw_approved_of:'approved of',
     qw_drip:'Drip feed', qw_cadence:'How often', qw_channel:'Where', qw_at:'At',
     qw_c_off:'Paused', qw_c_daily:'Every day', qw_c_2d:'Every two days', qw_c_weekly:'Every week',
     qw_ch_email:'Group email', qw_ch_telegram:'Telegram group', qw_ch_whatsapp:'WhatsApp group',
@@ -263,7 +292,7 @@ const UI = {
     howto_h:'Quick answers', howto_sub:'Reference clips — always here when you need a reminder. They don\u2019t count toward your 40 hours.', howto_no_path:'Reference clips don\u2019t join the training path — they\u2019re always one search away.',
     topics_h:'Browse by topic — straight from the lessons', pal_moments:'In the lessons',
     tr_loading:'Loading transcript…', tr_none:'No transcript for this lesson yet.', ask_moments:'From the lessons themselves', recall_recent:'Pick up where you asked', sw_update:'A new version is ready', sw_update_btn:'↻ Update now', mark_complete_short:'✓ Done', tutor_foot_gateway:'AI tutor · answers grounded in your courses · this is an AI, not a person', link_copy:'Copy link to this moment', link_copied:'Link copied — opens the video at this second', tag_at:'Said at', ask_speak:'Read the answer aloud', ask_no_moments:'Nothing in the lessons matches that yet — try other words, or ask the tutor.',
-    mc_conf:'How sure are you?', mc_conf_sure:'Sure', mc_conf_guess:'Guessing', mc_result:'Your result', mc_correct_was:'Correct answer:', mc_moment:'Review the moment', watch_again:'Watch again', next_lesson_btn:'Next lesson →', back_to_course:'Back to the course', mc_back_result:'↩ Back to your result', cert_needs_quiz:'Pass the course quiz (70%) to earn your certificate.', take_cert_quiz:'Take the certification quiz', certified_lbl:'Certified', quiz_intro_h:'Certification quiz', quiz_intro_n:'questions', quiz_intro_rules:'pass mark 70% · unlimited attempts', quiz_intro_earn:'Pass it and your certificate unlocks.', quiz_start:'Start the quiz', quiz_exit:'Not now', q_right:'✓ Correct.', q_wrong:'✗ Not quite.', q_answer_is:'The answer is', optional_lbl:'optional', outcomes_h:'What you will be able to do', how_h:'How it works', how_steps:'Watch short lessons — a few minutes each.|Answer two quick questions after each lesson — that records your training hours.|Pass the final quiz (70%) and your certificate is yours.', deep_h:'Go deeper', deep_sub:'Optional long-form lessons from the original training — watch them any time.', deep_note:'Plus {n} optional deep-dive lessons ({m}) at the end.', mc_continue:'Continue', rev_h:'Review', rev_done:'Review done — it sticks better every round', rev_chip:'to review', checks_chip:'lesson(s) awaiting their check',
+    mc_conf:'How sure are you?', mc_conf_sure:'Sure', mc_conf_guess:'Guessing', mc_result:'Your result', mc_correct_was:'Correct answer:', mc_moment:'Review the moment', watch_again:'Watch again', next_lesson_btn:'Next lesson →', back_to_course:'Back to the module', mc_back_result:'↩ Back', cert_needs_quiz:'Pass the course quiz (70%) to earn your certificate.', take_cert_quiz:'Take the certification quiz', certified_lbl:'Certified', quiz_intro_h:'Certification quiz', quiz_intro_n:'questions', quiz_intro_rules:'pass mark 70% · unlimited attempts', quiz_intro_earn:'Pass it and your certificate unlocks.', quiz_start:'Start the quiz', quiz_exit:'Not now', q_right:'✓ Correct.', q_wrong:'✗ Not quite.', q_answer_is:'The answer is', optional_lbl:'optional', outcomes_h:'What you will be able to do', how_h:'How it works', how_steps:'Watch short lessons — a few minutes each.|Answer two quick questions after each lesson — that records your training hours.|Pass the final quiz (70%) and your certificate is yours.', deep_h:'Go deeper', deep_sub:'Optional long-form lessons from the original training — watch them any time.', deep_note:'Plus {n} optional deep-dive lessons ({m}) at the end.', mc_continue:'Continue', rev_h:'Review', rev_done:'Review done — it sticks better every round', rev_chip:'to review', checks_chip:'lesson(s) awaiting their check',
     mc_eyebrow:'Quick check', mc_sub:'Two questions on what you just watched. Answering is what records your training hours.', mc_note:'Answer both to record this lesson.', mc_submit:'Submit & record', mc_all_right:'Both right — hours recorded', mc_recorded:'Recorded — hours counted, answers kept', mc_ack_q:'Confirm you watched this lesson', mc_ack_label:'I watched this lesson and understood it.', mc_ack_note:'Your confirmation is part of the training record.', mc_pending:'lesson(s) awaiting their check — hours are not counted until you answer',
     ask_h:'Ask the Academy', ask_sub:'Any question about the land — answered from your team\u2019s own courses.', ask_ph:'e.g. How do I fill the water tank on the fire truck?', ask_go:'Ask', ask_refs:'Learn more in', ask_thinking:'Reading the library…', ask_fail:'Could not answer right now — try again.',
     skills_h:'Skills', skills_sub:'',
@@ -277,7 +306,7 @@ const UI = {
     contract_permanent:'Permanent', contract_fixed:'Fixed-term', contract_part:'Part-time', fte_full:'Full-time', fte_half:'Part-time (50%)', ck_40h:'40h',
     ready_h:'Role readiness', ready_sub:'', ready_gap:'Biggest gap', ready_rec:'Recommended for this gap', ready_of:'of target', ready_none:'Pick a role on your profile to see your readiness.',
     ask_more:'Ask the Academy: ', dig_h:'This week at ADEN', dig_sub:'Two minutes per department — stay connected to the whole.', pwa_t:'Take the academy with you', pwa_b:'Add ADEN to your home screen — one tap from anywhere, even offline.', pwa_btn:'Install', pwa_ios:'On iPhone: tap Share, then \u201cAdd to Home Screen\u201d.', comm_pin:'Pin', comm_unpin:'Unpin', comm_delete:'Delete', comm_confirm_del:'Delete this post for everyone?', comm_confirm_del_reply:'Delete this reply?', comm_deleted:'Deleted', comm_privacy:'Your progress is stored in your ADEN account (Firestore, EU) and only you — and ADEN admins — can see it. Turn nudges on or off anytime in your profile.',
-    take_title:'What you take with you', take_sub:'Three things worth keeping from this module.', take_continue:'Keep going →', take_done:'Finish course',
+    take_title:'What you take with you', take_sub:'Three things worth keeping from this lesson.', take_continue:'Keep going →', take_done:'Finish course',
     match_goal:'For your goal', missing_ask:'Not seeing what you need? →', missing_prompt:'Tell me what you’re looking for — a topic, a problem on the land, a skill — and I’ll find it or flag it for the ADEN team to add. Your path only gets smarter when you push back on it.',
     assigned_tag:'Assigned', chosen_tag:'Your pick',
     voice_label:'Voice', voice_listening:'Listening…', voice_hint:'Say it naturally — “I’m looking for something about soil”', voice_unsupported:'Voice search needs Safari or Chrome', voice_search:'Voice search',
@@ -294,27 +323,27 @@ const UI = {
     notif_title:'Notifications', notif_sub:'Change anytime.', notif_browser:'Browser notifications', notif_browser_d:'Gentle desktop reminders — works right away.', notif_email:'Email', notif_email_d:'A weekly nudge to your inbox.', notif_whatsapp:'WhatsApp', notif_whatsapp_d:'Streak & leaderboard pings on WhatsApp.', notif_phone_ph:'WhatsApp number (+351…)', notif_soon:'ready once delivery is connected', notif_on:'Notifications on', notif_blocked:'Your browser blocked notifications — enable them in site settings.',
     mail_not_connected:'Email delivery isn’t connected yet — deploy the mailer first', mail_sent:'Encouragement sent', mail_rate_limited:'Already nudged this week — we keep it gentle', mail_no_email:'No email on this account', mail_not_opted:'hasn’t opted into email nudges — consent first', mail_optin_sent:'Welcome email sent — check your inbox 📬', mail_failed:'Couldn’t send — try again in a moment',
     search_ph:'Search courses, the land…', org:'ADEN · Academy',
-    featured_eyebrow:'For you', match:'match', modules:'modules', certified:'CERTIFIED', featured_h:'Featured', featured_sub:'Essential programs, front and centre',
+    featured_eyebrow:'For you', match:'match', modules:'lessons', certified:'CERTIFIED', featured_h:'Featured', featured_sub:'Essential programs, front and centre',
     all_levels:'All levels', Beginner:'Beginner', Intermediate:'Intermediate', Advanced:'Advanced', 'All levels':'All levels',
-    resume_module:'Resume Module', course_details:'Details', start_learning:'Start learning', start_course:'Start course', rewatch:'Rewatch',
+    resume_module:'Resume lesson', course_details:'Details', start_learning:'Start learning', start_course:'Start module', rewatch:'Rewatch',
     ai_overview:'Overview', my_path:'+ My Path', in_my_path:'✓ In My Path', complete:'complete', est:'est.', left:'left',
-    your_ai_path:'Your path', completed:'Completed', scored:'scored', modules_skipped:'modules you already know',
+    your_ai_path:'Your path', completed:'Completed', scored:'scored', modules_skipped:'lessons you already know',
     in_progress:'In progress', adapted_today:'adapted today', unlocks_after:'Coming up', next_up:'Next up', locked:'Locked',
     continue_learning:'Continue learning', synced_devices:'Synced across your devices', assigned_you:'Assigned to you', from_stewardship:'From ADEN · Stewardship',
     trending:'Explore more', community_learning:'Beyond your path', because_completed:'Because you completed', ai_recommendations:'AI recommendations', see_all:'See all →',
-    generated_by_ai:'Built for your goal', your_path_to:'Your path to', path_intro:'Shaped by your role. It adapts as you prove skills.', regenerate_path:'Regenerate path ↺', why_order:'Why this order?',
+    generated_by_ai:'Built for your goal', your_path_to:'Your path to', path_intro:'Shaped by your role and results. It adapts every time you learn.', regenerate_path:'Regenerate path ↺', why_order:'Why this order?',
     learning_streak:'Learning streak', personal_best:'▲ Personal best', this_week:'This week', vs_last_week:'▲ 38% vs last week', skills_verified:'Knowledge verified', from_quizzes:'from quizzes', avg_score:'Avg. assessment score', top_5:'— Top 5% at ADEN',
     ai_path_chip:'AI PATH', required:'REQUIRED', team_goal:'TEAM GOAL', new:'NEW', module:'MODULE', this_week_rank:'THIS WEEK', cert_issued:'cert issued', due:'Due',
-    library_title:'Library', courses_tended:'courses', filter_library:'Filter the library…', all:'All', nothing_matches:'Nothing matches — try another filter or ask the AI tutor to find it.',
-    in_ai_rotation:'Recommended', learners:'learners', quiz_me:'Quiz me', modules_h:'Modules', tap_module:'', coming_soon:'Coming soon', more_in:'More in', related_courses:'Related courses',
-    ask_tutor:'Ask the tutor', notes_transcript:'Notes & transcript', mark_complete:'✓ Mark module complete', soon_sub:"This lesson is being filmed for the Land Team Journey — we'll let you know the moment it's ready.", play_lesson:'▶ Play lesson',
+    library_title:'Library', courses_tended:'modules', filter_library:'Filter the library…', all:'All', nothing_matches:'Nothing matches — try another filter or ask the AI tutor to find it.',
+    in_ai_rotation:'Recommended', learners:'learners', quiz_me:'Quiz me', modules_h:'Lessons', tap_module:'', coming_soon:'Coming soon', more_in:'More in', related_courses:'Related modules',
+    ask_tutor:'Ask the tutor', notes_transcript:'Notes & transcript', mark_complete:'✓ Mark lesson complete', soon_sub:"This lesson is being filmed for the Land Team Journey — we'll let you know the moment it's ready.", play_lesson:'▶ Play lesson',
     live_title:'Live', live_empty:'No live session scheduled yet. When one is, it appears here, on the calendar and on your home page.', live_sub:'Live with real people. Replays next day.', watching:'watching', join_now:'Join now', remind_me:'Remind me',
     my_progress:'My Progress', progress_sub:'',
-    level_ab:'Lv', xp:'XP', xp_to:'XP to', highest_level:'Highest level — Elder Oak', board_rank:'Leaderboard rank', of:'of', badges_earned:'Badges earned', nice_work:'', earn_first:'Earn your first', courses_finished:'Courses finished',
+    level_ab:'Lv', xp:'XP', xp_to:'XP to', highest_level:'Highest level — Elder Oak', board_rank:'Leaderboard rank', of:'of', badges_earned:'Badges earned', nice_work:'', earn_first:'Earn your first', courses_finished:'Modules finished',
     badges_h:'Badges', badges_sub:'', locked_dot:'Locked ·', leaders_board:'Leaderboard · this week', board_sub:'Friendly. Only this week’s points reset on Monday; your progress and your path never do.', keep_alive:'',
     you:'you', xp_ahead_1:'is just', xp_ahead_2:'ahead — about {n} lessons', top_board:"You're top of the board this week. Keep the grove growing.", path_points:'',
     ob_welcome:'Welcome to ADEN', ob_step:'Step', ob_hi:'Welcome,', ob_pick_handle:"Pick a username — it's how others see you in the community.", ob_role_q:'And what do you do?', ob_q1:'What do you do?', ob_q1_sub:'The AI uses your role to seed your first learning path. You can change everything later.', ob_skip:'Skip — explore on my own', ob_continue:'Continue →',
-    ob_destination:'Your destination', ob_q2:'Pick a goal to work toward', ob_q2_sub:'The AI sequences courses toward this goal and re-plans as you prove skills.', ob_build:'Build my path ✦', ob_building:'Building your path to', courses_adaptive:'courses · adaptive', course_adaptive_one:'course · adaptive', courses_ready:'courses ready', course_ready_one:'course ready', track_more:'track',
+    ob_destination:'Your destination', ob_q2:'Pick a goal to work toward', ob_q2_sub:'Your path is built around it.', ob_build:'Build my path ✦', ob_building:'Building your path to', courses_adaptive:'modules · adaptive', course_adaptive_one:'module · adaptive', courses_ready:'courses ready', course_ready_one:'course ready', track_more:'track & more',
     ai_hello:'How can I help you today?', how_answers:'How it answers',
     tutor_foot_live:'AI · answers can be wrong · grounded in your courses',
     tutor_foot_demo:'Demo · scripted replies · grounded in your courses',
@@ -325,7 +354,7 @@ const UI = {
     no_access_h:"You don't have access to the team dashboard", no_access_b:'This dashboard is for team leads. If you should have access, ask your company administrator to add you.', back_home:'Back to home', analytics_sub:'Your progress, measured.',
     ob_need_role:'Pick what you do to continue.', ob_need_goal:'Pick a goal to continue.',
     paths_h:'Learning paths', paths_sub:'A sequence toward one goal. Finish a step and the rest re-plans around what you proved you know.',
-    active_path:'Active path', courses_in_path:'Courses in this path', in_order:'In order', next_paths:'Suggested next', next_paths_sub:'Based on your goal',
+    active_path:'Active path', courses_in_path:'Modules in this path', in_order:'In order', next_paths:'Suggested next', next_paths_sub:'Based on your goal',
     your_path:'Your path',
     me_h:'My learning', me_progress:'Progress', me_record:'Record', me_activity:'Activity',
     me_paths_sub:'Sequences toward a goal', me_comm_sub:'Questions, answers, your team', me_live_sub:'Sessions and replays',
@@ -340,6 +369,7 @@ const UI = {
     auth_forgot:'Forgot password?', auth_reset_sent:'Reset link sent — check your inbox', auth_reset_need_email:'Type your email above first, then tap "Forgot password?" again.', auth_verify_sent:'Welcome! We sent a verification link to your email'
   },
   pt: {
+    watch_progress:'Visto {p}% · as perguntas abrem aos {n}%',
     fix_eyebrow:'Rever',
     fix_sub_ck:'As perguntas que ainda não acertou. Veja de novo esse momento da lição e responda. As respostas certas de antes continuam a contar.',
     fix_watch:'Ver este momento',
@@ -374,7 +404,7 @@ const UI = {
     saved_sub:'Os reels que guardou, nesta conta.',
     goal_axes:'',
     cov_malformed:'Pergunta inválida',
-    cov_h:'Todos os vídeos terminam com uma pergunta?', cov_module:'Módulo', cov_none:'Sem pergunta', cov_ok:'Verificada', cov_reel:'Short', cov_sub:'vídeos com pergunta verificada', cov_unverified:'Não verificada', rc_next:'Seguinte', rc_not_quite:'Não é bem.', rc_right:'É isso.', rc_skip:'Saltar', reel_h:'Shorts', reel_keep_watching:'Continuar a ver', srv_local:'Apenas neste dispositivo — inicie sessão para guardar uma cópia no servidor', srv_ok:'Todos os eventos estão espelhados no servidor', srv_behind:'{m} de {t} eventos espelhados no servidor', srv_blocked:'A cópia no servidor está a ser recusada desde {d} — o seu registo está seguro neste dispositivo e continua a exportar, mas ainda não está guardado de forma independente. O seu administrador consegue ver isto.', cov_loading:'A carregar os bancos de perguntas…', cov_how:'Cada pergunta foi escrita a partir da transcrição do próprio módulo e depois respondida às cegas por um segundo modelo, contra a mesma transcrição. Se concordarem, avança; se não, é corrigida ou descartada. Abra uma linha para ver o processo.', cov_key:'Resposta:', cov_said:'Nesse momento o formador diz:', cov_a_verified:'Os dois modelos concordaram', cov_a_corrected:'Corrigida pela auditoria', cov_a_unaudited:'Não auditada', cov_prov:'Escrita por {m} a partir de uma transcrição {s}', cov_no_trail:'auditada antes de o processo ser registado', cov_authored:'Escrita por uma pessoa', reel_read:'Ler', reel_hide:'Fechar', reel_vlang:'O vídeo está em {l} — este texto está na sua língua', reel_beside:'Na lição', graph_shorts:'Shorts', graph_related:'Também em', close:'Fechar', loading:'A carregar…', reel_pending:'Por revisão', reel_none:'Ainda não há shorts nesta biblioteca.', reel_open:'Abrir feed', reel_pause_eyebrow:'Respire', reel_pause_h:'São cinco seguidos.', reel_pause_sub:'Os shorts são o engate. As horas, e o que consegue provar, estão no curso.', reel_placeholder:'Marcador — guião a caminho', reel_save:'Guardar', reel_sound:'Som',
+    cov_h:'Todos os vídeos terminam com uma pergunta?', cov_module:'Lição', cov_none:'Sem pergunta', cov_ok:'Verificada', cov_reel:'Short', cov_sub:'vídeos com pergunta verificada', cov_unverified:'Não verificada', rc_next:'Seguinte', rc_not_quite:'Não é bem.', rc_right:'É isso.', rc_skip:'Saltar', reel_h:'Reels', reel_keep_watching:'Continuar a ver', srv_local:'Apenas neste dispositivo — inicie sessão para guardar uma cópia no servidor', srv_ok:'Todos os eventos estão espelhados no servidor', srv_behind:'{m} de {t} eventos espelhados no servidor', srv_blocked:'A cópia no servidor está a ser recusada desde {d} — o seu registo está seguro neste dispositivo e continua a exportar, mas ainda não está guardado de forma independente. O seu administrador consegue ver isto.', cov_loading:'A carregar os bancos de perguntas…', cov_how:'Cada pergunta foi escrita a partir da transcrição desta lição e respondida às cegas por um segundo modelo.', cov_key:'Resposta:', cov_said:'Nesse momento o formador diz:', cov_a_verified:'Os dois modelos concordaram', cov_a_corrected:'Corrigida pela auditoria', cov_a_unaudited:'Não auditada', cov_prov:'Escrita por {m} a partir de uma transcrição {s}', cov_no_trail:'auditada antes de o processo ser registado', cov_authored:'Escrita por uma pessoa', reel_read:'Ler', reel_hide:'Fechar', reel_vlang:'O vídeo está em {l} — este texto está na sua língua', reel_beside:'Na lição', graph_shorts:'Shorts', graph_related:'Também em', close:'Fechar', loading:'A carregar…', reel_pending:'Por revisão', reel_none:'Ainda não há reels nesta biblioteca.', reel_open:'Começar a ver', reel_pause_eyebrow:'Respire', reel_pause_h:'São cinco seguidos.', reel_pause_sub:'Os shorts são o engate. As horas, e o que consegue provar, estão no curso.', reel_placeholder:'Marcador — guião a caminho', reel_save:'Guardar', reel_sound:'Som',
     lang_fallback:'em inglês — versão portuguesa a caminho',
     nav_home:'Início', nav_library:'Biblioteca', nav_paths:'Percursos', nav_live:'Ao Vivo', nav_progress:'Progresso', nav_analytics:'Análises', nav_admin:'Equipa', nav_me:'A minha aprendizagem', nav_settings:'Definições', nav_community:'Comunidade',
     comm_title:'Comunidade', comm_sub:'', comm_channels:'Comunidade', comm_paths:'Percursos', ch_intro:'Apresentações', ch_general:'Geral', ch_wins:'Conquistas',
@@ -383,7 +413,7 @@ const UI = {
     comm_online:'Online agora', comm_top:'Ranking', comm_newest:'Novos na comunidade', comm_next_live:'Próxima sessão ao vivo', comm_members:'Membros', comm_all_members:'Ver todos os membros →', comm_member_since:'aqui desde', comm_add_poll:'+ Sondagem', comm_poll_opt:'Opção', comm_poll_votes:'votos', comm_vote:'Votar', comm_no_members:'A comunidade cresce à medida que a equipa entra',
     comm_pinned:'Fixado', comm_official:'Oficial',
     cert_title:'Documento Comprovativo de Formação', cert_awarded:'Atribuído a', cert_for:'pela conclusão de', cert_dl:'Transferir documento', cert_li:'Adicionar ao LinkedIn', certs_h:'Documentos comprovativos', certs_sub:'', cert_none:'Termine um curso para receber o seu primeiro documento comprovativo.',
-    asg_assigned:'Atribuído a si', asg_due:'Prazo', asg_overdue:'Em atraso', asg_start:'Começar', dept_label:'Departamento', dept_none:'Escolha o seu departamento', mod_locked:'Termine o módulo anterior para desbloquear este',
+    asg_assigned:'Atribuído a si', asg_due:'Prazo', asg_overdue:'Em atraso', asg_start:'Começar', dept_label:'Departamento', dept_none:'Escolha o seu departamento', mod_locked:'Conclua a lição anterior para desbloquear esta',
     mis_h:'Missão de Campo', mis_sub:'Leve o que aprendeu para o terreno — a prova fotográfica vale XP real.', mis_note_ph:'O que reparou? O que fez?', mis_photo:'Adicionar foto', mis_submit:'Submeter para revisão', mis_pending:'Submetido — em revisão', mis_approved:'Missão aprovada!', mis_claim:'Reclamar', mis_declined:'Não aprovada desta vez — releia o guião e volte a submeter.', mis_done:'Missão concluída', mis_signin:'Inicie sessão para aceitar missões de campo', mis_photo_fail:'Não foi possível usar essa foto — tente um JPG ou PNG, ou uma imagem mais pequena.',
     coach_h:'Arena de prática', coach_sub:'Um lugar seguro para praticar a conversa difícil — com uma IA do outro lado.', coach_goal:'O seu objetivo', coach_start:'Começar a conversa', coach_end:'Terminar e receber feedback', coach_again:'Praticar de novo', coach_ph:'A sua resposta…', coach_score:'O seu feedback', coach_thinking:'…', coach_err:'Falha de ligação — a sua mensagem não se perdeu. Envie de novo, ou verifique a chave de IA nas Definições.',
     rate_h:'Como foi este curso?', rate_thanks:'Obrigado — isto ajuda-nos a fazer crescer a biblioteca.',
@@ -397,7 +427,7 @@ const UI = {
     trust_thinking:'Os modos Pista, Coach e Praticar do tutor foram desenhados para desenvolver o seu raciocínio, não para o substituir.',
     story_h:'A minha história de aprendizagem', story_sub:'', story_btn:'Diz-me onde estou', story_refresh:'↺ Atualizar',
     trust_peek:'Ver exatamente o que a IA sabe sobre mim', trust_peek_note:'É esta a lista completa — a IA não vê mais nada sobre si.',
-    knows_name:'Quem é', knows_goal:'O seu objetivo', knows_path:'O seu percurso', knows_open:'Curso aberto agora', knows_stats:'O seu ritmo', knows_quizzes:'quizzes passados',
+    knows_name:'Quem é', knows_goal:'O seu objetivo', knows_path:'O seu percurso', knows_open:'Módulo aberto agora', knows_stats:'O seu ritmo', knows_quizzes:'quizzes passados',
     flash_missed:'falhada num quiz', flash_missed_n:'perguntas falhadas em fila — vêm primeiro',
     quiz_flag_tip:'Algo errado nesta pergunta? Assinale para revisão', quiz_flagged:'Assinalada — o admin de formação vai rever esta pergunta. Obrigado!',
     updated_lbl:'Atualizado', ask_by:'Respondido por',
@@ -419,18 +449,18 @@ const UI = {
     ck_h:'Verificação rápida', ck_continue:'Continuar a ver', ck_right:'Em cheio — continue', ck_wrong:'Quase — a resposta certa está destacada. Vai voltar no seu baralho de revisão.',
     gdpr_doc_done:'Documento descarregado — abra e imprima para PDF', gdpr_retention:'Política de retenção', gdpr_art30:'Registo de tratamento — art. 30.º', gdpr_dpa:'Minuta DPA — art. 28.º',
     lesson_goal:'Nesta lição', nudge_today_one:'Tem 1 ação sugerida hoje', nudge_today:'Tem {n} ações sugeridas hoje', edu_about:'Sobre', edu_your:'O seu formador', edu_more:'Mais de', edu_external:'formador externo', edu_teaches:'Ensina', edu_band_h:'Aprenda com a sua equipa', edu_avatar:'avatar IA', edu_avatar_note:'Esta lição é apresentada por um avatar de IA do formador, com o seu consentimento. As palavras e o saber são dele.', course_one:'curso', courses_n:'cursos',
-    cap_h:'O que consegue provar', cap_none:'Ainda nada provado — conclua um módulo e aparece aqui.',
-    cap_module:'módulo', cap_modules:'módulos', cap_proven:'Provado', cap_today:'hoje',
+    cap_h:'O que consegue provar', cap_none:'Ainda nada comprovado — conclua uma lição e aparece aqui.',
+    cap_module:'lição', cap_modules:'lições', cap_proven:'Provado', cap_today:'hoje',
     cap_lapsed:'Caducado', cap_expires_in:'Caduca em', cap_valid:'Válido',
-    cap_gaps:'A sua função pede também', cap_no_course:'Ainda não há curso que ensine isto', cap_close_gap:'Começar',
+    cap_gaps:'A sua função pede também', cap_no_course:'Nenhum módulo ensina isto ainda', cap_close_gap:'Começar',
     cap_org_h:'Quem sabe fazer o quê', cap_org_sub:'Derivado de evidência — nunca autoavaliado. Cobertura fraca primeiro.',
     cap_org_none:'Ainda sem competências provadas na equipa.',
     cap_who:'Quem', cap_holder:'pessoa', cap_holders:'pessoas', cap_people:'pessoas',
     cap_one_person:'Só uma pessoa', cap_nobody:'Ninguém',
     attrib_refs:'Referências desta lição', edu_learn_more:'Saber mais',
     qw_h:'Ganhos rápidos', qw_none:'Ainda não há ganhos rápidos nesta biblioteca.', qw_deeper:'Aprofundar',
-    qw_deeper_resume:'Continuar o curso', qw_deeper_done:'Já concluiu', qw_opens_into:'Liga a',
-    qw_no_deeper:'Ainda sem curso associado', qw_approved_of:'aprovados de',
+    qw_deeper_resume:'Continuar o módulo', qw_deeper_done:'Já concluiu', qw_opens_into:'Liga a',
+    qw_no_deeper:'Ainda não há módulo por trás deste', qw_approved_of:'aprovados de',
     qw_drip:'Envio gradual', qw_cadence:'Frequência', qw_channel:'Onde', qw_at:'Às',
     qw_c_off:'Em pausa', qw_c_daily:'Todos os dias', qw_c_2d:'De dois em dois dias', qw_c_weekly:'Todas as semanas',
     qw_ch_email:'E-mail de grupo', qw_ch_telegram:'Grupo de Telegram', qw_ch_whatsapp:'Grupo de WhatsApp',
@@ -441,7 +471,7 @@ const UI = {
     howto_h:'Respostas rápidas', howto_sub:'Clipes de referência — sempre aqui quando precisar de relembrar. Não contam para as suas 40 horas.', howto_no_path:'Clipes de referência não entram no percurso de formação — estão sempre à distância de uma pesquisa.',
     topics_h:'Explorar por tema — direto das lições', pal_moments:'Nas lições',
     tr_loading:'A carregar a transcrição…', tr_none:'Ainda não há transcrição para esta lição.', ask_moments:'Das próprias lições', recall_recent:'Retomar o que perguntou', sw_update:'Há uma nova versão pronta', sw_update_btn:'↻ Atualizar agora', mark_complete_short:'✓ Feito', tutor_foot_gateway:'Tutor de IA · respostas baseadas nos seus cursos · é uma IA, não uma pessoa', link_copy:'Copiar ligação para este momento', link_copied:'Ligação copiada — abre o vídeo neste segundo', tag_at:'Dito aos', ask_speak:'Ler a resposta em voz alta', ask_no_moments:'Nada nas lições corresponde a isso — tente outras palavras, ou pergunte ao tutor.',
-    mc_conf:'Que certeza tem?', mc_conf_sure:'Tenho a certeza', mc_conf_guess:'A adivinhar', mc_result:'O seu resultado', mc_correct_was:'Resposta certa:', mc_moment:'Rever o momento', watch_again:'Ver de novo', next_lesson_btn:'Próxima lição →', back_to_course:'Voltar ao curso', mc_back_result:'↩ Voltar ao resultado', cert_needs_quiz:'Passe no teste final do curso (70%) para obter o seu comprovativo.', take_cert_quiz:'Fazer o teste final', certified_lbl:'Aprovado', quiz_intro_h:'Teste final', quiz_intro_n:'perguntas', quiz_intro_rules:'nota mínima 70% · tentativas ilimitadas', quiz_intro_earn:'Passe e o seu comprovativo fica desbloqueado.', quiz_start:'Começar o teste', quiz_exit:'Agora não', q_right:'✓ Certo.', q_wrong:'✗ Não exatamente.', q_answer_is:'A resposta é', optional_lbl:'opcionais', outcomes_h:'O que vai conseguir fazer', how_h:'Como funciona', how_steps:'Veja lições curtas — poucos minutos cada.|Responda a duas perguntas rápidas depois de cada lição — é isso que regista as suas horas de formação.|Passe no teste final (70%) e o comprovativo é seu.', deep_h:'Aprofundar', deep_sub:'Lições longas opcionais da formação original — veja quando quiser.', deep_note:'Mais {n} lições opcionais de aprofundamento ({m}) no fim.', mc_continue:'Continuar', rev_h:'Revisão', rev_done:'Revisão feita — fica mais sólido a cada volta', rev_chip:'para rever', checks_chip:'lição(ões) por verificar',
+    mc_conf:'Que certeza tem?', mc_conf_sure:'Tenho a certeza', mc_conf_guess:'A adivinhar', mc_result:'O seu resultado', mc_correct_was:'Resposta certa:', mc_moment:'Rever o momento', watch_again:'Ver de novo', next_lesson_btn:'Próxima lição →', back_to_course:'Voltar ao módulo', mc_back_result:'↩ Voltar', cert_needs_quiz:'Passe no teste final do curso (70%) para obter o seu comprovativo.', take_cert_quiz:'Fazer o teste final', certified_lbl:'Aprovado', quiz_intro_h:'Teste final', quiz_intro_n:'perguntas', quiz_intro_rules:'nota mínima 70% · tentativas ilimitadas', quiz_intro_earn:'Passe e o seu comprovativo fica desbloqueado.', quiz_start:'Começar o teste', quiz_exit:'Agora não', q_right:'✓ Certo.', q_wrong:'✗ Não exatamente.', q_answer_is:'A resposta é', optional_lbl:'opcionais', outcomes_h:'O que vai conseguir fazer', how_h:'Como funciona', how_steps:'Veja lições curtas — poucos minutos cada.|Responda a duas perguntas rápidas depois de cada lição — é isso que regista as suas horas de formação.|Passe no teste final (70%) e o comprovativo é seu.', deep_h:'Aprofundar', deep_sub:'Lições longas opcionais da formação original — veja quando quiser.', deep_note:'Mais {n} lições opcionais de aprofundamento ({m}) no fim.', mc_continue:'Continuar', rev_h:'Revisão', rev_done:'Revisão feita — fica mais sólido a cada volta', rev_chip:'para rever', checks_chip:'lição(ões) por verificar',
     mc_eyebrow:'Verificação rápida', mc_sub:'Duas perguntas sobre o que acabou de ver. É a resposta que regista as suas horas de formação.', mc_note:'Responda às duas para registar esta lição.', mc_submit:'Submeter e registar', mc_all_right:'Ambas certas — horas registadas', mc_recorded:'Registado — horas contadas, respostas guardadas', mc_ack_q:'Confirme que viu esta lição', mc_ack_label:'Vi esta lição e compreendi-a.', mc_ack_note:'A sua confirmação faz parte do registo de formação.', mc_pending:'lição(ões) por verificar — as horas só contam depois de responder',
     ask_h:'Pergunte à Academia', ask_sub:'Qualquer pergunta sobre a terra — respondida a partir dos cursos da equipa.', ask_ph:'ex.: Como encho o tanque de água do camião?', ask_go:'Perguntar', ask_refs:'Aprenda mais em', ask_thinking:'A ler a biblioteca…', ask_fail:'Não foi possível responder — tente de novo.',
     skills_h:'Competências', skills_sub:'',
@@ -455,7 +485,7 @@ const UI = {
     contract_permanent:'Sem termo', contract_fixed:'A termo', contract_part:'Tempo parcial', fte_full:'Tempo inteiro', fte_half:'Tempo parcial (50%)', ck_40h:'40h',
     ready_h:'Prontidão para a função', ready_sub:'', ready_gap:'Maior lacuna', ready_rec:'Recomendado para esta lacuna', ready_of:'do objetivo', ready_none:'Escolha uma função no seu perfil para ver a sua prontidão.',
     ask_more:'Pergunte à Academia: ', dig_h:'Esta semana na ADEN', dig_sub:'Dois minutos por departamento — ligados ao todo.', pwa_t:'Leve a academia consigo', pwa_b:'Adicione a ADEN ao ecrã principal — um toque, mesmo offline.', pwa_btn:'Instalar', pwa_ios:'No iPhone: toque em Partilhar e depois \u201cAdicionar ao ecrã principal\u201d.', comm_pin:'Fixar', comm_unpin:'Soltar', comm_delete:'Eliminar', comm_confirm_del:'Eliminar esta publicação para todos?', comm_confirm_del_reply:'Eliminar esta resposta?', comm_deleted:'Eliminado', comm_privacy:'O seu progresso é guardado na sua conta ADEN (Firestore, UE) e só você — e os administradores da ADEN — o podem ver. Ative ou desative os lembretes no seu perfil quando quiser.',
-    take_title:'O que leva consigo', take_sub:'Três coisas a guardar deste módulo.', take_continue:'Continuar →', take_done:'Terminar curso',
+    take_title:'O que leva consigo', take_sub:'Três coisas a guardar desta lição.', take_continue:'Continuar →', take_done:'Terminar curso',
     match_goal:'Para o seu objetivo', missing_ask:'Não encontra o que precisa? Diga à IA →', missing_prompt:'Diga-me o que procura — um tema, um problema na terra, uma competência — e eu encontro-o ou sinalizo-o à equipa ADEN para o criar. O seu percurso só fica mais inteligente quando o desafia.',
     assigned_tag:'Atribuído', chosen_tag:'Escolha sua',
     voice_label:'Voz', voice_listening:'A ouvir…', voice_hint:'Diga naturalmente — “procuro algo sobre solo”', voice_unsupported:'A pesquisa por voz precisa de Safari ou Chrome', voice_search:'Pesquisa por voz',
@@ -472,27 +502,27 @@ const UI = {
     notif_title:'Notificações', notif_sub:'Altere quando quiser.', notif_browser:'Notificações do navegador', notif_browser_d:'Lembretes suaves no ecrã — funcionam já.', notif_email:'Email', notif_email_d:'Um lembrete semanal no seu email.', notif_whatsapp:'WhatsApp', notif_whatsapp_d:'Avisos de sequência e ranking no WhatsApp.', notif_phone_ph:'Número de WhatsApp (+351…)', notif_soon:'pronto assim que o envio for ligado', notif_on:'Notificações ativas', notif_blocked:'O navegador bloqueou as notificações — ative-as nas definições do site.',
     mail_not_connected:'O envio de emails ainda não está ligado — implemente primeiro o mailer', mail_sent:'Incentivo enviado', mail_rate_limited:'Já foi incentivado esta semana — mantemos a suavidade', mail_no_email:'Esta conta não tem email', mail_not_opted:'não ativou os lembretes por email — consentimento primeiro', mail_optin_sent:'Email de boas-vindas enviado — veja a sua caixa 📬', mail_failed:'Não foi possível enviar — tente novamente',
     search_ph:'Procurar cursos, a terra…', org:'ADEN · Academia',
-    featured_eyebrow:'Para si', match:'compatível', modules:'módulos', certified:'CERTIFICADO', featured_h:'Em Destaque', featured_sub:'Programas essenciais, em primeiro plano',
+    featured_eyebrow:'Para si', match:'compatível', modules:'lições', certified:'CERTIFICADO', featured_h:'Em Destaque', featured_sub:'Programas essenciais, em primeiro plano',
     all_levels:'Todos os níveis', Beginner:'Iniciante', Intermediate:'Intermédio', Advanced:'Avançado', 'All levels':'Todos os níveis',
-    resume_module:'Retomar Módulo', course_details:'Detalhes', start_learning:'Começar', start_course:'Começar curso', rewatch:'Rever',
+    resume_module:'Retomar lição', course_details:'Detalhes', start_learning:'Começar', start_course:'Começar módulo', rewatch:'Rever',
     ai_overview:'Visão da IA', my_path:'+ Meu Percurso', in_my_path:'✓ No Meu Percurso', complete:'concluído', est:'aprox.', left:'restantes',
-    your_ai_path:'O seu percurso', completed:'Concluído', scored:'nota', modules_skipped:'módulos ignorados pela IA',
+    your_ai_path:'O seu percurso', completed:'Concluído', scored:'nota', modules_skipped:'lições que já conhece',
     in_progress:'Em curso', adapted_today:'adaptado hoje', unlocks_after:'A seguir', next_up:'A seguir', locked:'Bloqueado',
     continue_learning:'Continuar a aprender', synced_devices:'Sincronizado nos seus dispositivos', assigned_you:'Atribuído a si', from_stewardship:'Da ADEN · Zeladoria',
     trending:'Explorar mais', community_learning:'Para além do seu percurso', because_completed:'Porque concluiu', ai_recommendations:'Recomendações da IA', see_all:'Ver tudo →',
-    generated_by_ai:'Construído para o seu objetivo', your_path_to:'O seu percurso para', path_intro:'Moldado pela sua função. Adapta-se à medida que prova competências.', regenerate_path:'Regenerar percurso ↺', why_order:'Porquê esta ordem?',
+    generated_by_ai:'Construído para o seu objetivo', your_path_to:'O seu percurso para', path_intro:'Moldado pela sua função e resultados. Adapta-se sempre que aprende.', regenerate_path:'Regenerar percurso ↺', why_order:'Porquê esta ordem?',
     learning_streak:'Sequência de estudo', personal_best:'▲ Recorde pessoal', this_week:'Esta semana', vs_last_week:'▲ 38% vs semana passada', skills_verified:'Conhecimento verificado', from_quizzes:'de questionários', avg_score:'Nota média das avaliações', top_5:'— Top 5% na ADEN',
     ai_path_chip:'PERCURSO IA', required:'OBRIGATÓRIO', team_goal:'META DE EQUIPA', new:'NOVO', module:'MÓDULO', this_week_rank:'ESTA SEMANA', cert_issued:'documento emitido', due:'Prazo',
-    library_title:'Biblioteca', courses_tended:'cursos', filter_library:'Filtrar a biblioteca…', all:'Todos', nothing_matches:'Nada corresponde — experimente outro filtro ou peça ao tutor de IA.',
-    in_ai_rotation:'Em rotação de IA', learners:'alunos', quiz_me:'Testar-me', modules_h:'Módulos', tap_module:'', coming_soon:'Em breve', more_in:'Mais em', related_courses:'Cursos relacionados',
-    ask_tutor:'Perguntar ao tutor', notes_transcript:'Notas e transcrição', mark_complete:'✓ Marcar como concluído', soon_sub:'Esta lição está a ser filmada para a Jornada da Equipa da Terra — avisamos assim que estiver pronta.', play_lesson:'▶ Reproduzir lição',
+    library_title:'Biblioteca', courses_tended:'módulos', filter_library:'Filtrar a biblioteca…', all:'Todos', nothing_matches:'Nada corresponde — experimente outro filtro ou peça ao tutor de IA.',
+    in_ai_rotation:'Em rotação de IA', learners:'alunos', quiz_me:'Testar-me', modules_h:'Lições', tap_module:'', coming_soon:'Em breve', more_in:'Mais em', related_courses:'Módulos relacionados',
+    ask_tutor:'Perguntar ao tutor', notes_transcript:'Notas e transcrição', mark_complete:'✓ Marcar lição como concluída', soon_sub:'Esta lição está a ser filmada para a Jornada da Equipa da Terra — avisamos assim que estiver pronta.', play_lesson:'▶ Reproduzir lição',
     live_title:'Ao Vivo', live_empty:'Ainda não há sessões ao vivo marcadas. Quando houver, aparecem aqui, no calendário e na sua página inicial.', live_sub:'Sessões com pessoas reais — horas abertas, perguntas e respostas e workshops. As gravações ficam na Biblioteca em um dia.', watching:'a assistir', join_now:'Entrar agora', remind_me:'Lembrar-me',
     my_progress:'O Meu Progresso', progress_sub:'',
-    level_ab:'Nv', xp:'XP', xp_to:'XP para', highest_level:'Nível máximo — Carvalho Ancião', board_rank:'Posição no ranking', of:'de', badges_earned:'Distintivos ganhos', nice_work:'▲ Bom trabalho', earn_first:'Ganhe o seu primeiro', courses_finished:'Cursos terminados',
+    level_ab:'Nv', xp:'XP', xp_to:'XP para', highest_level:'Nível máximo — Carvalho Ancião', board_rank:'Posição no ranking', of:'de', badges_earned:'Distintivos ganhos', nice_work:'▲ Bom trabalho', earn_first:'Ganhe o seu primeiro', courses_finished:'Módulos concluídos',
     badges_h:'Distintivos', badges_sub:'', locked_dot:'Bloqueado ·', leaders_board:'Ranking · esta semana', board_sub:'Amigável. Só os pontos desta semana reiniciam à segunda; o seu progresso e o seu percurso nunca.', keep_alive:'▲ Mantenha viva',
     you:'você', xp_ahead_1:'está apenas', xp_ahead_2:'à sua frente — termine um módulo para alcançar', top_board:'Está no topo do ranking esta semana. Continue a fazer crescer o bosque.', path_points:'',
     ob_welcome:'Bem-vindo à ADEN', ob_step:'Passo', ob_hi:'Bem-vindo,', ob_pick_handle:'Escolha um nome de utilizador — é assim que os outros o veem na comunidade.', ob_role_q:'E o que faz?', ob_q1:'O que faz?', ob_q1_sub:'A IA usa a sua função para criar o seu primeiro percurso. Pode mudar tudo mais tarde.', ob_skip:'Ignorar — explorar sozinho', ob_continue:'Continuar →',
-    ob_destination:'O seu destino', ob_q2:'Escolha um objetivo', ob_q2_sub:'A IA sequencia cursos para este objetivo e replaneia à medida que prova competências.', ob_build:'Criar o meu percurso ✦', ob_building:'A criar o seu percurso para', courses_adaptive:'cursos · adaptativo', course_adaptive_one:'curso · adaptativo', courses_ready:'cursos prontos', course_ready_one:'curso pronto', track_more:'percurso',
+    ob_destination:'O seu destino', ob_q2:'Escolha um objetivo', ob_q2_sub:'O seu percurso é construído à volta dele.', ob_build:'Criar o meu percurso ✦', ob_building:'A criar o seu percurso para', courses_adaptive:'módulos · adaptativo', course_adaptive_one:'módulo · adaptativo', courses_ready:'cursos prontos', course_ready_one:'curso pronto', track_more:'percurso e mais',
     ai_hello:'Como posso ajudar hoje?', how_answers:'Como responde',
     tutor_foot_live:'IA · as respostas podem conter erros · baseadas nos seus cursos',
     tutor_foot_demo:'Demo · respostas guionadas · baseadas nos seus cursos',
@@ -503,7 +533,7 @@ const UI = {
     no_access_h:'Sem acesso ao painel da equipa', no_access_b:'Este painel é para responsáveis de equipa. Se devia ter acesso, peça ao administrador da sua empresa para o adicionar.', back_home:'Voltar ao início', analytics_sub:'O seu progresso, medido.',
     ob_need_role:'Escolha o que faz para continuar.', ob_need_goal:'Escolha um objetivo para continuar.',
     paths_h:'Percursos', paths_sub:'Uma sequência para um objetivo. Termine um passo e o resto reorganiza-se com base no que já provou saber.',
-    active_path:'Percurso ativo', courses_in_path:'Cursos deste percurso', in_order:'Por ordem', next_paths:'Sugestões seguintes', next_paths_sub:'Com base no seu objetivo',
+    active_path:'Percurso ativo', courses_in_path:'Módulos neste percurso', in_order:'Por ordem', next_paths:'Sugestões seguintes', next_paths_sub:'Com base no seu objetivo',
     your_path:'O seu percurso',
     me_h:'A minha aprendizagem', me_progress:'Progresso', me_record:'Registo', me_activity:'Atividade',
     me_paths_sub:'Sequências para um objetivo', me_comm_sub:'Perguntas, respostas, a sua equipa', me_live_sub:'Sessões e gravações',
@@ -526,9 +556,8 @@ const PILLARS_PT = { 'Regenerative':'Regenerativo', 'Rooted':'Enraizado', 'Resto
 const tpillar = l => _lang() === 'pt' ? (PILLARS_PT[l] || l) : l;
 const LEVELS_PT = ['Semente','Rebento','Broto','Muda','Árvore Jovem','Guardião do Bosque','Carvalho Ancião'];
 const tlevel = i => _lang() === 'pt' ? (LEVELS_PT[i] || LEVELS[i].name) : LEVELS[i].name;
-const ROLES_PT = { land:'Terra e Agricultura', build:'Construção e Manutenção', hosting:'Hospitalidade e Limpezas', kitchen:'Cozinha e Alimentação', nature:'Natureza e Bem-estar', water:'Água e Clima', community:'Comunidade e Lugar', office:'Escritório e Liderança' };
+const ROLES_PT = { land:'Terra e Jardins', building:'Construção e Manutenção', hospitality:'Malhão Pardo e Hospitalidade', animals:'Cuidado Animal', office:'Escritório e Liderança' };
 const trole = r => _lang() === 'pt' ? (ROLES_PT[r.key] || r.label) : r.label;
-const GOALS_PT = { 'Show up Above the Line':'Estar acima da linha', 'Purpose & goals that stick':'Propósito e objetivos que ficam', 'Fire-season ready':'Pronto para a época de fogos', 'Work well with AI':'Trabalhar bem com IA', 'Land Team':'A jornada completa da Equipa da Terra' };
 const tgoal = g => _lang() === 'pt' ? (GOALS_PT[g] || g) : ((typeof GOALS_EN !== 'undefined' && GOALS_EN[g]) || g);
 const qgoal = g => `“${tgoal(g)}”`;   /* a goal name quoted, used inside sentences (engine) */
 const BADGES_PT = {
