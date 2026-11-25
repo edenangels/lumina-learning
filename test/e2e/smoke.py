@@ -25,13 +25,17 @@ def check(name, ok, got=''):
     if not ok: FAILS.append(name)
 
 with sync_playwright() as p:
-    try: b = p.chromium.launch()
-    except Exception: b = p.chromium.launch(channel='chrome')   # Playwright's own browser missing → installed Chrome
+    ENGINE = os.environ.get('E2E_BROWSER', 'chromium')   # chromium | webkit (Safari's engine) | firefox
+    if ENGINE != 'chromium': b = getattr(p, ENGINE).launch()
+    else:
+        try: b = p.chromium.launch()
+        except Exception: b = p.chromium.launch(channel='chrome')   # Playwright's own browser missing → installed Chrome
     c = b.new_context(viewport={'width': W, 'height': 844}, service_workers='block')
     if L == 'pt':
         c.add_init_script("localStorage.getItem('edenrise-state-v2')||localStorage.setItem('edenrise-state-v2',JSON.stringify({lang:'pt'}))")
     pg = c.new_page(); pg.set_default_timeout(10000); errs = []
-    pg.on('pageerror', lambda e: errs.append('PAGEERR ' + str(e)[:200]))
+    VIMEO_NOISE = 'player.vimeo.com" from accessing a frame'   # Safari: Vimeo's own frame probing its parent; not ours, harmless
+    pg.on('pageerror', lambda e: (None if VIMEO_NOISE in str(e) else errs.append('PAGEERR ' + str(e)[:200])))
     pg.on('console', lambda m: errs.append('CONSOLE ' + m.text[:160]) if m.type == 'error' and 'ERR_NETWORK' not in m.text else None)
 
     pg.goto(B + '#/home'); pg.wait_for_timeout(4000)

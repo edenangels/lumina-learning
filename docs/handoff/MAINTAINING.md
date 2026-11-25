@@ -10,6 +10,19 @@ project `edenrise-academy`, `sw.js` VERSION prefix `edenrise-v`, worker/reel URL
 employer**: `company: 'EdenRise'` in brand.js (and the Firestore company doc) — change only on João's word.
 Older videos say "EdenRise" aloud; the tutor's `ethos` says ADEN was formerly EdenRise.
 
+**One engine, two academies (25 Nov 2026).** ADEN runs the same engine as Belong Academy
+(`~/Workflows/belong-academy`, repo `edenangels/belong-academy`).
+- **Shared files:** `core/app.js`, `curriculum.js`, `team.js`, `localdb.js`, `compat.js`, `auth.js`, `brandkit.js`,
+  `styles.css` are identical in both. A fix in one gets copied to the other.
+- **Never shared:** `core/firestore.rules` (each has its own admin list), `brands/`, `data.js` (only new UI
+  keys are added, in both languages) and `index.html` (only structural changes).
+- **Brand settings that differ on purpose:**
+  - `backend: 'firebase'`. ADEN must keep it: a missing value means no-login mode.
+  - The watch rule stays on.
+  - `leanProfile` is off, because the NIF and contract fields feed the 40-hour record.
+- **Course layer:** `curriculum.js` switches itself off when `content.js` has no `CURRICULUM`, which is the
+  case for ADEN today.
+
 **Map**
 | What | Where |
 |---|---|

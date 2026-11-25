@@ -104,8 +104,11 @@ manual Claude reads (the `CLAUDE.md` in your folder points Claude to it).
 
 - **Phone header:** on phones the logo doesn't show in the top bar and the search box runs off
   the right edge.
-- **After a wrong answer, EdenRise shows the correct answer.** Belong Academy was changed to
-  "review the moment, then answer again". Ask João whether ADEN should do the same.
+- **ADEN and Belong Academy now share one engine** (since 25 Nov 2026). An improvement made to one
+  should be copied to the other. `MAINTAINING.md` says how.
+- **Course grouping (open decision for João):** Belong groups modules into courses with one certificate
+  per course. ADEN still uses one certificate per course after a final quiz. Don't change this
+  without João.
 - **Older videos still say "EdenRise" out loud.** That's expected. The AI tutor knows ADEN
   was formerly EdenRise.
 - **Security-rules work on the Firebase project** is João's to schedule. Don't deploy rules.

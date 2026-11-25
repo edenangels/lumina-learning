@@ -37,11 +37,11 @@
 <script src="brands/edenrise/brand.js?v=edr229"></script>
 <script src="brands/_example/brand.js?v=edr229"></script>
 <script src="core/brandkit.js?v=edr229"></script>
-<script src="core/ots.js?v=edr229"></script>
 <link rel="stylesheet" href="core/styles.css?v=edr229">
+<script src="core/compat.js?v=edr229"></script>
 <script>/* per-brand key: several academies share one origin (see app.js STATE_KEY) */
 var _b=(window.BRAND&&window.BRAND.id)||'edenrise';window.AUTH_MODE_KEY=(window.BRAND&&window.BRAND.authModeKey)||(_b+'-auth-mode');
-try{var m=localStorage.getItem(window.AUTH_MODE_KEY);document.documentElement.setAttribute('data-gate',(m==='guest'||m==='firebase')?'off':'on');}catch(e){document.documentElement.setAttribute('data-gate','on');}</script>
+try{var m=localStorage.getItem(window.AUTH_MODE_KEY);if(window.BRAND&&BRAND.backend==='open'){m='guest';document.documentElement.classList.add('open-mode');}document.documentElement.setAttribute('data-gate',(m==='guest'||m==='firebase'||m==='local')?'off':'on');}catch(e){document.documentElement.setAttribute('data-gate','on');}</script>
 </head>
 <body>
 
@@ -107,6 +107,7 @@ try{var m=localStorage.getItem(window.AUTH_MODE_KEY);document.documentElement.se
         <span class="mic-label">Voice</span>
       </button>
     </div>
+    <button class="streak-chip" id="streakChip" data-action="goto" data-route="#/progress" aria-label="Streak"></button>
     <button class="bell" id="bellBtn" aria-label="Nudges" aria-haspopup="true">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
       <span class="bell-dot" id="bellDot"></span>
@@ -125,7 +126,7 @@ try{var m=localStorage.getItem(window.AUTH_MODE_KEY);document.documentElement.se
 <div class="mobile-drawer" id="mobileDrawer">
   <div class="mobile-drawer-panel" role="dialog" aria-label="Menu">
     <div class="mobile-drawer-head">
-      <div class="org-chip" id="orgChip"><span class="org-dot"></span>ADEN · Academy</div>
+      <span></span>
       <button class="mobile-drawer-close" id="drawerClose" aria-label="Close menu">✕</button>
     </div>
     <div class="md-label">Browse</div>
@@ -139,8 +140,8 @@ try{var m=localStorage.getItem(window.AUTH_MODE_KEY);document.documentElement.se
     <a href="#/profile">Settings</a>
     <button class="md-signout" data-m="signout">Sign out</button>
     <div class="lang-toggle drawer-lang" role="group" aria-label="Language / Idioma">
-      <button class="lang-btn on" data-lang="en" aria-pressed="true">EN · English</button>
-      <button class="lang-btn" data-lang="pt" aria-pressed="false">PT · Português</button>
+      <button class="lang-btn on" data-lang="en" aria-pressed="true" aria-label="English">EN</button>
+      <button class="lang-btn" data-lang="pt" aria-pressed="false" aria-label="Português">PT</button>
     </div>
   </div>
 </div>
@@ -198,8 +199,8 @@ try{var m=localStorage.getItem(window.AUTH_MODE_KEY);document.documentElement.se
     </div>
     <div class="nd-section-title">✦ AI transcript</div>
     <div class="nd-transcript" id="ndTranscript"></div>
-    <div class="nd-section-title">Your notes <span class="nd-saved" id="ndSaved"></span></div>
-    <textarea class="nd-notes" id="ndNotes" placeholder="Type a note — saved automatically, pinned to this module…"></textarea>
+    <!-- personal notes removed (Belong round, 9 Nov 2026, mirrored 25 Nov); hidden stubs keep old listeners harmless -->
+    <span class="nd-saved" id="ndSaved" hidden></span><textarea class="nd-notes" id="ndNotes" hidden aria-hidden="true" tabindex="-1"></textarea>
   </aside>
 </div>
 
@@ -291,8 +292,14 @@ try{var m=localStorage.getItem(window.AUTH_MODE_KEY);document.documentElement.se
 <script src="brands/edenrise/content.js?v=edr229"></script>
 <script src="data.js?v=edr229"></script>
 <script src="core/app.js?v=edr229"></script>
-<script src="core/landflow.js?v=edr229"></script>
-<script type="module" src="core/auth.js?v=edr229"></script>
+<script src="core/curriculum.js?v=edr229"></script>
+<script src="core/team.js?v=edr229"></script>
+<script>/* Not on the first screen: OpenTimestamps (certificate/ledger proofs; every
+   caller checks window.OTS) and the LandFlow return leg (runs on module
+   completion). Loaded after the page has loaded, off the hero's critical path. */
+addEventListener('load', function () { ['core/ots.js', 'core/landflow.js'].forEach(function (f) { var s = document.createElement('script'); s.src = f + '?v=edr229'; document.body.appendChild(s); }); }, { once: true });</script>
+<script>/* backend switch: BRAND.backend 'firebase' → Firebase (core/auth.js); 'open' (no sign-in) or 'local' → core/localdb.js */
+(function(){var s=document.createElement('script'),v='edr229';if(!window.BRAND||BRAND.backend!=='firebase'){s.src='core/localdb.js?v='+v;}else{s.type='module';s.src='core/auth.js?v='+v;}document.body.appendChild(s);})();</script>
 <script>
 /* Safety net: if the Firebase module can't load (blocked CDN, offline), make sure
    the "continue as guest" button still dismisses the gate so no one is stuck. */
