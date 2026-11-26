@@ -1,5 +1,5 @@
 {
- "generatedAt": 1795622117937,
+ "generatedAt": 1795716354675,
  "courses": {
   "alignment-journey": {
    "title": "The ADEN Alignment Journey",
@@ -837,7 +837,7 @@
     },
     {
      "mod": 4,
-     "title": "Six Core Human Needs",
+     "title": "Six Core Human Needs · Master Your Reactions",
      "language": "en",
      "translated": "pt",
      "segments": 110,
@@ -1111,6 +1111,63 @@
        "t0": 57,
        "teaches": "You're working on your goals and you realize that you need to make some adjustments to stay on track. What approach shou",
        "audit": "verified"
+      }
+     ],
+     "questions": 6
+    },
+    {
+     "mod": 9,
+     "title": "Six Core Human Needs · Know Your Drive",
+     "language": "en",
+     "translated": null,
+     "segments": 58,
+     "chars": 3841,
+     "durationSec": 285,
+     "capability": "leadership",
+     "tags": [
+      "leadership",
+      "needs",
+      "certainty",
+      "connection",
+      "contribution",
+      "change",
+      "variety",
+      "significance",
+      "growth"
+     ],
+     "regime": null,
+     "summary": "By now, you've learned the six human needs: certainty, variety, significance, love and connection, growth, and contribution. These needs influence all of us, and they don't disappear when you come to work.",
+     "url": "https://academy.edenrise.com/#/play/growth-journey/9",
+     "moments": [
+      {
+       "t0": 22,
+       "teaches": "According to the lesson, what do you gain by understanding what drives you?",
+       "audit": "unaudited"
+      },
+      {
+       "t0": 37,
+       "teaches": "What happens when certainty becomes too important to someone?",
+       "audit": "unaudited"
+      },
+      {
+       "t0": 127,
+       "teaches": "Instead of asking \"Do people notice me?\", which question does the lesson suggest?",
+       "audit": "unaudited"
+      },
+      {
+       "t0": 181,
+       "teaches": "Your work has started to feel repetitive. What does the lesson suggest you ask yourself?",
+       "audit": "unaudited"
+      },
+      {
+       "t0": 150,
+       "teaches": "A teammate sees a problem but says nothing, because they do not want anyone to be upset with them. What does the lesson ",
+       "audit": "unaudited"
+      },
+      {
+       "t0": 75,
+       "teaches": "A colleague keeps changing a process that was introduced only last week, because the routine bores them. What does the l",
+       "audit": "unaudited"
       }
      ],
      "questions": 6

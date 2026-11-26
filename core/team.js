@@ -40,7 +40,7 @@
       let now = null;
       if (nx) {
         const co = C.courses.find(x => x.id === nx.m.courseId);
-        now = { course: C.cTitle(co), module: C.mTitle(nx.m), lesson: C.lTitle(nx.m.source, nx.i), n: nx.m.lessons.indexOf(nx.i) + 1, of: nx.m.lessons.length,
+        now = { course: C.cTitle(co), module: C.mTitle(nx.m), lesson: C.lTitle(nx.s, nx.i), n: nx.m.lessons.indexOf(nx.r) + 1, of: nx.m.lessons.length,
           started: courses.some(c => c.done > 0) };
       }
       const events = [];

@@ -1457,6 +1457,188 @@
     "generatedAt": 1785750245109,
     "verified": true
    }
+  ],
+  "9": [
+   {
+    "a": 1,
+    "en": {
+     "q": "According to the lesson, what do you gain by understanding what drives you?",
+     "opts": [
+      "More control over what other people do",
+      "More choice in how you respond",
+      "Fewer needs to deal with at work",
+      "A way to avoid change altogether"
+     ],
+     "why": "The more you understand what drives you, the more choice you have in how you respond."
+    },
+    "pt": {
+     "q": "Segundo a lição, o que ganha ao perceber o que o move?",
+     "opts": [
+      "Mais controlo sobre o que os outros fazem",
+      "Mais escolha na forma como responde",
+      "Menos necessidades com que lidar no trabalho",
+      "Uma forma de evitar a mudança por completo"
+     ],
+     "why": "Quanto melhor percebe o que o move, mais escolha tem na forma como responde."
+    },
+    "t0": 22,
+    "type": "recall",
+    "gen": true,
+    "model": "claude-fable-5-2",
+    "src": "vimeo-captions",
+    "generatedAt": 1795716215234,
+    "verified": true
+   },
+   {
+    "a": 3,
+    "en": {
+     "q": "What happens when certainty becomes too important to someone?",
+     "opts": [
+      "They take on too many new projects",
+      "They stop caring about recognition",
+      "They find it hard to work with others",
+      "Change starts to feel threatening"
+     ],
+     "why": "A new process or a different schedule can feel like a threat when certainty matters too much."
+    },
+    "pt": {
+     "q": "O que acontece quando a certeza se torna demasiado importante para alguém?",
+     "opts": [
+      "Aceita demasiados projetos novos",
+      "Deixa de se importar com o reconhecimento",
+      "Tem dificuldade em trabalhar com os outros",
+      "A mudança começa a parecer uma ameaça"
+     ],
+     "why": "Um processo novo ou um horário diferente podem parecer uma ameaça quando a certeza pesa demasiado."
+    },
+    "t0": 37,
+    "type": "recall",
+    "gen": true,
+    "model": "claude-fable-5-2",
+    "src": "vimeo-captions",
+    "generatedAt": 1795716215234,
+    "verified": true
+   },
+   {
+    "a": 0,
+    "en": {
+     "q": "Instead of asking \"Do people notice me?\", which question does the lesson suggest?",
+     "opts": [
+      "\"Am I creating value?\"",
+      "\"Who is getting the credit?\"",
+      "\"How can I prove I am right?\"",
+      "\"Why does nobody thank me?\""
+     ],
+     "why": "Significance is met in a healthy way through excellence, reliability and real contribution."
+    },
+    "pt": {
+     "q": "Em vez de perguntar \"As pessoas reparam em mim?\", que pergunta sugere a lição?",
+     "opts": [
+      "\"Estou a criar valor?\"",
+      "\"Quem fica com o mérito?\"",
+      "\"Como provo que tenho razão?\"",
+      "\"Porque é que ninguém me agradece?\""
+     ],
+     "why": "A necessidade de significado satisfaz-se de forma saudável com excelência, fiabilidade e um contributo real."
+    },
+    "t0": 127,
+    "type": "application",
+    "gen": true,
+    "model": "claude-fable-5-2",
+    "src": "vimeo-captions",
+    "generatedAt": 1795716215234,
+    "verified": true
+   },
+   {
+    "a": 2,
+    "en": {
+     "q": "Your work has started to feel repetitive. What does the lesson suggest you ask yourself?",
+     "opts": [
+      "\"When will someone give me a new role?\"",
+      "\"Who can I hand this task to?\"",
+      "\"What can I learn from this, and what can I become better at?\"",
+      "\"How can I change this process today?\""
+     ],
+     "why": "Growth does not have to come from someone else. It is something you can take ownership of."
+    },
+    "pt": {
+     "q": "O seu trabalho começou a parecer repetitivo. O que sugere a lição que pergunte a si mesmo?",
+     "opts": [
+      "\"Quando é que alguém me dá uma função nova?\"",
+      "\"A quem posso passar esta tarefa?\"",
+      "\"O que posso aprender com isto, e em que posso melhorar?\"",
+      "\"Como posso mudar este processo hoje?\""
+     ],
+     "why": "O crescimento não tem de vir de outra pessoa. É algo que pode assumir como seu."
+    },
+    "t0": 181,
+    "type": "application",
+    "gen": true,
+    "model": "claude-fable-5-2",
+    "src": "vimeo-captions",
+    "generatedAt": 1795716215234,
+    "verified": true
+   },
+   {
+    "a": 1,
+    "en": {
+     "q": "A teammate sees a problem but says nothing, because they do not want anyone to be upset with them. What does the lesson say about this?",
+     "opts": [
+      "It is the need for certainty, and they should wait for clear instructions",
+      "It is the need for connection, and real connection does not mean agreeing all the time",
+      "It is the need for growth, and they should ask for more training first",
+      "It is the need for variety, and they should move to a different task"
+     ],
+     "why": "The need for connection can make us avoid difficult conversations. Strong teams can disagree and still respect one another."
+    },
+    "pt": {
+     "q": "Um colega vê um problema mas não diz nada, porque não quer que ninguém fique aborrecido com ele. O que diz a lição sobre isto?",
+     "opts": [
+      "É a necessidade de certeza, e deve esperar por instruções claras",
+      "É a necessidade de ligação, e uma ligação verdadeira não significa concordar sempre",
+      "É a necessidade de crescimento, e deve pedir mais formação primeiro",
+      "É a necessidade de variedade, e deve mudar para outra tarefa"
+     ],
+     "why": "A necessidade de ligação pode levar-nos a evitar conversas difíceis. As equipas fortes conseguem discordar e continuar a respeitar-se."
+    },
+    "t0": 150,
+    "type": "scenario",
+    "gen": true,
+    "model": "claude-fable-5-2",
+    "src": "vimeo-captions",
+    "generatedAt": 1795716215234,
+    "verified": true
+   },
+   {
+    "a": 2,
+    "en": {
+     "q": "A colleague keeps changing a process that was introduced only last week, because the routine bores them. What does the lesson suggest?",
+     "opts": [
+      "Let them change it, because energy matters more than routine",
+      "Give them more recognition so that they settle down",
+      "Find a healthy challenge, such as learning something new, without creating unnecessary chaos",
+      "Ask them to stop suggesting improvements from now on"
+     ],
+     "why": "Too much variety becomes distraction. Not everything needs to change just because change feels exciting."
+    },
+    "pt": {
+     "q": "Um colega está sempre a mudar um processo que foi introduzido só na semana passada, porque a rotina o aborrece. O que sugere a lição?",
+     "opts": [
+      "Deixá-lo mudar o processo, porque a energia importa mais do que a rotina",
+      "Dar-lhe mais reconhecimento para que se acalme",
+      "Encontrar um desafio saudável, como aprender algo novo, sem criar caos desnecessário",
+      "Pedir-lhe que deixe de sugerir melhorias a partir de agora"
+     ],
+     "why": "Variedade a mais torna-se distração. Nem tudo precisa de mudar só porque a mudança é entusiasmante."
+    },
+    "t0": 86,
+    "type": "scenario",
+    "gen": true,
+    "model": "claude-fable-5-2",
+    "src": "vimeo-captions",
+    "generatedAt": 1795716215234,
+    "verified": true
+   }
   ]
  }
 }

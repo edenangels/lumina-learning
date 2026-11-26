@@ -1,5 +1,5 @@
 {
- "generatedAt": 1795622118048,
+ "generatedAt": 1795716354789,
  "nodes": [
   {
    "id": "course:alignment-journey",
@@ -629,7 +629,7 @@
   {
    "id": "module:growth-journey:4",
    "kind": "module",
-   "title": "Six Core Human Needs",
+   "title": "Six Core Human Needs · Master Your Reactions",
    "course": "growth-journey",
    "mod": 4,
    "url": "https://academy.edenrise.com/#/play/growth-journey/4",
@@ -780,6 +780,35 @@
    "id": "concept:review",
    "kind": "concept",
    "title": "review"
+  },
+  {
+   "id": "module:growth-journey:9",
+   "kind": "module",
+   "title": "Six Core Human Needs · Know Your Drive",
+   "course": "growth-journey",
+   "mod": 9,
+   "url": "https://academy.edenrise.com/#/play/growth-journey/9",
+   "seconds": 285
+  },
+  {
+   "id": "concept:certainty",
+   "kind": "concept",
+   "title": "certainty"
+  },
+  {
+   "id": "concept:connection",
+   "kind": "concept",
+   "title": "connection"
+  },
+  {
+   "id": "concept:contribution",
+   "kind": "concept",
+   "title": "contribution"
+  },
+  {
+   "id": "concept:variety",
+   "kind": "concept",
+   "title": "variety"
   },
   {
    "id": "course:land-team-journey",
@@ -2520,6 +2549,66 @@
    "w": 1
   },
   {
+   "from": "module:growth-journey:9",
+   "to": "course:growth-journey",
+   "rel": "in",
+   "w": 1
+  },
+  {
+   "from": "module:growth-journey:9",
+   "to": "concept:leadership",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:growth-journey:9",
+   "to": "concept:needs",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:growth-journey:9",
+   "to": "concept:certainty",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:growth-journey:9",
+   "to": "concept:connection",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:growth-journey:9",
+   "to": "concept:contribution",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:growth-journey:9",
+   "to": "concept:change",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:growth-journey:9",
+   "to": "concept:variety",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:growth-journey:9",
+   "to": "concept:significance",
+   "rel": "about",
+   "w": 1
+  },
+  {
+   "from": "module:growth-journey:9",
+   "to": "concept:growth",
+   "rel": "about",
+   "w": 1
+  },
+  {
    "from": "module:land-team-journey:0",
    "to": "course:land-team-journey",
    "rel": "in",
@@ -3594,6 +3683,12 @@
    "w": 1
   },
   {
+   "from": "reel:bring-the-energy",
+   "to": "module:growth-journey:9",
+   "rel": "beside",
+   "w": 0.303
+  },
+  {
    "from": "reel:culture",
    "to": "module:land-team-journey:4",
    "rel": "beside",
@@ -3694,6 +3789,12 @@
    "to": "module:land-team-journey:4",
    "rel": "related",
    "w": 0.143
+  },
+  {
+   "from": "module:growth-journey:4",
+   "to": "module:growth-journey:9",
+   "rel": "related",
+   "w": 0.194
   },
   {
    "from": "module:growth-journey:4",
@@ -4173,16 +4274,16 @@
  "stats": {
   "nodes": {
    "course": 5,
-   "module": 36,
+   "module": 37,
    "reel": 5,
-   "concept": 194
+   "concept": 198
   },
   "edges": {
-   "in": 36,
-   "about": 330,
+   "in": 37,
+   "about": 339,
    "deeper": 5,
-   "beside": 6,
-   "related": 23,
+   "beside": 7,
+   "related": 24,
    "similar": 67
   }
  },

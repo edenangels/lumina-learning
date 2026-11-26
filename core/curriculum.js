@@ -90,13 +90,29 @@
   const courses = CURRICULUM.courses;
   const modules = [];
   courses.forEach(co => co.modules.forEach(m => {
-    const src = m.source || m.id, item = courseById(src); if (!item) return;
-    modules.push({ id: m.id, courseId: co.id, source: src, item, lessons: m.lessons || item.modules.map((_, i) => i), optional: m.optional || [], def: m });
+    /* A module's lessons may come from SEVERAL catalogue items (26 Nov 2026): each lesson is a ref
+       { s: item id, i: index } and keeps its own record key "<item id>:<index>", so regrouping lessons
+       into different modules never touches a learner record. In CURRICULUM a lesson is written as a
+       number (index in the module's own item) or as "item-id:index". `source` is the module's home
+       item (art, educator, colour); it defaults to the item of the first lesson, then to the module id. */
+    const first = Array.isArray(m.lessons) && typeof m.lessons[0] === 'string' ? m.lessons[0].slice(0, m.lessons[0].lastIndexOf(':')) : null;
+    const src = m.source || (courseById(m.id) ? m.id : first) || m.id, item = courseById(src); if (!item) return;
+    const parse = x => typeof x === 'string' ? { s: x.slice(0, x.lastIndexOf(':')), i: +x.slice(x.lastIndexOf(':') + 1) } : { s: src, i: x };
+    const real = r => { const c = courseById(r.s); return !!(c && c.modules[r.i] != null); };
+    const lessons = (m.lessons || item.modules.map((_, i) => i)).map(parse).filter(real);
+    if (!lessons.length) return;
+    const optional = (m.optional || []).map(parse);
+    modules.push({ id: m.id, courseId: co.id, source: src, item, lessons, optional, def: m });
   }));
+  const sameL = (r, s, i) => r.s === s && r.i === i;
+  const hasL = (m, s, i) => m.lessons.some(r => sameL(r, s, i));
+  /* the modules a catalogue item now lives in (old links, old paths, item cards): `covers` in the module's
+     definition says so explicitly; without it, the module whose home item it is */
+  const modsFor = id => modules.filter(m => (m.def.covers || [m.source]).includes(id));
   const courseOf = id => courses.find(c => c.id === id) || null;
   const moduleOf = id => modules.find(m => m.id === id) || null;
   const modulesOfCourse = id => modules.filter(m => m.courseId === id);
-  const moduleOfLesson = (src, i) => modules.find(m => m.source === src && m.lessons.includes(i)) || null;
+  const moduleOfLesson = (src, i) => modules.find(m => hasL(m, src, i)) || null;
   const lkey = (src, i) => src + ':' + i;
   const cTitle = co => (PT() && co.pt && co.pt.title) || co.title;
   const cField = (co, f) => (PT() && co.pt && co.pt[f]) || co[f];
@@ -104,7 +120,7 @@
   const mOutcome = m => m.def.outcome ? ((PT() && m.def.pt && m.def.pt.outcome) || m.def.outcome) : (((PT() && m.item.outcomes_pt) || m.item.outcomes || [])[0] || chook(m.item));
   const lTitle = (src, i) => { const o = CURRICULUM.lessonTitles && CURRICULUM.lessonTitles[lkey(src, i)]; return (o && (PT() ? o.pt : o.en)) || cmods(courseById(src))[i] || courseById(src).modules[i]; };
   const lMins = (src, i) => { const c = courseById(src); return (c.moduleDurations && c.moduleDurations[i]) || 6; };
-  const isOptional = (m, i) => m.optional.includes(i);
+  const isOptional = (m, r) => m.optional.some(o => sameL(o, r.s, r.i));
 
   /* ---------- lesson state ---------- */
   const logEntry = (src, i) => (S.trainingLog || []).find(e => e && e.courseId === src && e.mod === i);
@@ -166,20 +182,20 @@
 
   /* ---------- module / course state ---------- */
   function moduleStats(m) {
-    const req = m.lessons.filter(i => !isOptional(m, i));
-    const done = req.filter(i => lessonDone(m.source, i)).length;
-    const minsAll = m.lessons.reduce((a, i) => a + lMins(m.source, i) + 1, 0);
-    const minsLeft = req.filter(i => !lessonDone(m.source, i)).reduce((a, i) => a + lMins(m.source, i) + 1, 0);
-    return { lessons: m.lessons.length, required: req.length, done, complete: req.length > 0 && done === req.length, pct: req.length ? Math.round(done / req.length * 100) : 0, mins: minsAll, minsLeft, started: m.lessons.some(i => lessonDone(m.source, i) || watched(m.source, i)) };
+    const req = m.lessons.filter(r => !isOptional(m, r));
+    const done = req.filter(r => lessonDone(r.s, r.i)).length;
+    const minsAll = m.lessons.reduce((a, r) => a + lMins(r.s, r.i) + 1, 0);
+    const minsLeft = req.filter(r => !lessonDone(r.s, r.i)).reduce((a, r) => a + lMins(r.s, r.i) + 1, 0);
+    return { lessons: m.lessons.length, required: req.length, done, complete: req.length > 0 && done === req.length, pct: req.length ? Math.round(done / req.length * 100) : 0, mins: minsAll, minsLeft, started: m.lessons.some(r => lessonDone(r.s, r.i) || watched(r.s, r.i)) };
   }
   function courseStats(id) {
     const ms = modulesOfCourse(id);
-    const req = ms.flatMap(m => m.lessons.filter(i => !isOptional(m, i)).map(i => [m.source, i]));
+    const req = ms.flatMap(m => m.lessons.filter(r => !isOptional(m, r)).map(r => [r.s, r.i]));
     const done = req.filter(([s, i]) => lessonDone(s, i)).length;
     let right = 0, total = 0, answered = 0, assessable = 0;
     req.forEach(([s, i]) => { const b = best(s, i); assessable++; if (b) { answered++; right += b.score; total += b.total; } });
     const score = total ? Math.round(right / total * 100) : null;
-    const recordedH = (S.trainingLog || []).filter(e => e && ms.some(m => m.source === e.courseId && m.lessons.includes(e.mod))).reduce((a, e) => a + (e.hours || 0), 0);
+    const recordedH = (S.trainingLog || []).filter(e => e && ms.some(m => hasL(m, e.courseId, e.mod))).reduce((a, e) => a + (e.hours || 0), 0);
     const complete = req.length > 0 && done === req.length;
     const passed = score != null && answered === assessable && score >= PASS;
     const lastAt = Math.max(0, ...req.map(([s, i]) => Math.max(0, ...attempts(s, i).map(a => +new Date(a.at) || 0), (logEntry(s, i) || {}).at || 0)));
@@ -190,7 +206,7 @@
   }
   /* the next lesson to open in a course (first incomplete required, in order), else null */
   function nextInCourse(id) {
-    for (const m of modulesOfCourse(id)) for (const i of m.lessons) if (!isOptional(m, i) && !lessonDone(m.source, i)) return { m, i };
+    for (const m of modulesOfCourse(id)) for (const r of m.lessons) if (!isOptional(m, r) && !lessonDone(r.s, r.i)) return { m, r, s: r.s, i: r.i };
     return null;
   }
   /* the learner's path, as modules: each path item expands into its modules, in curriculum order */
@@ -198,11 +214,11 @@
     const out = [];
     /* the goal's exact modules first (S.pathMods), then anything the learner added that they don't cover */
     (Array.isArray(S.pathMods) ? S.pathMods : []).forEach(id => { const m = moduleOf(id); if (m && !out.includes(m)) out.push(m); });
-    (S.path || []).forEach(id => { if (out.some(m => m.source === id)) return; modules.filter(m => m.source === id).forEach(m => { if (!out.includes(m)) out.push(m); }); });
+    (S.path || []).forEach(id => { modsFor(id).forEach(m => { if (!out.includes(m)) out.push(m); }); });
     return out;
   }
   function nextLessonGlobal() {
-    for (const m of pathModules()) for (const i of m.lessons) if (!isOptional(m, i) && !lessonDone(m.source, i)) return { m, i };
+    for (const m of pathModules()) for (const r of m.lessons) if (!isOptional(m, r) && !lessonDone(r.s, r.i)) return { m, r, s: r.s, i: r.i };
     for (const co of courses) { const n = nextInCourse(co.id); if (n) return n; }
     return null;
   }
@@ -247,7 +263,7 @@
   /* CURRICULUM.moduleArt 'video': a module's tile is a frame of its first lesson, never a lettered title card
      cropped to a tile (ADEN, round 3: "the words are not readable, 'Above' is cut") */
   const videoArt = CURRICULUM.moduleArt === 'video';
-  const modPoster = m => ((videoArt || sharedPoster(m)) && lThumb(m.source, m.lessons[0])) ? lThumb(m.source, m.lessons[0]).replace('_320x180', '_640x360') : m.item.poster;
+  const modPoster = m => { const f = m.lessons[0], th = f && (videoArt || sharedPoster(m)) ? lThumb(f.s, f.i) : ''; return th ? th.replace('_320x180', '_640x360') : (m.def.poster || m.item.poster); };
   /* `locked` is passed on purpose by ONE caller (the modules-in-your-path rail). Never hand this function
      straight to .map(): the index arrives as `locked` and every card after the first gets a padlock
      (the Library did, until 26 Nov 2026). */
@@ -268,31 +284,31 @@
   }
   const crumbs = parts => `<nav class="cur-crumbs" aria-label="Breadcrumb">${parts.map((p, k) => p.href && k < parts.length - 1 ? `<a href="${p.href}">${esc(p.t)}</a>` : `<span${k === parts.length - 1 ? ' aria-current="page"' : ''}>${esc(p.t)}</span>`).join('<span class="sep" aria-hidden="true">›</span>')}</nav>`;
 
-  function lessonRowHTML(m, i, n) {
-    const done = lessonDone(m.source, i), b = best(m.source, i), opt = isOptional(m, i), w = watched(m.source, i);
-    const nx = nextInCourse(m.courseId), isNext = nx && nx.m === m && nx.i === i;
-    const ms = misses(m.source, i);
+  function lessonRowHTML(m, r, n) {
+    const done = lessonDone(r.s, r.i), b = best(r.s, r.i), opt = isOptional(m, r), w = watched(r.s, r.i);
+    const nx = nextInCourse(m.courseId), isNext = nx && nx.m === m && nx.r === r;
+    const ms = misses(r.s, r.i);
     const q = b ? `<span class="cur-q ${b.score === b.total ? 'ok' : ''}">${b.score}/${b.total} ${L('questions')}</span>` : (w && !done ? `<span class="cur-q">${L('q_pending')}</span>` : '');
     /* missed questions → a focused fix (only those, with the moment); no known detail → the old retake */
-    const act = ms ? `<button class="cur-fix" data-action="cur-fix" data-id="${m.source}" data-mod="${i}">${ms.wrong.length === 1 ? L('fix_one') : L('fix_n', { n: ms.wrong.length })}</button>`
-      : b && b.score < b.total ? `<button class="cur-retake" data-action="cur-retake" data-id="${m.source}" data-mod="${i}">${L('retake')}</button>`
-      : (done && !b && !opt ? `<button class="cur-retake" data-action="cur-retake" data-id="${m.source}" data-mod="${i}">${L('answer_q')}</button>` : '');
-    const meta = lessonMeta(m.source, i), th = lThumb(m.source, i), did = `cl-${m.source}-${i}`;
+    const act = ms ? `<button class="cur-fix" data-action="cur-fix" data-id="${r.s}" data-mod="${r.i}">${ms.wrong.length === 1 ? L('fix_one') : L('fix_n', { n: ms.wrong.length })}</button>`
+      : b && b.score < b.total ? `<button class="cur-retake" data-action="cur-retake" data-id="${r.s}" data-mod="${r.i}">${L('retake')}</button>`
+      : (done && !b && !opt ? `<button class="cur-retake" data-action="cur-retake" data-id="${r.s}" data-mod="${r.i}">${L('answer_q')}</button>` : '');
+    const meta = lessonMeta(r.s, r.i), th = lThumb(r.s, r.i), did = `cl-${r.s}-${r.i}`;
     const sum = meta && meta.summary ? (PT() ? meta.summary.pt : meta.summary.en) : '';
     const chs = meta && Array.isArray(meta.chapters) ? meta.chapters : [];
     /* round 6 gate: a lesson is open when it is done, or it is the first not-done lesson of its module */
     /* optional lessons are always open and never block the required ones after them */
-    const firstOpen = m.lessons.find(x => !isOptional(m, x) && !lessonDone(m.source, x));
-    const locked = !done && !opt && i !== firstOpen;
+    const firstOpen = m.lessons.find(x => !isOptional(m, x) && !lessonDone(x.s, x.i));
+    const locked = !done && !opt && r !== firstOpen;
     return `<div class="cl ${done ? 'done' : ''} ${isNext ? 'current' : ''}${locked ? ' locked' : ''}">
-      <button class="cl-main" ${locked ? 'disabled aria-disabled="true"' : `data-action="play" data-id="${m.source}" data-mod="${i}"`} aria-label="${L('lesson')} ${n}: ${esc(lTitle(m.source, i))}${done ? ' · ' + L('completed') : ''}${locked ? ' · 🔒' : ''}${b ? ` · ${b.score}/${b.total} ${L('questions')}` : ''}">
-        <span class="cl-thumb"${th ? ` style="background-image:url('${th}')"` : ''}><span class="cl-len">${lMins(m.source, i)} min</span>${done ? '<span class="cl-tick" aria-hidden="true">✓</span>' : ''}</span>
-        <span class="cl-text"><span class="cl-n">${L('lesson')} ${n}${opt ? ` · ${L('optional')}` : ''}${isNext ? ` · ${(w || ((prog(m.source) || {}).pos || {}).mod === i) ? L('resume') : L('up_next')}` : ''}</span><b>${esc(lTitle(m.source, i))}</b>${q ? `<span class="cl-q">${q}</span>` : ''}</span>
+      <button class="cl-main" ${locked ? 'disabled aria-disabled="true"' : `data-action="play" data-id="${r.s}" data-mod="${r.i}"`} aria-label="${L('lesson')} ${n}: ${esc(lTitle(r.s, r.i))}${done ? ' · ' + L('completed') : ''}${locked ? ' · 🔒' : ''}${b ? ` · ${b.score}/${b.total} ${L('questions')}` : ''}">
+        <span class="cl-thumb"${th ? ` style="background-image:url('${th}')"` : ''}><span class="cl-len">${lMins(r.s, r.i)} min</span>${done ? '<span class="cl-tick" aria-hidden="true">✓</span>' : ''}</span>
+        <span class="cl-text"><span class="cl-n">${L('lesson')} ${n}${opt ? ` · ${L('optional')}` : ''}${isNext ? ` · ${(w || ((prog(r.s) || {}).pos || {}).mod === r.i) ? L('resume') : L('up_next')}` : ''}</span><b>${esc(lTitle(r.s, r.i))}</b>${q ? `<span class="cl-q">${q}</span>` : ''}</span>
       </button>
       <span class="cl-side">${act}${sum || chs.length ? `<button class="cl-more" data-action="cur-more" aria-expanded="false" aria-controls="${did}" aria-label="${L('see_more')}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>` : ''}</span>
       ${sum || chs.length ? `<div class="cl-detail" id="${did}" hidden>
         ${sum ? `<p class="cl-sum">${esc(sum)}</p>` : ''}
-        ${chs.length ? `<div class="cl-ch-h">${L('chapters')}</div><ol class="cl-chs">${chs.map(c => `<li><button data-action="review-moment" data-id="${m.source}" data-mod="${i}" data-t="${c.t}"><span class="cl-tc">${tc(c.t)}</span><span>${esc(PT() ? c.pt : c.en)}</span></button></li>`).join('')}</ol>` : ''}
+        ${chs.length ? `<div class="cl-ch-h">${L('chapters')}</div><ol class="cl-chs">${chs.map(c => `<li><button data-action="review-moment" data-id="${r.s}" data-mod="${r.i}" data-t="${c.t}"><span class="cl-tc">${tc(c.t)}</span><span>${esc(PT() ? c.pt : c.en)}</span></button></li>`).join('')}</ol>` : ''}
       </div>` : ''}
     </div>`;
   }
@@ -304,7 +320,7 @@
     const st = courseStats(id), nx = nextInCourse(id);
     const outcomes = cField(co, 'outcomes') || [];
     const aud = cField(co, 'audience'), pre = cField(co, 'prerequisites');
-    const primary = nx ? `<button class="btn btn-primary" data-action="play" data-id="${nx.m.source}" data-mod="${nx.i}">▶&nbsp; ${st.done ? L('resume') : L('start')}: ${esc(lTitle(nx.m.source, nx.i))}</button>`
+    const primary = nx ? `<button class="btn btn-primary" data-action="play" data-id="${nx.s}" data-mod="${nx.i}">▶&nbsp; ${st.done ? L('resume') : L('start')}: ${esc(lTitle(nx.s, nx.i))}</button>`
       : `<button class="btn btn-primary" data-action="goto" data-route="#/module/${ms[0].id}">▶&nbsp; ${L('rewatch')}</button>`;
     const certBtn = st.eligible ? `<button class="btn btn-glass" data-action="cur-cert" data-id="${id}">⤓ ${L('cert_dl')}</button>` : '';
     return `<div class="page">
@@ -350,7 +366,7 @@
         return `<details class="cur-module"${s.done && !s.complete ? ' open' : (k === 0 && !st.done ? ' open' : '')}>
           <summary><span class="cur-mnum">${s.complete ? '✓' : k + 1}</span><span class="cur-mtitle"><b>${esc(mTitle(m))}</b><small>${esc(mOutcome(m))}</small></span>
             <span class="cur-mmeta">${s.lessons} ${s.lessons === 1 ? L('lesson_one') : L('lessons_lc')} · ${fmtMins(s.mins)}${s.done ? ` · ${s.pct}%` : ''}</span></summary>
-          <div class="module-list cur-inner">${m.lessons.map((i, n) => lessonRowHTML(m, i, n + 1)).join('')}</div>
+          <div class="module-list cur-inner">${m.lessons.map((r, n) => lessonRowHTML(m, r, n + 1)).join('')}</div>
           <a class="cur-open" href="#/module/${m.id}">${L('module')}: ${esc(mTitle(m))} →</a>
         </details>`; }).join('')}</div>
       <div class="page-pad" style="padding-top:0;">${missionCardHTML({ id })}${window.missionAdminHTML ? missionAdminHTML(id) : ''}</div>
@@ -360,13 +376,14 @@
   /* ---------- module detail ---------- */
   function renderModulePage(id) {
     const m = moduleOf(id); if (!m) return null;
-    const c = m.item, co = courseOf(m.courseId), st = moduleStats(m);
+    /* a module made of lessons from several items can carry its own cover (def.poster / def.heroArt) */
+    const c = m.def.poster ? Object.assign({}, m.item, { poster: m.def.poster, heroArt: m.def.heroArt || m.def.poster, posterPos: m.def.posterPos }) : m.item, co = courseOf(m.courseId), st = moduleStats(m);
     const ms = modulesOfCourse(m.courseId), k = ms.indexOf(m), nextM = ms[k + 1];
-    const nx = m.lessons.find(i => !isOptional(m, i) && !lessonDone(m.source, i));
+    const nx = m.lessons.find(r => !isOptional(m, r) && !lessonDone(r.s, r.i));
     const first = m.lessons[0];
-    const primary = nx != null
-      ? `<button class="btn btn-primary" data-action="play" data-id="${m.source}" data-mod="${nx}">▶&nbsp; ${st.started ? L('resume') : L('start_lesson')}: ${esc(lTitle(m.source, nx))}</button>`
-      : `<button class="btn btn-primary" data-action="play" data-id="${m.source}" data-mod="${first}">▶&nbsp; ${L('rewatch')}</button>`;
+    const primary = nx
+      ? `<button class="btn btn-primary" data-action="play" data-id="${nx.s}" data-mod="${nx.i}">▶&nbsp; ${st.started ? L('resume') : L('start_lesson')}: ${esc(lTitle(nx.s, nx.i))}</button>`
+      : `<button class="btn btn-primary" data-action="play" data-id="${first.s}" data-mod="${first.i}">▶&nbsp; ${L('rewatch')}</button>`;
     const nextBtn = nextM && st.complete ? `<button class="btn btn-glass" data-action="goto" data-route="#/module/${nextM.id}">${L('next_module')} →</button>` : '';
     const optNote = m.def.optionalNote ? ((PT() && m.def.pt && m.def.pt.optionalNote) || m.def.optionalNote) : '';
     return `<div class="page">
@@ -387,7 +404,7 @@
         </div>
       </div>
       <div class="rail-head cur-lessons-head" style="margin-top:14px;"><h2>${L('lessons')}</h2>${optNote ? `<span class="hint">${esc(optNote)}</span>` : ''}</div>
-      <div class="module-list">${m.lessons.map((i, n) => lessonRowHTML(m, i, n + 1)).join('')}</div>
+      <div class="module-list">${m.lessons.map((r, n) => lessonRowHTML(m, r, n + 1)).join('')}</div>
       <div class="page-pad" style="padding-top:0;">${resourcesHTML(c)}${coachCardHTML(c)}</div>
       ${(() => { /* what comes after this module in its course; the last module points to the next course */
         const after = ms.slice(k + 1);
@@ -405,7 +422,7 @@
     if (courseOf(param)) return renderCourseOverview(param);
     if (moduleOf(param)) { history.replaceState(null, '', '#/module/' + param); return renderModulePage(param); }
     /* an item split into several modules (old link): the module holding the next lesson */
-    const ms = modules.filter(m => m.source === param);
+    const ms = modsFor(param);
     if (ms.length) { const m = ms.find(x => !moduleStats(x).complete) || ms[0]; history.replaceState(null, '', '#/module/' + m.id); return renderModulePage(m.id); }
     return null;
   };
@@ -413,7 +430,7 @@
   /* ---------- cards everywhere: an item card becomes a module card ---------- */
   const _cardHTML = cardHTML;
   window.cardHTML = cardHTML = function (c, opts) {
-    const ms = modules.filter(m => m.source === c.id);
+    const ms = modsFor(c.id);
     if (ms.length === 1) return moduleCardHTML(ms[0]);
     if (ms.length > 1) return courseCardHTML(courseOf(ms[0].courseId));
     return _cardHTML(c, opts);
@@ -481,11 +498,11 @@
     const n = nextLessonGlobal(); if (!n) return null;
     const m = n.m, co = courseOf(m.courseId), st = moduleStats(m);
     return {
-      source: m.source, title: mTitle(m), hook: mOutcome(m),
+      source: n.s, title: mTitle(m), hook: mOutcome(m),
       count: `${st.lessons} ${st.lessons === 1 ? L('lesson_one') : L('lessons_lc')}`, time: `${L('est_time')} ${fmtMins(st.mins)}`,
       pct: st.pct, progress: `${L('module')} ${st.pct}% · ${fmtMins(st.minsLeft)} ${L('left')}`,
       eyebrow: `<span class="hero-eyebrow cur-hero-ctx">${esc(cTitle(co))} · ${L('module')} ${modulesOfCourse(co.id).indexOf(m) + 1} ${t('of')} ${modulesOfCourse(co.id).length}</span>`,
-      play: `<button class="btn btn-primary" data-action="play" data-id="${m.source}" data-mod="${n.i}">▶&nbsp; ${st.started ? L('continue_lesson') : L('start_lesson')}: ${esc(lTitle(m.source, n.i))}</button>`,
+      play: `<button class="btn btn-primary" data-action="play" data-id="${n.s}" data-mod="${n.i}">▶&nbsp; ${st.started ? L('continue_lesson') : L('start_lesson')}: ${esc(lTitle(n.s, n.i))}</button>`,
       details: `<button class="btn btn-glass" data-action="goto" data-route="#/module/${m.id}">${L('module')}</button>`
     };
   };
@@ -511,7 +528,7 @@
       <div class="filter-row">${cats.map(c => `<button class="filter-chip ${c === libFilter ? 'active' : ''}" data-action="lib-filter" data-cat="${c}">${c === 'All' ? t('all') : catName(c)}</button>`).join('')}</div>
       <div class="grid">${ml.map(m => moduleCardHTML(m)).join('')}</div>
       ${(() => { /* items outside the curriculum (e.g. made in Course Studio) still need a home */
-        const extra = CATALOG.filter(c => !c.hidden && !modules.some(m => m.source === c.id) && (!q || (ctitle(c) + ' ' + (c.desc || '')).toLowerCase().includes(q)));
+        const extra = CATALOG.filter(c => !c.hidden && !modules.some(m => m.lessons.some(r => r.s === c.id)) && (!q || (ctitle(c) + ' ' + (c.desc || '')).toLowerCase().includes(q)));
         return extra.length ? `<h2 class="sect-h cur-sect">${L('lib_other_h')}</h2><div class="grid">${extra.map(c => cardHTML(c)).join('')}</div>` : '';
       })()}
       ${ml.length || cl.length ? '' : `<p class="empty-note">${t('nothing_matches')}</p>`}
@@ -519,39 +536,40 @@
   };
 
   /* ---------- player: course › module context, the module's lessons, prev / next ---------- */
-  function lessonSeq(courseId) { return modulesOfCourse(courseId).flatMap(m => m.lessons.map(i => ({ m, i }))); }
+  function lessonSeq(courseId) { return modulesOfCourse(courseId).flatMap(m => m.lessons.map(r => ({ m, r, s: r.s, i: r.i }))); }
   window.curPlayer = (c, mod) => {
     const m = moduleOfLesson(c.id, mod); if (!m) return;
-    const co = courseOf(m.courseId), pos = m.lessons.indexOf(mod);
+    const co = courseOf(m.courseId), pos = m.lessons.findIndex(r => sameL(r, c.id, mod));
     const pt = $('#playerTitle'), ps = $('#playerSub');
     if (pt) pt.innerHTML = `<a href="#/course/${co.id}" class="cur-pl-link" data-action="cur-pl-go" data-route="#/course/${co.id}">${esc(cTitle(co))}</a> <span aria-hidden="true">›</span> <a href="#/module/${m.id}" class="cur-pl-link" data-action="cur-pl-go" data-route="#/module/${m.id}">${esc(mTitle(m))}</a>`;
     if (ps) ps.textContent = `${L('lesson')} ${pos + 1} ${t('of')} ${m.lessons.length} · ${lTitle(c.id, mod)}${lessonDone(c.id, mod) ? ' · ✓ ' + L('completed') : ''}` + ((typeof modLangFallback === 'function' && modLangFallback(c, mod)) ? ' · ' + t('lang_fallback') : '');
     const pills = $('#playerPills');
     /* round 6 gate: a lesson opens only when every lesson before it in the module is completed (its questions
        answered). Done lessons and the current one stay open; nothing further can be skipped to. */
-    const firstOpen = m.lessons.find(i => !isOptional(m, i) && !lessonDone(c.id, i));
-    const reachable = i => i === mod || lessonDone(c.id, i) || isOptional(m, i) || i === firstOpen;
-    if (pills) pills.innerHTML = m.lessons.map((i, n) => { const ok = reachable(i);
-      return `<button class="mod-pill ${i === mod ? 'current' : lessonDone(c.id, i) ? 'done' : ''}${ok ? '' : ' locked'}" ${ok ? `data-action="play" data-id="${c.id}" data-mod="${i}"` : 'disabled aria-disabled="true"'}><span class="mp-n">${lessonDone(c.id, i) ? '✓ ' : ok ? '' : '🔒 '}${n + 1}</span> ${esc(lTitle(c.id, i))}</button>`; }).join('');
-    const seq = lessonSeq(co.id), at = seq.findIndex(x => x.m === m && x.i === mod), prev = seq[at - 1], next = seq[at + 1];
+    const firstOpen = m.lessons.find(r => !isOptional(m, r) && !lessonDone(r.s, r.i));
+    const isCur = r => sameL(r, c.id, mod);
+    const reachable = r => isCur(r) || lessonDone(r.s, r.i) || isOptional(m, r) || r === firstOpen;
+    if (pills) pills.innerHTML = m.lessons.map((r, n) => { const ok = reachable(r);
+      return `<button class="mod-pill ${isCur(r) ? 'current' : lessonDone(r.s, r.i) ? 'done' : ''}${ok ? '' : ' locked'}" ${ok ? `data-action="play" data-id="${r.s}" data-mod="${r.i}"` : 'disabled aria-disabled="true"'}><span class="mp-n">${lessonDone(r.s, r.i) ? '✓ ' : ok ? '' : '🔒 '}${n + 1}</span> ${esc(lTitle(r.s, r.i))}</button>`; }).join('');
+    const seq = lessonSeq(co.id), at = seq.findIndex(x => x.m === m && sameL(x, c.id, mod)), prev = seq[at - 1], next = seq[at + 1];
     let nav = $('#curPlNav');
     if (!nav) { nav = document.createElement('div'); nav.id = 'curPlNav'; nav.className = 'cur-pl-nav'; const pb = document.querySelector('.player-bottom'); if (pb) pb.insertBefore(nav, pb.firstChild); }
-    nav.innerHTML = `<button class="pl-ic" ${prev ? `data-action="play" data-id="${prev.m.source}" data-mod="${prev.i}"` : 'disabled'} aria-label="${L('prev')}" title="${L('prev')}">‹</button>
-      <button class="pl-ic" ${next && lessonDone(c.id, mod) ? `data-action="play" data-id="${next.m.source}" data-mod="${next.i}"` : 'disabled'} aria-label="${L('next')}" title="${next && next.m !== m ? L('next_module') : L('next')}">›</button>`;
+    nav.innerHTML = `<button class="pl-ic" ${prev ? `data-action="play" data-id="${prev.s}" data-mod="${prev.i}"` : 'disabled'} aria-label="${L('prev')}" title="${L('prev')}">‹</button>
+      <button class="pl-ic" ${next && lessonDone(c.id, mod) ? `data-action="play" data-id="${next.s}" data-mod="${next.i}"` : 'disabled'} aria-label="${L('next')}" title="${next && next.m !== m ? L('next_module') : L('next')}">›</button>`;
   };
 
   /* ---------- end of a lesson: the next lesson in curriculum order, no overview screens between ---------- */
   window.curNext = (src, mod, next) => {
     const m = moduleOfLesson(src, mod); if (!m) return next;
-    const seq = lessonSeq(m.courseId), at = seq.findIndex(x => x.m === m && x.i === mod);
-    const after = seq.slice(at + 1).find(x => !lessonDone(x.m.source, x.i) && !(x.m.source === src && x.i === mod)) || seq[at + 1];
+    const seq = lessonSeq(m.courseId), at = seq.findIndex(x => x.m === m && sameL(x, src, mod));
+    const after = seq.slice(at + 1).find(x => !lessonDone(x.s, x.i) && !sameL(x, src, mod)) || seq[at + 1];
     const base = { checkFor: next && next.checkFor };
-    if (after && after.m === m) return Object.assign(base, { kind: 'next', courseId: after.m.source, mod: after.i });
+    if (after && after.m === m) return Object.assign(base, { kind: 'next', courseId: after.s, mod: after.i });
     /* the module is finished (round 6): stop on a "Module complete" window that offers the next module IN THE PATH */
     if (after && moduleStats(m).complete) return Object.assign(base, { kind: 'cur-module-end', moduleId: m.id, courseId: src });
     if (after) { /* module not finished yet (a lesson was skipped): go back to its first open lesson, never jump modules */
-      const back = m.lessons.find(i => !isOptional(m, i) && !lessonDone(m.source, i) && !(m.source === src && i === mod));
-      if (back != null) return Object.assign(base, { kind: 'next', courseId: m.source, mod: back });
+      const back = m.lessons.find(r => !isOptional(m, r) && !lessonDone(r.s, r.i) && !sameL(r, src, mod));
+      if (back) return Object.assign(base, { kind: 'next', courseId: back.s, mod: back.i });
       return Object.assign(base, { kind: 'cur-module-end', moduleId: m.id, courseId: src }); }
     return Object.assign(base, { kind: 'cur-course-end', programId: m.courseId, courseId: src });
   };
@@ -576,7 +594,7 @@
   }
   function showModuleDone(id) {
     const m = moduleOf(id); if (!m) return;
-    const nx = nextModuleAfter(m), first = nx && (nx.lessons.find(i => !lessonDone(nx.source, i)) ?? nx.lessons[0]);
+    const nx = nextModuleAfter(m), first = nx && (nx.lessons.find(r => !lessonDone(r.s, r.i)) || nx.lessons[0]);
     let ov = $('#certEarned');
     if (!ov) { ov = document.createElement('div'); ov.id = 'certEarned'; ov.className = 'ck-ov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); document.body.appendChild(ov); }
     ov.innerHTML = `<div class="ck-card cert-earned">
@@ -586,7 +604,7 @@
       <p class="ce-meta">${esc(cTitle(courseOf(m.courseId)))}</p>
       ${nx ? `<p class="ce-meta">${L('next_in_course') === 'A seguir neste curso' ? 'A seguir' : 'Up next'}: <b>${esc(mTitle(nx))}</b></p>` : `<p class="ce-meta">${t('mod_path_done')}</p>`}
       <div class="ce-actions">
-        ${nx ? `<button class="btn btn-primary" data-action="cur-modnext" data-id="${nx.source}" data-mod="${first}">▶ ${t('mod_next')}</button>` : ''}
+        ${nx ? `<button class="btn btn-primary" data-action="cur-modnext" data-id="${first.s}" data-mod="${first.i}">▶ ${t('mod_next')}</button>` : ''}
         <button class="btn btn-glass" data-action="cur-modpath">${t('mod_back_path')}</button>
       </div></div>`;
     ov.classList.add('on');
@@ -647,7 +665,7 @@
   }
   window.CUR.historical = historical;
   const reviewItems = () => { const items = [];
-    modules.forEach(m => m.lessons.forEach(i => { const x = misses(m.source, i); if (x) items.push({ m, i, n: x.wrong.length }); }));
+    modules.forEach(m => m.lessons.forEach(r => { const x = misses(r.s, r.i); if (x) items.push({ m, s: r.s, i: r.i, n: x.wrong.length }); }));
     return items; };
   window.curReviewCount = () => reviewItems().reduce((a, x) => a + x.n, 0);
   window.curFixHTML = function (full) {
@@ -655,9 +673,9 @@
     if (!items.length) return full ? `<section class="admin-section cur-fixbox"><h2>${L('fix_h')}</h2><p class="sect-sub sub-auto">${L('fix_none')}</p></section>` : '';
     return `<section class="admin-section cur-fixbox">
       <h2>${L('fix_h')}</h2><p class="sect-sub sub-auto">${L('fix_sub')}</p>
-      ${items.map(x => `<div class="cur-fixrow"><span class="cl-thumb sm"${lThumb(x.m.source, x.i) ? ` style="background-image:url('${lThumb(x.m.source, x.i)}')"` : ''}></span>
-        <span class="cf-t"><b>${esc(lTitle(x.m.source, x.i))}</b><small>${esc(cTitle(courseOf(x.m.courseId)))} · ${esc(mTitle(x.m))}</small></span>
-        <button class="btn btn-primary btn-sm" data-action="cur-fix" data-id="${x.m.source}" data-mod="${x.i}">${x.n === 1 ? L('fix_one') : L('fix_n', { n: x.n })}</button></div>`).join('')}
+      ${items.map(x => `<div class="cur-fixrow"><span class="cl-thumb sm"${lThumb(x.s, x.i) ? ` style="background-image:url('${lThumb(x.s, x.i)}')"` : ''}></span>
+        <span class="cf-t"><b>${esc(lTitle(x.s, x.i))}</b><small>${esc(cTitle(courseOf(x.m.courseId)))} · ${esc(mTitle(x.m))}</small></span>
+        <button class="btn btn-primary btn-sm" data-action="cur-fix" data-id="${x.s}" data-mod="${x.i}">${x.n === 1 ? L('fix_one') : L('fix_n', { n: x.n })}</button></div>`).join('')}
     </section>`;
   };
   window.certsSectionHTML = certsSectionHTML = function () {

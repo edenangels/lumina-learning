@@ -5194,7 +5194,7 @@ function libSuggestHTML(q) {
   CUR.courses.forEach(co => { if (CUR.cTitle(co).toLowerCase().includes(k)) out.push({ type: t('lib_t_course'), label: CUR.cTitle(co), route: '#/course/' + co.id }); });
   CUR.modules.forEach(m => {
     if (CUR.mTitle(m).toLowerCase().includes(k)) out.push({ type: t('lib_t_module'), label: CUR.mTitle(m), route: '#/module/' + m.id });
-    m.lessons.forEach((i, n) => { const lt = CUR.lTitle(m.source, i); if (lt && lt.toLowerCase().includes(k)) out.push({ type: t('lib_t_lesson'), label: lt, sub: CUR.mTitle(m), route: '#/module/' + m.id }); });
+    m.lessons.forEach(r => { const lt = CUR.lTitle(r.s, r.i); if (lt && lt.toLowerCase().includes(k)) out.push({ type: t('lib_t_lesson'), label: lt, sub: CUR.mTitle(m), route: '#/module/' + m.id }); });
   });
   if (!out.length) return `<div class="lib-suggest"><div class="ls-empty">${t('nothing_matches')}</div></div>`;
   }

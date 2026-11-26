@@ -69,33 +69,35 @@ const PATH_RATIONALES = [
    exact module path; GOAL_PRESETS stays the catalogue-item view older screens read. */
 const GOAL_DEFS = [
   { k: 'Work as one land team', icon: 'people', pt: 'Trabalhar como uma só equipa da terra',
-    en_d: 'How we think and act together, and owning the result on the land.', pt_d: 'Como pensamos e agimos juntos, e assumir o resultado no terreno.', mods: ['alignment-journey', 'land-team-journey', 'trust-journey'] },
+    en_d: 'How we think and act together, and owning the result on the land.', pt_d: 'Como pensamos e agimos juntos, e assumir o resultado no terreno.', mods: ['alignment-journey', 'trust-journey'] },
   { k: 'Be ready for fire season', icon: 'fire', pt: 'Estar pronto para a época de incêndios',
-    en_d: 'The fire truck from start to spray, and the habits that keep the crew safe.', pt_d: 'O camião de incêndio do arranque à aspersão, e os hábitos que protegem a equipa.', mods: ['alignment-journey', 'fire-truck-training', 'land-team-journey'] },
+    en_d: 'The fire truck from start to spray, and the habits that keep the crew safe.', pt_d: 'O camião de incêndio do arranque à aspersão, e os hábitos que protegem a equipa.', mods: ['alignment-journey', 'fire-truck-training'] },
   { k: 'Grow in your work', icon: 'sprout', pt: 'Crescer no seu trabalho',
-    en_d: 'Your purpose, goals you keep, and a little better every day.', pt_d: 'O seu propósito, objetivos que cumpre e um pouco melhor todos os dias.', mods: ['alignment-journey', 'growth-journey'] },
+    en_d: 'Your purpose, goals you keep, and a little better every day.', pt_d: 'O seu propósito, objetivos que cumpre e um pouco melhor todos os dias.', mods: ['alignment-journey', 'growth-journey', 'goal-setting'] },
   { k: 'Own every job, start to finish', icon: 'hands', pt: 'Assumir cada trabalho do início ao fim',
-    en_d: 'Responsibility, clarifying instead of assuming, and the detail that makes the job.', pt_d: 'Responsabilidade, clarificar em vez de supor, e o detalhe que faz o trabalho.', mods: ['alignment-journey', 'land-team-journey', 'trust-journey'] },
+    en_d: 'Responsibility, clarifying instead of assuming, and the detail that makes the job.', pt_d: 'Responsabilidade, clarificar em vez de supor, e o detalhe que faz o trabalho.', mods: ['alignment-journey', 'trust-journey'] },
   { k: 'Back the fire crew', icon: 'fire', pt: 'Apoiar a equipa de incêndio',
     en_d: 'Drive, fill and run the fire truck when the season comes.', pt_d: 'Conduzir, encher e operar o camião de incêndio quando chega a época.', mods: ['alignment-journey', 'fire-truck-training'] },
   { k: 'Show up for every guest', icon: 'sun', pt: 'Estar presente para cada hóspede',
-    en_d: 'Above-the-line habits at reception, in the houses and at the table.', pt_d: 'Hábitos acima da linha na receção, nas casas e à mesa.', mods: ['alignment-journey', 'land-team-journey', 'trust-journey'] },
+    en_d: 'Above-the-line habits at reception, in the houses and at the table.', pt_d: 'Hábitos acima da linha na receção, nas casas e à mesa.', mods: ['alignment-journey', 'trust-journey'] },
   { k: 'Work as one with every team', icon: 'people', pt: 'Trabalhar em conjunto com cada equipa',
-    en_d: 'The ADEN way of working, shared with the land, building and office teams.', pt_d: 'A forma ADEN de trabalhar, partilhada com as equipas da terra, da construção e do escritório.', mods: ['alignment-journey', 'land-team-journey', 'growth-journey', 'trust-journey'] },
+    en_d: 'The ADEN way of working, shared with the land, building and office teams.', pt_d: 'A forma ADEN de trabalhar, partilhada com as equipas da terra, da construção e do escritório.', mods: ['alignment-journey', 'growth-journey', 'trust-journey'] },
   { k: 'Care for the animals as a team', icon: 'leaf', pt: 'Cuidar dos animais em equipa',
-    en_d: 'Responsibility, feedback and attention to detail, every day.', pt_d: 'Responsabilidade, feedback e atenção ao detalhe, todos os dias.', mods: ['alignment-journey', 'land-team-journey', 'trust-journey'] },
+    en_d: 'Responsibility, feedback and attention to detail, every day.', pt_d: 'Responsabilidade, feedback e atenção ao detalhe, todos os dias.', mods: ['alignment-journey', 'trust-journey'] },
   { k: 'Lead above the line', icon: 'compass', pt: 'Liderar acima da linha',
-    en_d: 'Lead with responsibility, feedback and benchmarks of excellence.', pt_d: 'Liderar com responsabilidade, feedback e padrões de excelência.', mods: ['alignment-journey', 'land-team-journey', 'growth-journey', 'trust-journey'] },
+    en_d: 'Lead with responsibility, feedback and benchmarks of excellence.', pt_d: 'Liderar com responsabilidade, feedback e padrões de excelência.', mods: ['alignment-journey', 'growth-journey', 'trust-journey'] },
   { k: 'Set goals the team can reach', icon: 'seed', pt: 'Definir objetivos que a equipa alcança',
-    en_d: 'Purpose, 90-day goals and Kaizen, for you and your team.', pt_d: 'Propósito, objetivos a 90 dias e Kaizen, para si e para a equipa.', mods: ['alignment-journey', 'growth-journey'] },
+    en_d: 'Purpose, 90-day goals and Kaizen, for you and your team.', pt_d: 'Propósito, objetivos a 90 dias e Kaizen, para si e para a equipa.', mods: ['alignment-journey', 'growth-journey', 'goal-setting'] },
   { k: 'Bring a newcomer in the ADEN way', icon: 'hands', pt: 'Integrar alguém novo à maneira ADEN',
-    en_d: 'Welcome someone new with ESIP and the above-the-line habits.', pt_d: 'Acolher alguém novo com o ESIP e os hábitos acima da linha.', mods: ['alignment-journey', 'land-team-journey'] }
+    en_d: 'Welcome someone new with ESIP and the above-the-line habits.', pt_d: 'Acolher alguém novo com o ESIP e os hábitos acima da linha.', mods: ['alignment-journey'] }
 ];
 const GOAL_MODS = {}, GOAL_PRESETS = {}, GOAL_INFO = {}, GOALS_PT = {};
 (function () {
   GOAL_DEFS.forEach(g => {
     GOAL_MODS[g.k] = g.mods.slice();
-    GOAL_PRESETS[g.k] = g.mods.slice();   /* ADEN modules are whole catalogue items */
+    /* the catalogue-item view of the same path (older screens, hour records): since 26 Nov 2026 a module
+       can draw lessons from several items, so module ids are mapped back to the items they cover */
+    GOAL_PRESETS[g.k] = [...new Set(g.mods.flatMap(m => ({ 'alignment-journey': ['alignment-journey', 'land-team-journey'], 'goal-setting': ['growth-journey'] })[m] || [m]))];
     GOAL_INFO[g.k] = { icon: g.icon, en: g.en_d, pt: g.pt_d };
     GOALS_PT[g.k] = g.pt;
   });

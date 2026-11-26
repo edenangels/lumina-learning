@@ -1319,6 +1319,59 @@
      "pt": "Pequenos ajustes"
     }
    ]
+  },
+  "9": {
+   "summary": {
+    "en": "The six human needs do not stay at home when you come to work. The lesson takes each one in turn (certainty, variety, significance, connection, growth and contribution) and shows how it can help you or get in your way: certainty can make you prepared or resistant to change, significance can lead to excellence or to ego. It ends by asking which two needs drive you most, and how to meet them in a way that also helps the team.",
+    "pt": "As seis necessidades humanas não ficam em casa quando vem trabalhar. A lição percorre cada uma delas (certeza, variedade, significado, ligação, crescimento e contributo) e mostra como pode ajudá-lo ou atrapalhá-lo: a certeza pode torná-lo preparado ou resistente à mudança, o significado pode levar à excelência ou ao ego. Termina a perguntar quais são as duas necessidades que mais o movem, e como satisfazê-las de uma forma que também ajude a equipa."
+   },
+   "chapters": [
+    {
+     "t": 0,
+     "en": "Needs come to work too",
+     "pt": "As necessidades também vêm para o trabalho"
+    },
+    {
+     "t": 27,
+     "en": "Certainty",
+     "pt": "Certeza"
+    },
+    {
+     "t": 65,
+     "en": "Variety",
+     "pt": "Variedade"
+    },
+    {
+     "t": 101,
+     "en": "Significance",
+     "pt": "Significado"
+    },
+    {
+     "t": 133,
+     "en": "Connection",
+     "pt": "Ligação"
+    },
+    {
+     "t": 167,
+     "en": "Growth",
+     "pt": "Crescimento"
+    },
+    {
+     "t": 198,
+     "en": "Contribution",
+     "pt": "Contributo"
+    },
+    {
+     "t": 225,
+     "en": "Neither good nor bad",
+     "pt": "Nem boas nem más"
+    },
+    {
+     "t": 255,
+     "en": "The two needs that drive you most",
+     "pt": "As duas necessidades que mais o movem"
+    }
+   ]
   }
  },
  "trust-journey": {
