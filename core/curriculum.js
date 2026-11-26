@@ -248,7 +248,11 @@
      cropped to a tile (ADEN, round 3: "the words are not readable, 'Above' is cut") */
   const videoArt = CURRICULUM.moduleArt === 'video';
   const modPoster = m => ((videoArt || sharedPoster(m)) && lThumb(m.source, m.lessons[0])) ? lThumb(m.source, m.lessons[0]).replace('_320x180', '_640x360') : m.item.poster;
+  /* `locked` is passed on purpose by ONE caller (the modules-in-your-path rail). Never hand this function
+     straight to .map(): the index arrives as `locked` and every card after the first gets a padlock
+     (the Library did, until 26 Nov 2026). */
   function moduleCardHTML(m, locked) {
+    locked = locked === true;
     const st = moduleStats(m), co = courseOf(m.courseId), pos = sharedPoster(m) ? null : m.item.posterPos;
     return `<article class="card cur-card${locked ? ' locked' : ''}"${locked ? ' aria-disabled="true"' : ` data-action="goto" data-route="#/module/${m.id}"`}>
       <div class="thumb t-grad-${m.item.grad} ${modPoster(m) ? 'has-poster' : ''}"${posterStyle(modPoster(m), pos)}>${locked ? '<span class="lock-badge" aria-hidden="true">🔒</span>' : ''}</div>
@@ -387,7 +391,7 @@
       <div class="page-pad" style="padding-top:0;">${resourcesHTML(c)}${coachCardHTML(c)}</div>
       ${(() => { /* what comes after this module in its course; the last module points to the next course */
         const after = ms.slice(k + 1);
-        if (after.length) return railHTML(L('next_in_course'), L('see_course'), after.map(moduleCardHTML), '#/course/' + co.id);
+        if (after.length) return railHTML(L('next_in_course'), L('see_course'), after.map(m => moduleCardHTML(m)), '#/course/' + co.id);
         const ci = courses.indexOf(co), nc = courses[ci + 1];
         return nc ? railHTML(L('next_course'), cTitle(nc), [courseCardHTML(nc)], '#/course/' + nc.id) : '';
       })()}
@@ -469,7 +473,7 @@
     const pm = pathModules();
     const ms = modules.filter(m => !pm.includes(m));
     const cs = courses.filter(co => !modulesOfCourse(co.id).some(m => pm.includes(m)));
-    const cards = ms.map(moduleCardHTML).concat(cs.map(courseCardHTML));
+    const cards = ms.map(m => moduleCardHTML(m)).concat(cs.map(courseCardHTML));
     return cards.length ? railHTML(t('trending'), L('explore_sub2'), cards, '#/library') : '';
   };
   /* hero: whatever it features, say which course and module it belongs to, and open the next lesson */
@@ -505,7 +509,7 @@
       <div class="grid">${cl.map(courseCardHTML).join('')}</div>
       <h2 class="sect-h cur-sect">${L('lib_modules_h')}</h2><p class="page-sub" style="margin-top:2px">${L('lib_modules_sub')}</p>
       <div class="filter-row">${cats.map(c => `<button class="filter-chip ${c === libFilter ? 'active' : ''}" data-action="lib-filter" data-cat="${c}">${c === 'All' ? t('all') : catName(c)}</button>`).join('')}</div>
-      <div class="grid">${ml.map(moduleCardHTML).join('')}</div>
+      <div class="grid">${ml.map(m => moduleCardHTML(m)).join('')}</div>
       ${(() => { /* items outside the curriculum (e.g. made in Course Studio) still need a home */
         const extra = CATALOG.filter(c => !c.hidden && !modules.some(m => m.source === c.id) && (!q || (ctitle(c) + ' ' + (c.desc || '')).toLowerCase().includes(q)));
         return extra.length ? `<h2 class="sect-h cur-sect">${L('lib_other_h')}</h2><div class="grid">${extra.map(c => cardHTML(c)).join('')}</div>` : '';
