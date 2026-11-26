@@ -296,10 +296,9 @@
     const meta = lessonMeta(r.s, r.i), th = lThumb(r.s, r.i), did = `cl-${r.s}-${r.i}`;
     const sum = meta && meta.summary ? (PT() ? meta.summary.pt : meta.summary.en) : '';
     const chs = meta && Array.isArray(meta.chapters) ? meta.chapters : [];
-    /* round 6 gate: a lesson is open when it is done, or it is the first not-done lesson of its module */
-    /* optional lessons are always open and never block the required ones after them */
-    const firstOpen = m.lessons.find(x => !isOptional(m, x) && !lessonDone(x.s, x.i));
-    const locked = !done && !opt && r !== firstOpen;
+    /* 26 Nov 2026 (Sajid): any lesson plays in any order, like a film library. "Up next" still marks the
+       suggested one, and the certificate still needs every required lesson and its questions. */
+    const locked = false;
     return `<div class="cl ${done ? 'done' : ''} ${isNext ? 'current' : ''}${locked ? ' locked' : ''}">
       <button class="cl-main" ${locked ? 'disabled aria-disabled="true"' : `data-action="play" data-id="${r.s}" data-mod="${r.i}"`} aria-label="${L('lesson')} ${n}: ${esc(lTitle(r.s, r.i))}${done ? ' · ' + L('completed') : ''}${locked ? ' · 🔒' : ''}${b ? ` · ${b.score}/${b.total} ${L('questions')}` : ''}">
         <span class="cl-thumb"${th ? ` style="background-image:url('${th}')"` : ''}><span class="cl-len">${lMins(r.s, r.i)} min</span>${done ? '<span class="cl-tick" aria-hidden="true">✓</span>' : ''}</span>
@@ -546,16 +545,15 @@
     const pills = $('#playerPills');
     /* round 6 gate: a lesson opens only when every lesson before it in the module is completed (its questions
        answered). Done lessons and the current one stay open; nothing further can be skipped to. */
-    const firstOpen = m.lessons.find(r => !isOptional(m, r) && !lessonDone(r.s, r.i));
     const isCur = r => sameL(r, c.id, mod);
-    const reachable = r => isCur(r) || lessonDone(r.s, r.i) || isOptional(m, r) || r === firstOpen;
+    const reachable = () => true;   /* 26 Nov 2026: every lesson is open, in any order */
     if (pills) pills.innerHTML = m.lessons.map((r, n) => { const ok = reachable(r);
       return `<button class="mod-pill ${isCur(r) ? 'current' : lessonDone(r.s, r.i) ? 'done' : ''}${ok ? '' : ' locked'}" ${ok ? `data-action="play" data-id="${r.s}" data-mod="${r.i}"` : 'disabled aria-disabled="true"'}><span class="mp-n">${lessonDone(r.s, r.i) ? '✓ ' : ok ? '' : '🔒 '}${n + 1}</span> ${esc(lTitle(r.s, r.i))}</button>`; }).join('');
     const seq = lessonSeq(co.id), at = seq.findIndex(x => x.m === m && sameL(x, c.id, mod)), prev = seq[at - 1], next = seq[at + 1];
     let nav = $('#curPlNav');
     if (!nav) { nav = document.createElement('div'); nav.id = 'curPlNav'; nav.className = 'cur-pl-nav'; const pb = document.querySelector('.player-bottom'); if (pb) pb.insertBefore(nav, pb.firstChild); }
     nav.innerHTML = `<button class="pl-ic" ${prev ? `data-action="play" data-id="${prev.s}" data-mod="${prev.i}"` : 'disabled'} aria-label="${L('prev')}" title="${L('prev')}">‹</button>
-      <button class="pl-ic" ${next && lessonDone(c.id, mod) ? `data-action="play" data-id="${next.s}" data-mod="${next.i}"` : 'disabled'} aria-label="${L('next')}" title="${next && next.m !== m ? L('next_module') : L('next')}">›</button>`;
+      <button class="pl-ic" ${next ? `data-action="play" data-id="${next.s}" data-mod="${next.i}"` : 'disabled'} aria-label="${L('next')}" title="${next && next.m !== m ? L('next_module') : L('next')}">›</button>`;
   };
 
   /* ---------- end of a lesson: the next lesson in curriculum order, no overview screens between ---------- */
