@@ -932,15 +932,16 @@ const CURRICULUM = {
             'trust-journey:1'],                                              /* 10 Promises Kept */
           pt: { outcome: 'Estar acima da linha, assumir o resultado e cumprir a sua palavra.' } },
         { id: 'growth-journey', covers: ['growth-journey'], cats: ['everyone', 'land', 'building', 'hospitality', 'animals', 'office'],
-          title: 'The Growth Journey', outcome: 'Move beyond fear, find your purpose and understand what drives you.',
+          title: 'The Growth Journey', outcome: 'Find your purpose, understand what drives you and move beyond fear.',
           poster: 'media/covers/growth-module.webp', heroArt: 'media/covers/growth-journey-hero.webp',
-          lessons: ['alignment-journey:2', 'alignment-journey:3', 'alignment-journey:4',   /* 1-3  Beyond Fear · Intro, Animation, Unpack & Summary */
-            'growth-journey:2',                                              /* 4  Kaizen */
-            'growth-journey:0',                                              /* 5  Ultimate Purpose */
-            'growth-journey:3',                                              /* 6  Winning Beliefs */
-            'alignment-journey:5', 'alignment-journey:6',                    /* 7-8  Body, Soul & Spirit · Intro, Deep Dive */
-            'growth-journey:4', 'growth-journey:9'],                         /* 9-10 Six Core Human Needs · Master Your Reactions, Know Your Drive */
-          pt: { title: 'A Jornada de Crescimento', outcome: 'Ir para além do medo, encontrar o seu propósito e perceber o que o move.' } }
+          /* order from the lesson review, 27 Nov 2026 */
+          lessons: ['growth-journey:0',                                      /* 1  Ultimate Purpose */
+            'growth-journey:3',                                              /* 2  Winning Beliefs */
+            'growth-journey:4', 'growth-journey:9',                          /* 3-4  Six Core Human Needs · Master Your Reactions, Know Your Drive */
+            'growth-journey:2',                                              /* 5  Kaizen */
+            'alignment-journey:2', 'alignment-journey:3', 'alignment-journey:4',   /* 6-8  Beyond Fear · Intro, Animation, Unpack & Summary */
+            'alignment-journey:5', 'alignment-journey:6'],                   /* 9-10 Body, Soul & Spirit · Intro, Deep Dive */
+          pt: { title: 'A Jornada de Crescimento', outcome: 'Encontrar o seu propósito, perceber o que o move e ir para além do medo.' } }
       ],
       pt: {
         title: 'Fundamentos ADEN',

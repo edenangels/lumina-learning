@@ -169,7 +169,6 @@
           const openRows = [...document.querySelectorAll('.cl-more.on')].map(b => b.getAttribute('aria-controls'));
           render();
           requestAnimationFrame(() => {
-            document.querySelectorAll('details.cur-module').forEach((d, k) => { if (openMods[k] != null) d.open = openMods[k]; });
             openRows.forEach(id => { const b = document.querySelector(`.cl-more[aria-controls="${id}"]`), d = document.getElementById(id); if (b && d) { d.hidden = false; b.classList.add('on'); b.setAttribute('aria-expanded', 'true'); } });
           });
         }
@@ -313,6 +312,8 @@
   }
 
   /* ---------- course overview ---------- */
+  const modOpen = {};   /* module id → open? as the learner left it */
+  document.addEventListener('toggle', e => { const d = e.target; if (d && d.matches && d.matches('details.cur-module') && d.dataset.mid && d.isConnected) modOpen[d.dataset.mid] = d.open; }, true);
   function renderCourseOverview(id) {
     const co = courseOf(id); if (!co) return null;
     const ms = modulesOfCourse(id); if (!ms.length) return null;   /* a course whose modules all failed to resolve */
@@ -362,7 +363,10 @@
       <div class="rail-head" style="margin-top:14px;"><h2>${L('courses') === 'Cursos' ? 'Módulos' : 'Modules'}</h2></div>
       <div class="cur-modules">${ms.map((m, k) => {
         const s = moduleStats(m);
-        return `<details class="cur-module"${s.done && !s.complete ? ' open' : (k === 0 && !st.done ? ' open' : '')}>
+        /* what the learner opened or closed stays that way through every redraw (coming back from a lesson
+           redraws the page); only a module they never touched falls back to the default */
+        const isOpen = m.id in modOpen ? modOpen[m.id] : (s.done && !s.complete) || (k === 0 && !st.done);
+        return `<details class="cur-module" data-mid="${m.id}"${isOpen ? ' open' : ''}>
           <summary><span class="cur-mnum">${s.complete ? '✓' : k + 1}</span><span class="cur-mtitle"><b>${esc(mTitle(m))}</b><small>${esc(mOutcome(m))}</small></span>
             <span class="cur-mmeta">${s.lessons} ${s.lessons === 1 ? L('lesson_one') : L('lessons_lc')} · ${fmtMins(s.mins)}${s.done ? ` · ${s.pct}%` : ''}</span></summary>
           <div class="module-list cur-inner">${m.lessons.map((r, n) => lessonRowHTML(m, r, n + 1)).join('')}</div>
@@ -538,6 +542,7 @@
   function lessonSeq(courseId) { return modulesOfCourse(courseId).flatMap(m => m.lessons.map(r => ({ m, r, s: r.s, i: r.i }))); }
   window.curPlayer = (c, mod) => {
     const m = moduleOfLesson(c.id, mod); if (!m) return;
+    modOpen[m.id] = true;   /* going back lands on this lesson's module, open */
     const co = courseOf(m.courseId), pos = m.lessons.findIndex(r => sameL(r, c.id, mod));
     const pt = $('#playerTitle'), ps = $('#playerSub');
     if (pt) pt.innerHTML = `<a href="#/course/${co.id}" class="cur-pl-link" data-action="cur-pl-go" data-route="#/course/${co.id}">${esc(cTitle(co))}</a> <span aria-hidden="true">›</span> <a href="#/module/${m.id}" class="cur-pl-link" data-action="cur-pl-go" data-route="#/module/${m.id}">${esc(mTitle(m))}</a>`;
